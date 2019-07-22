@@ -1,7 +1,17 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Go4Lunch</string>
 
     <!-- Used for Connexion -->
-    <string name="homeConnexion">Find a nice restaurant and invite your co-workers for launch!</string>
+    <string name="homeConnection">Find a nice restaurant and invite your co-workers for launch!</string>
+    <string name="connection">Connection</string>
+    <string name="connection_succeed">Successful authentication</string>
+    <string name="error_authentication_canceled">Authentication canceled</string>
+    <string name="error_no_internet">No internet connection!</string>
+    <string name="error_unknown_error">An unknown error has occurred</string>
+
+    <!-- Facebook Purpose -->
+    <string name="facebook_application_id" translatable="false">468791053912314</string>
+    <string name="facebook_login_protocol_scheme" translatable="false"
+        tools:ignore="UnusedResources">fb468791053912314</string>
 
 </resources>

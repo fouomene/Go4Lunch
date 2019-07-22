@@ -27,6 +27,18 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // Firebase
+    implementation 'com.google.android.material:material:1.0.0'
+
+    // FIREBASE
     implementation 'com.google.firebase:firebase-core:17.0.1'
+
+    // Firebase UI
+    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+
+    // Firebase Authentication
+    implementation 'com.google.firebase:firebase-auth:18.1.0'
+
+    // FACEBOOK LOGIN SUPPORT
+    implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
+
 }
