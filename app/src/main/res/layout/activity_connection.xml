@@ -5,8 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ConnectionActivity"
+    tools:context=".activities.ConnectionActivity"
     android:id="@+id/connexion_activity_layout">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/lunch_photo_portrait" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/connexion_activity_guideline"
@@ -21,7 +26,6 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:text="@string/app_name"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/connexion_activity_text-home_connexion" />
@@ -35,15 +39,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/connexion_activity_guideline" />
-
-    <Button
-        android:id="@+id/connexion_activity_button_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connexion_activity_guideline"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

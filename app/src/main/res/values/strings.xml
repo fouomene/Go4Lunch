@@ -11,7 +11,15 @@
 
     <!-- Facebook Purpose -->
     <string name="facebook_application_id" translatable="false">468791053912314</string>
-    <string name="facebook_login_protocol_scheme" translatable="false"
-        tools:ignore="UnusedResources">fb468791053912314</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb468791053912314</string>
+
+    <!--NavigationDrawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Bottom Navigation View -->
+    <string name="mapView">Map View</string>
+    <string name="listView">List View</string>
+    <string name="workmates">Workmates</string>
 
 </resources>
