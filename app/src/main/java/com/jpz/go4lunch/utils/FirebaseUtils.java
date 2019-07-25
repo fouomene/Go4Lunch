@@ -7,6 +7,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FirebaseUtils {
 
+    // Method to have the Firebase instance
+    public FirebaseAuth authGetInstance() {
+        return FirebaseAuth.getInstance();
+    }
+
     // Method to recover the user currently connected
     @Nullable
     public FirebaseUser getCurrentUser(){
@@ -18,5 +23,9 @@ public class FirebaseUtils {
         return (getCurrentUser() != null);
     }
 
+    // Method to sin out the user currently connected
+    public void userLogout() {
+        FirebaseAuth.getInstance().signOut();
+    }
 
 }

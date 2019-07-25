@@ -17,6 +17,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="info_no_email_found">No email found</string>
+    <string name="info_no_username_found">No username found</string>
+
     <!-- Bottom Navigation View -->
     <string name="mapView">Map View</string>
     <string name="listView">List View</string>

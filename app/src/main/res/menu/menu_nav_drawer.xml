@@ -14,7 +14,7 @@
             android:checkable="false" />
         <item
             android:id="@+id/nav_drawer_logout"
-            android:title="lOG OUT"
+            android:title="LOG OUT"
             android:checkable="false" />
     </group>
 
