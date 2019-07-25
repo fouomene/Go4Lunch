@@ -6,38 +6,132 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.ConnectionActivity"
-    android:id="@+id/connexion_activity_layout">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@mipmap/lunch_photo_portrait" />
+    android:id="@+id/connection_activity_layout">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/connexion_activity_guideline"
+        android:id="@+id/connection_activity_horizontal_guideline_five"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_horizontal_guideline_fifty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5"/>
 
-    <TextView
-        android:id="@+id/connexion_activity_text-app-name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:text="@string/app_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/connexion_activity_text-home_connexion" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_horizontal_guideline_ninety"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_vertical_guideline_ten"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_vertical_guideline_thirty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_vertical_guideline_eighty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/connection_activity_vertical_guideline_ninety"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/lunch_photo_portrait"
+        android:contentDescription="@string/businessLunch"/>
+
+    <ImageView
+        android:id="@+id/connection_activity_bowl"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foregroundGravity="bottom"
+        android:scaleType="fitEnd"
+        android:src="@mipmap/ic_white_bowl"
+        app:layout_constraintVertical_weight="5"
+        app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
+        app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_eighty"
+        app:layout_constraintTop_toTopOf="@id/connection_activity_horizontal_guideline_five"
+        app:layout_constraintBottom_toTopOf="@+id/connection_activity_text_app_name"
+        android:contentDescription="@string/hotFoodInABowl"/>
 
     <TextView
-        android:id="@+id/connexion_activity_text-home_connexion"
-        android:layout_width="wrap_content"
+        android:id="@+id/connection_activity_text_app_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textAlignment="gravity"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:text="@string/app_name"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintVertical_weight="2"
+        app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
+        app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
+        app:layout_constraintTop_toBottomOf="@id/connection_activity_bowl"
+        app:layout_constraintBottom_toTopOf="@+id/connection_activity_text_home"/>
+
+    <TextView
+        android:id="@+id/connection_activity_text_home"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAlignment="center"
+        android:maxLines="1"
         android:text="@string/homeConnection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/connexion_activity_guideline" />
+        android:textColor="@android:color/white"
+        android:textStyle="italic"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
+        app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
+        app:layout_constraintTop_toBottomOf="@+id/connection_activity_text_app_name"
+        app:layout_constraintBottom_toTopOf="@+id/connection_activity_horizontal_guideline_fifty" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/connection_activity_facebook_login"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:elevation="2dp"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
+        app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
+        app:layout_constraintBottom_toTopOf="@+id/connection_activity_google_login"
+        tools:targetApi="LOLLIPOP"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/connection_activity_google_login"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:buttonSize="wide"
+        android:layout_marginTop="30dp"
+        app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
+        app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
+        app:layout_constraintBottom_toBottomOf="@+id/connection_activity_horizontal_guideline_ninety"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

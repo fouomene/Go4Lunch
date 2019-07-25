@@ -22,4 +22,8 @@
     <string name="listView">List View</string>
     <string name="workmates">Workmates</string>
 
+    <!-- ImageViews (contentDescription) -->
+    <string name="businessLunch">Business lunch</string>
+    <string name="hotFoodInABowl">Hot food in a bowl</string>
+
 </resources>

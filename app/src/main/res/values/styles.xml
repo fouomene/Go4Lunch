@@ -8,9 +8,4 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- Connection Screen Theme -->
-    <style name="AppTheme.Connection">
-        <item name="android:windowBackground">@mipmap/lunch_photo_portrait</item>
-    </style>
-
 </resources>
