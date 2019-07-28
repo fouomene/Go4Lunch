@@ -20,6 +20,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="yourLunch">YOUR LUNCH</string>
+    <string name="settings">SETTINGS</string>
+    <string name="logOut">LOGOUT</string>
+
     <string name="info_no_email_found">No email found</string>
     <string name="info_no_username_found">No username found</string>
 
@@ -31,5 +35,6 @@
     <!-- ImageViews (contentDescription) -->
     <string name="businessLunch">Business lunch</string>
     <string name="hotFoodInABowl">Hot food in a bowl</string>
+    <string name="photoProfile">Photo profile</string>
 
 </resources>

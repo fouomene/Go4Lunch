@@ -13,11 +13,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -41,8 +44,9 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNav;
-    private TextView nameText;
-    private TextView emailText;
+    private TextView nameProfile;
+    private TextView emailProfile;
+    private ImageView photoProfile;
 
     // User profile
     private String username;
@@ -96,8 +100,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         // For Nav Header
         View headerView = navigationView.getHeaderView(0);
-        nameText = headerView.findViewById(R.id.nav_header_name);
-        emailText = headerView.findViewById(R.id.nav_header_email);
+        nameProfile = headerView.findViewById(R.id.nav_header_name);
+        emailProfile = headerView.findViewById(R.id.nav_header_email);
+        photoProfile = headerView.findViewById(R.id.nav_header_photo);
         updateUserProfile();
     }
 
@@ -157,7 +162,7 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "settings", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_drawer_logout:
-                // Log out from Firebase & Facebook
+                // Log out from Firebase & Facebook LoginManager
                 firebaseUtils.userLogout();
                 LoginManager.getInstance().logOut();
                 startConnectionActivity();
@@ -175,6 +180,15 @@ public class MainActivity extends AppCompatActivity
     // Update the user profile in the Nav Drawer Header
     private void updateUserProfile() {
         if (user != null) {
+
+            //Get picture URL from Firebase
+            if (user.getPhotoUrl() != null) {
+                Glide.with(this)
+                        .load(user.getPhotoUrl())
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(photoProfile);
+            }
+
             //Get username & email from Firebase
             username = TextUtils.isEmpty(user.getDisplayName()) ?
                     getString(R.string.info_no_username_found) : user.getDisplayName();
@@ -185,8 +199,8 @@ public class MainActivity extends AppCompatActivity
             Log.i("MainActivity", "email = " + user.getEmail());
         }
         //Update views with data
-        nameText.setText(username);
-        emailText.setText(email);
+        nameProfile.setText(username);
+        emailProfile.setText(email);
     }
 
     private void startConnectionActivity() {

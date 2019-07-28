@@ -6,16 +6,16 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_drawer_lunch"
-            android:title="YOUR LUNCH"
-            android:checkable="false" />
+            android:icon="@drawable/ic_local_dining"
+            android:title="@string/yourLunch" />
         <item
             android:id="@+id/nav_drawer_settings"
-            android:title="SETTINGS"
-            android:checkable="false" />
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings" />
         <item
             android:id="@+id/nav_drawer_logout"
-            android:title="LOG OUT"
-            android:checkable="false" />
+            android:icon="@drawable/ic_power_settings_new"
+            android:title="@string/logOut" />
     </group>
 
 </menu>
