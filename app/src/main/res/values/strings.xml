@@ -9,12 +9,11 @@
     <string name="authentication_succeed">Successful authentication</string>
     <string name="authentication_failed">Authentication failed</string>
 
-    <string name="error_authentication_canceled">Authentication canceled</string>
-    <string name="error_no_internet">No internet connection!</string>
-    <string name="error_unknown_error">An unknown error has occurred</string>
-
     <!-- Connection Layout -->
     <string name="homeConnection">Find a nice restaurant and invite your co-workers for launch!</string>
+
+    <!-- Request Permissions -->
+    <string name="popup_title_permission_files_access">This application needs to access your site to work.</string>
 
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>

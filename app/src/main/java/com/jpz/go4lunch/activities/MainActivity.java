@@ -25,7 +25,7 @@ import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
-import com.jpz.go4lunch.fragments.MapFragment;
+import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity
         configureNavigationView();
         configureBottomView();
 
-        // Open the view with MapFragment by default
+        // Open the view with RestaurantMapFragment by default
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new MapFragment()).commit();
+                new RestaurantMapFragment()).commit();
 
         // Update the user profile in the Nav Drawer
         //updateUserProfile();
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
                 // Check the fragment selected
                 switch (menuItem.getItemId()) {
                     case R.id.nav_map:
-                        selectedFragment = new MapFragment();
+                        selectedFragment = new RestaurantMapFragment();
                         break;
                     case R.id.nav_list:
                         selectedFragment = new RestaurantListFragment();
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity
                         selectedFragment = new WorkmatesFragment();
                         break;
                     default:
-                        selectedFragment = new MapFragment();
+                        selectedFragment = new RestaurantMapFragment();
 
                 }
                 // Add it to FrameLayout fragment_container

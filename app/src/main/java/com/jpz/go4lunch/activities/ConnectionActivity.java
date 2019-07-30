@@ -2,7 +2,6 @@ package com.jpz.go4lunch.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.firebase.ui.auth.ErrorCodes;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,7 +35,6 @@ import com.jpz.go4lunch.utils.FirebaseUtils;
 
 public class ConnectionActivity extends AppCompatActivity {
 
-    private ConstraintLayout constraintLayout;
     public ProgressBar progressBar;
 
     // Identifier for Google Sign-In Activity
@@ -60,8 +56,6 @@ public class ConnectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
-
-        constraintLayout = findViewById(R.id.connection_activity_layout);
 
         progressBar = findViewById(R.id.progress_bar);
 
@@ -164,7 +158,6 @@ public class ConnectionActivity extends AppCompatActivity {
      */
     private void handleFacebookAccessToken(AccessToken token) {
         Log.i(FACEBOOK_TAG, "handleFacebookAccessToken:" + token);
-        // showProgressDialog();
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         auth.signInWithCredential(credential)
@@ -174,15 +167,12 @@ public class ConnectionActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.i(FACEBOOK_TAG, "signInWithCredential:success");
-                            //showSnackBar(getString(R.string.authentication_succeed));
                             startMainActivity();
                             finish();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(FACEBOOK_TAG, "signInWithCredential:failure", task.getException());
-                            //showSnackBar(getString(R.string.authentication_failed));
                         }
-                        // hideProgressDialog();
                     }
                 });
     }
@@ -202,7 +192,6 @@ public class ConnectionActivity extends AppCompatActivity {
      */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.i(GOOGLE_TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        // showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         auth.signInWithCredential(credential)
@@ -212,7 +201,6 @@ public class ConnectionActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.i(GOOGLE_TAG, "signInWithCredential:success");
-                            //showSnackBar(getString(R.string.authentication_succeed));
                             startMainActivity();
                             finish();
                         } else {
@@ -220,7 +208,6 @@ public class ConnectionActivity extends AppCompatActivity {
                             Log.w(GOOGLE_TAG, "signInWithCredential:failure", task.getException());
                             showSnackBar(getString(R.string.authentication_failed));
                         }
-                        // hideProgressDialog();
                     }
                 });
     }
@@ -234,37 +221,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
     // Show Snack Bar with a message
     private void showSnackBar(String message){
-        Snackbar.make(constraintLayout, message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
-
-
-    /*
-
-    // Method that handles response after SignIn Activity close
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) { // SUCCESS
-                showSnackBar(getString(R.string.connection_succeed));
-                startMainActivity();
-            } else { // ERRORS
-                if (response == null) {
-                    showSnackBar(getString(R.string.error_authentication_canceled));
-                } else {
-                    if (response.getError() != null) {
-                        if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                            showSnackBar(getString(R.string.error_no_internet));
-                        } if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                            showSnackBar(getString(R.string.error_unknown_error));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    */
 
 }

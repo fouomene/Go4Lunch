@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.ConnectionActivity"
-    android:id="@+id/connection_activity_layout">
+    tools:context=".activities.ConnectionActivity">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/connection_activity_horizontal_guideline_five"
