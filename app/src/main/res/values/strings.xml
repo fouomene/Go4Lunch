@@ -8,6 +8,9 @@
     <!-- Used for Connexion -->
     <string name="authentication_succeed">Successful authentication</string>
     <string name="authentication_failed">Authentication failed</string>
+    <string name="connexionFailure">Connexion failure</string>
+    <string name="accountExists">Account exists with different credential</string>
+    <string name="signInCancelled">Sign in cancelled</string>
 
     <!-- Connection Layout -->
     <string name="homeConnection">Find a nice restaurant and invite your co-workers for launch!</string>

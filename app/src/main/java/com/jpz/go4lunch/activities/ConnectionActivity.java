@@ -14,6 +14,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -25,10 +26,12 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.utils.FirebaseUtils;
@@ -37,8 +40,9 @@ public class ConnectionActivity extends AppCompatActivity {
 
     public ProgressBar progressBar;
 
-    // Identifier for Google Sign-In Activity
-    public static final int RC_SIGN_IN = 9001;
+    // Identifier for Google and Facebook Sign-In
+    public static final int RC_GOOGLE_SIGN_IN = 9001;
+    private static int RC_FACEBOOK_SIGN_IN;
 
     private static final String FACEBOOK_TAG = "FacebookLogin";
     private static final String GOOGLE_TAG = "GoogleActivity";
@@ -49,7 +53,9 @@ public class ConnectionActivity extends AppCompatActivity {
     // Declare Firebase authentication
     private FirebaseAuth auth;
 
+    // Callback Manager for Facebook purpose
     private CallbackManager callbackManager;
+    // For Google SignIn
     private GoogleSignInClient googleSignInClient;
 
     @Override
@@ -81,14 +87,21 @@ public class ConnectionActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
                 Log.i(FACEBOOK_TAG, "facebook:onCancel");
+                showSnackBar(getString(R.string.signInCancelled));
             }
 
             @Override
             public void onError(FacebookException error) {
                 Log.w(FACEBOOK_TAG, "facebook:onError", error);
-                showSnackBar(getString(R.string.authentication_failed));
+                if (error.toString().equals("CONNECTION_FAILURE: CONNECTION_FAILURE"))
+                    showSnackBar(getString(R.string.connexionFailure));
+                else
+                    showSnackBar(getString(R.string.authentication_failed));
             }
         });
+
+        RC_FACEBOOK_SIGN_IN = facebookLogin.getRequestCode();
+        Log.i(FACEBOOK_TAG, "facebook : requestCode :" + RC_FACEBOOK_SIGN_IN);
 
         //--------------------------------------------------------------------------------------
         // For Google Authentication
@@ -131,7 +144,7 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("Tag", "onActivityResult : " + requestCode + ":" + resultCode + ":" + data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
@@ -141,8 +154,16 @@ public class ConnectionActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(GOOGLE_TAG, "Google sign in failed", e);
+                Log.i(GOOGLE_TAG, "signInResult:failed code=" + e.getStatusCode());
+                if (e.getStatusCode() == 12501)
+                    showSnackBar(getString(R.string.signInCancelled));
+                else if (e.getStatusCode() == 7)
+                    showSnackBar(getString(R.string.connexionFailure));
+                else
+                    showSnackBar(getString(R.string.authentication_failed));
+                //showSnackBar(getString(R.string.authentication_failed));
             }
-        } else {
+        } else if (requestCode == RC_FACEBOOK_SIGN_IN){
             // Pass the activity result back to the Facebook SDK
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
@@ -156,7 +177,7 @@ public class ConnectionActivity extends AppCompatActivity {
     get an access token for the signed-in user, exchange it for a Firebase credential,
     and authenticate with Firebase using the Firebase credential
      */
-    private void handleFacebookAccessToken(AccessToken token) {
+    private void handleFacebookAccessToken(@NonNull AccessToken token) {
         Log.i(FACEBOOK_TAG, "handleFacebookAccessToken:" + token);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
@@ -172,6 +193,19 @@ public class ConnectionActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(FACEBOOK_TAG, "signInWithCredential:failure", task.getException());
+                            try {
+                                if (task.getException() != null)
+                                    throw task.getException();
+                                } catch(FirebaseAuthUserCollisionException e) {
+                                // If account already exists, logout from Facebook provider
+                                showSnackBar(getString(R.string.accountExists));
+                                LoginManager.getInstance().logOut();
+                            } catch(FirebaseNetworkException e) {
+                                showSnackBar(getString(R.string.connexionFailure));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                showSnackBar(getString(R.string.authentication_failed));
+                            }
                         }
                     }
                 });
@@ -183,14 +217,14 @@ public class ConnectionActivity extends AppCompatActivity {
     // Starting the intent prompts the user to select a Google account to sign in with
     private void googleSignIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
     }
 
     /*
     After a user successfully signs in, get an ID token from the GoogleSignInAccount object,
     exchange it for a Firebase credential, and authenticate with Firebase using the Firebase credential
      */
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(@NonNull GoogleSignInAccount acct) {
         Log.i(GOOGLE_TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -206,13 +240,25 @@ public class ConnectionActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(GOOGLE_TAG, "signInWithCredential:failure", task.getException());
-                            showSnackBar(getString(R.string.authentication_failed));
+                            //showSnackBar(getString(R.string.authentication_failed));
+                            try {
+                                if (task.getException() != null)
+                                    throw task.getException();
+                            } catch(FirebaseAuthUserCollisionException e) {
+                                showSnackBar(getString(R.string.accountExists));
+                            } catch(FirebaseNetworkException e) {
+                                showSnackBar(getString(R.string.connexionFailure));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                showSnackBar(getString(R.string.authentication_failed));
+                            }
                         }
                     }
                 });
     }
 
     //--------------------------------------------------------------------------------------
+    // Privates methods for UI and Utils
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
@@ -221,7 +267,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
     // Show Snack Bar with a message
     private void showSnackBar(String message){
-        Snackbar.make(findViewById(R.id.content), message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
 
 }

@@ -25,6 +25,7 @@ import com.facebook.login.LoginManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
@@ -162,9 +163,16 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "settings", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_drawer_logout:
-                // Log out from Firebase & Facebook LoginManager
+                // Check if the user is logged in with Facebook...
+                for (UserInfo user: user.getProviderData()) {
+                    if (user.getProviderId().equals("facebook.com")) {
+                        Log.i("Tag", "provider in loop " + user.getProviderId());
+                        // ... then, in this case, logout from Facebook
+                        LoginManager.getInstance().logOut();
+                    }
+                }
+                // Log out from Firebase
                 firebaseUtils.userLogout();
-                LoginManager.getInstance().logOut();
                 startConnectionActivity();
                 finish();
                 break;
