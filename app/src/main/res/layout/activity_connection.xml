@@ -135,4 +135,15 @@
         app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
         app:layout_constraintBottom_toBottomOf="@+id/connection_activity_horizontal_guideline_ninety"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.65"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

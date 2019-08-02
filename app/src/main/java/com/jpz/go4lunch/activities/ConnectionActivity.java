@@ -38,7 +38,7 @@ import com.jpz.go4lunch.utils.FirebaseUtils;
 
 public class ConnectionActivity extends AppCompatActivity {
 
-    public ProgressBar progressBar;
+    private ProgressBar progressBar;
 
     // Identifier for Google and Facebook Sign-In
     public static final int RC_GOOGLE_SIGN_IN = 9001;
@@ -161,7 +161,6 @@ public class ConnectionActivity extends AppCompatActivity {
                     showSnackBar(getString(R.string.connexionFailure));
                 else
                     showSnackBar(getString(R.string.authentication_failed));
-                //showSnackBar(getString(R.string.authentication_failed));
             }
         } else if (requestCode == RC_FACEBOOK_SIGN_IN){
             // Pass the activity result back to the Facebook SDK
@@ -179,6 +178,7 @@ public class ConnectionActivity extends AppCompatActivity {
      */
     private void handleFacebookAccessToken(@NonNull AccessToken token) {
         Log.i(FACEBOOK_TAG, "handleFacebookAccessToken:" + token);
+        progressBar.setVisibility(View.VISIBLE);
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         auth.signInWithCredential(credential)
@@ -207,6 +207,7 @@ public class ConnectionActivity extends AppCompatActivity {
                                 showSnackBar(getString(R.string.authentication_failed));
                             }
                         }
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
@@ -226,6 +227,7 @@ public class ConnectionActivity extends AppCompatActivity {
      */
     private void firebaseAuthWithGoogle(@NonNull GoogleSignInAccount acct) {
         Log.i(GOOGLE_TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        progressBar.setVisibility(View.VISIBLE);
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         auth.signInWithCredential(credential)
@@ -240,7 +242,6 @@ public class ConnectionActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(GOOGLE_TAG, "signInWithCredential:failure", task.getException());
-                            //showSnackBar(getString(R.string.authentication_failed));
                             try {
                                 if (task.getException() != null)
                                     throw task.getException();
@@ -253,6 +254,7 @@ public class ConnectionActivity extends AppCompatActivity {
                                 showSnackBar(getString(R.string.authentication_failed));
                             }
                         }
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
     }
