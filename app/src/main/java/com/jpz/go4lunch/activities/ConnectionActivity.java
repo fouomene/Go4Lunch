@@ -87,14 +87,14 @@ public class ConnectionActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
                 Log.i(FACEBOOK_TAG, "facebook:onCancel");
-                showSnackBar(getString(R.string.signInCancelled));
+                showSnackBar(getString(R.string.sign_in_cancelled));
             }
 
             @Override
             public void onError(FacebookException error) {
                 Log.w(FACEBOOK_TAG, "facebook:onError", error);
                 if (error.toString().equals("CONNECTION_FAILURE: CONNECTION_FAILURE"))
-                    showSnackBar(getString(R.string.connexionFailure));
+                    showSnackBar(getString(R.string.connexion_failure));
                 else
                     showSnackBar(getString(R.string.authentication_failed));
             }
@@ -156,9 +156,9 @@ public class ConnectionActivity extends AppCompatActivity {
                 Log.w(GOOGLE_TAG, "Google sign in failed", e);
                 Log.i(GOOGLE_TAG, "signInResult:failed code=" + e.getStatusCode());
                 if (e.getStatusCode() == 12501)
-                    showSnackBar(getString(R.string.signInCancelled));
+                    showSnackBar(getString(R.string.sign_in_cancelled));
                 else if (e.getStatusCode() == 7)
-                    showSnackBar(getString(R.string.connexionFailure));
+                    showSnackBar(getString(R.string.connexion_failure));
                 else
                     showSnackBar(getString(R.string.authentication_failed));
             }
@@ -198,10 +198,10 @@ public class ConnectionActivity extends AppCompatActivity {
                                     throw task.getException();
                                 } catch(FirebaseAuthUserCollisionException e) {
                                 // If account already exists, logout from Facebook provider
-                                showSnackBar(getString(R.string.accountExists));
+                                showSnackBar(getString(R.string.account_exists));
                                 LoginManager.getInstance().logOut();
                             } catch(FirebaseNetworkException e) {
-                                showSnackBar(getString(R.string.connexionFailure));
+                                showSnackBar(getString(R.string.connexion_failure));
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 showSnackBar(getString(R.string.authentication_failed));
@@ -246,9 +246,9 @@ public class ConnectionActivity extends AppCompatActivity {
                                 if (task.getException() != null)
                                     throw task.getException();
                             } catch(FirebaseAuthUserCollisionException e) {
-                                showSnackBar(getString(R.string.accountExists));
+                                showSnackBar(getString(R.string.account_exists));
                             } catch(FirebaseNetworkException e) {
-                                showSnackBar(getString(R.string.connexionFailure));
+                                showSnackBar(getString(R.string.connexion_failure));
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 showSnackBar(getString(R.string.authentication_failed));

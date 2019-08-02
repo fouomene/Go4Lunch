@@ -7,7 +7,7 @@
         <item
             android:id="@+id/nav_drawer_lunch"
             android:icon="@drawable/ic_local_dining"
-            android:title="@string/yourLunch" />
+            android:title="@string/your_lunch" />
         <item
             android:id="@+id/nav_drawer_settings"
             android:icon="@drawable/ic_settings"
@@ -15,7 +15,7 @@
         <item
             android:id="@+id/nav_drawer_logout"
             android:icon="@drawable/ic_power_settings_new"
-            android:title="@string/logOut" />
+            android:title="@string/log_out" />
     </group>
 
 </menu>

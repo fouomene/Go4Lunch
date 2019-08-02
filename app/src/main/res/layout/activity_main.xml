@@ -84,7 +84,7 @@
                 app:layout_constraintStart_toStartOf="@+id/main_activity_guideline_twenty"
                 app:layout_constraintEnd_toEndOf="@+id/main_activity_guideline_eighty"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:contentDescription="@string/hotFoodInABowl" />
+                android:contentDescription="@string/hot_food_in_a_bowl" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

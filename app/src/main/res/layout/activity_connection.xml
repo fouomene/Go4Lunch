@@ -61,7 +61,7 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/lunch_photo_portrait"
-        android:contentDescription="@string/businessLunch"/>
+        android:contentDescription="@string/business_lunch"/>
 
     <ImageView
         android:id="@+id/connection_activity_bowl"
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="@+id/connection_activity_vertical_guideline_eighty"
         app:layout_constraintTop_toTopOf="@id/connection_activity_horizontal_guideline_five"
         app:layout_constraintBottom_toTopOf="@+id/connection_activity_text_app_name"
-        android:contentDescription="@string/hotFoodInABowl"/>
+        android:contentDescription="@string/hot_food_in_a_bowl"/>
 
     <TextView
         android:id="@+id/connection_activity_text_app_name"
@@ -92,15 +92,15 @@
         app:layout_constraintStart_toStartOf="@id/connection_activity_vertical_guideline_ten"
         app:layout_constraintEnd_toEndOf="@id/connection_activity_vertical_guideline_ninety"
         app:layout_constraintTop_toBottomOf="@id/connection_activity_bowl"
-        app:layout_constraintBottom_toTopOf="@+id/connection_activity_text_home"/>
+        app:layout_constraintBottom_toTopOf="@+id/connection_activity_home_text"/>
 
     <TextView
-        android:id="@+id/connection_activity_text_home"
+        android:id="@+id/connection_activity_home_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:maxLines="1"
-        android:text="@string/homeConnection"
+        android:text="@string/home_text"
         android:textColor="@android:color/white"
         android:textStyle="italic"
         app:autoSizeTextType="uniform"
