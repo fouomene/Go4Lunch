@@ -7,6 +7,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,8 +33,14 @@ import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
+import pub.devrel.easypermissions.EasyPermissions;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // Static data for ACCESS_FINE_LOCATION
+    public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
+    public static final int RC_LOCATION = 123;
 
     // FirebaseUtils class
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
@@ -68,12 +75,14 @@ public class MainActivity extends AppCompatActivity
         configureNavigationView();
         configureBottomView();
 
-        // Open the view with RestaurantMapFragment by default
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new RestaurantMapFragment()).commit();
+        // Request permission when starting MainActivity which contains Google Maps services
+        EasyPermissions.requestPermissions(this,
+                getString(R.string.permission_location_access), RC_LOCATION, PERMS);
 
-        // Update the user profile in the Nav Drawer
-        //updateUserProfile();
+        // Open the view with RestaurantMapFragment if permissions were already allowed
+        if (EasyPermissions.hasPermissions(this, PERMS))
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new RestaurantMapFragment()).commit();
     }
 
     //----------------------------------------------------------------------------------
@@ -216,4 +225,20 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    //----------------------------------------------------------------------------------
+    // Easy Permissions
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+
+        // If there isn't permission, wait for the user to allow permissions before starting...
+        // ...RestaurantMapFragment and geolocate it at the opening with the method in the fragment
+        if (EasyPermissions.hasPermissions(this, PERMS))
+            // Open the view with RestaurantMapFragment
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new RestaurantMapFragment()).commit();
+    }
 }

@@ -16,7 +16,7 @@
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
 
     <!-- Request Permissions -->
-    <string name="popup_title_permission_files_access">This application needs to access your site to work.</string>
+    <string name="permission_location_access">This application needs to access your site to work.</string>
 
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
