@@ -68,7 +68,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
 
         mMapView = view.findViewById(R.id.map_view);
@@ -183,7 +183,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        if (getActivity() != null) {
+        if (getActivity() != null)
             try {
                 if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
@@ -223,7 +223,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             } catch (SecurityException e) {
                 Log.e("Exception: %s", e.getMessage());
             }
-        }
     }
 
     @AfterPermissionGranted(RC_LOCATION)
