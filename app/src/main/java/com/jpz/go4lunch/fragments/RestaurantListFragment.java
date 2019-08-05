@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.maps.model.LatLng;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
 import com.jpz.go4lunch.models.FieldRestaurant;
@@ -38,7 +37,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     private AdapterListRestaurant adapterListRestaurant;
     private List<FieldRestaurant> fieldRestaurantList;
 
-    private LatLng testLatLng = new LatLng(-48.8748, 2.34698);
+    private String testLatLng = "48.874793,2.346896";
 
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
 

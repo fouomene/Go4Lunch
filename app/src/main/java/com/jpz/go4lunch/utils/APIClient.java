@@ -1,6 +1,7 @@
 package com.jpz.go4lunch.utils;
 
-import com.google.android.gms.maps.model.LatLng;
+import android.util.Log;
+
 import com.jpz.go4lunch.models.FieldRestaurant;
 import com.jpz.go4lunch.models.NearbySearchModels.NearbySearchResponse;
 import com.jpz.go4lunch.models.NearbySearchModels.Result;
@@ -17,8 +18,10 @@ import io.reactivex.schedulers.Schedulers;
 public class APIClient {
     // Class for streams of the the Google Places API with Observables of RxJava
 
+    private static final String TAG = APIClient.class.getSimpleName();
+
     // Public method to start fetching the result for Nearby Search request
-    private static Observable<NearbySearchResponse> fetchNearbySearch(LatLng latLng){
+    private static Observable<NearbySearchResponse> fetchNearbySearch(String latLng){
         // Get a Retrofit instance and the related Observable of the Interface
         Service service = Service.retrofit.create(Service.class);
         // Create the call on Top Stories API
@@ -29,7 +32,7 @@ public class APIClient {
     }
 
     // Public method to generify the result list of Top Stories
-    public static Observable<List<FieldRestaurant>> getNearbySearchRestaurants(LatLng latLng){
+    public static Observable<List<FieldRestaurant>> getNearbySearchRestaurants(String latLng){
         return fetchNearbySearch(latLng)
                 .map(new Function<NearbySearchResponse, List<Result>>() {
                     @Override
@@ -46,6 +49,8 @@ public class APIClient {
                             FieldRestaurant fieldRestaurant = new FieldRestaurant();
 
                             fieldRestaurant.name = result.getName();
+                            Log.i(TAG,"restaurants name = " + fieldRestaurant.name);
+
                             //fieldRestaurant.type;
                             //fieldRestaurant.distance;
                             //fieldRestaurant.address;
