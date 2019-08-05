@@ -1,7 +1,12 @@
 package com.jpz.go4lunch.models;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class FieldRestaurant {
     // Common list for the fields of the restaurants
+
+    public String placeId;
+    public LatLng latLng;
 
     public String name;
     public String distance;

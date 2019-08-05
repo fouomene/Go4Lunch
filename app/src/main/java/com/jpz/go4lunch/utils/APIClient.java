@@ -2,6 +2,7 @@ package com.jpz.go4lunch.utils;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.jpz.go4lunch.models.FieldRestaurant;
 import com.jpz.go4lunch.models.NearbySearchModels.NearbySearchResponse;
 import com.jpz.go4lunch.models.NearbySearchModels.Result;
@@ -31,7 +32,7 @@ public class APIClient {
                 .timeout(10, TimeUnit.SECONDS);
     }
 
-    // Public method to generify the result list of Top Stories
+    // Public method to generify the result list of Nearby Search
     public static Observable<List<FieldRestaurant>> getNearbySearchRestaurants(String latLng){
         return fetchNearbySearch(latLng)
                 .map(new Function<NearbySearchResponse, List<Result>>() {
@@ -59,6 +60,37 @@ public class APIClient {
                             //fieldRestaurant.opinions;
                             //fieldRestaurant.image;
 
+                            fieldRestaurantList.add(fieldRestaurant);
+                        }
+                        return fieldRestaurantList;
+                    }
+                });
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Public method to generify the result list of Nearby Search and get the restaurants location
+    public static Observable<List<FieldRestaurant>> getNearbySearchRestaurantsOnMap(String latLng){
+        return fetchNearbySearch(latLng)
+                .map(new Function<NearbySearchResponse, List<Result>>() {
+                    @Override
+                    public List<Result> apply(NearbySearchResponse response) {
+                        return response.getResults();
+                    }
+                }).map(new Function<List<Result>, List<FieldRestaurant>>() {
+                    @Override
+                    public List<FieldRestaurant> apply(List<Result> resultList) {
+
+                        List<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
+
+                        for(Result result : resultList){
+                            FieldRestaurant fieldRestaurant = new FieldRestaurant();
+                            //fieldRestaurant.placeId = result.getPlaceId();
+                            //Log.i(TAG,"restaurants id = " + fieldRestaurant.placeId);
+                            fieldRestaurant.latLng =
+                                    new LatLng(result.getGeometry().getLocation().getLat(),
+                                            result.getGeometry().getLocation().getLng());
+                            Log.i(TAG,"restaurants lng = " + fieldRestaurant.latLng);
                             fieldRestaurantList.add(fieldRestaurant);
                         }
                         return fieldRestaurantList;

@@ -1,7 +1,10 @@
 package com.jpz.go4lunch.fragments;
 
 
+import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -20,14 +23,24 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
+import com.jpz.go4lunch.models.FieldRestaurant;
+import com.jpz.go4lunch.utils.APIClient;
 
+import java.util.List;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -60,6 +73,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 16;
+
+    // Declare Disposable a list of fields
+    private Disposable disposable;
+
+    private String currentLatLng;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -121,6 +139,18 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         // Hide POI of business on the map
         hideBusinessPOI();
+
+        fetchRestaurantsOnMap();
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                startDetailsRestaurantActivity();
+                // Return false to indicate that we have not consumed the event and that we wish
+                // for the default behavior to occur.
+                return false;
+            }
+        });
     }
 
     //----------------------------------------------------------------------------------
@@ -268,6 +298,51 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             } catch (Resources.NotFoundException e) {
                 Log.e(TAG, "Can't find style. Error: ", e);
             }
+    }
+
+    private void updateRestaurantsUI(List<FieldRestaurant> restaurantList) {
+        // Add the list from the request and update the map with the restaurants
+        for (FieldRestaurant fieldRestaurant : restaurantList) {
+            googleMap.addMarker(new MarkerOptions()
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant))
+                    .position(fieldRestaurant.latLng));
+            Log.i(TAG,"list of latLng = " + fieldRestaurant.latLng);
+        }
+    }
+
+    private String convertLocation() {
+        //currentLatLng = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+        currentLatLng = "48.874793,2.346896";
+        return currentLatLng;
+    }
+
+    // HTTP (RxJAVA)
+    private void fetchRestaurantsOnMap() {
+        // Execute the stream subscribing to Observable defined inside APIClient
+        this.disposable = APIClient.getNearbySearchRestaurantsOnMap(convertLocation())
+                .subscribeWith(new DisposableObserver<List<FieldRestaurant>>() {
+                    @Override
+                    public void onNext(List<FieldRestaurant> fieldRestaurantList) {
+                        Log.i(TAG,"On Next NearbySearch");
+                        // Update UI with the list of NearbySearch
+                        updateRestaurantsUI(fieldRestaurantList);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG,"On Error NearbySearch" + Log.getStackTraceString(e));
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.i(TAG,"On Complete NearbySearch");
+                    }
+                });
+    }
+
+    private void startDetailsRestaurantActivity() {
+        Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
+        startActivity(intent);
     }
 
 }

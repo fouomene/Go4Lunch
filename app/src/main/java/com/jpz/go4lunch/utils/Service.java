@@ -15,13 +15,13 @@ public interface Service {
     //----------------------------------------------------------------------------------
     // Fields to complete requests
 
-    // Base url for the Places API with an output in JSON
+    // Base url for the Places API
     String API_BASE_URL = "https://maps.googleapis.com/maps/api/place/";
     // Places API Key
     String API_KEY_PLACES = "AIzaSyA99RAbLDLAnBQkXkk3jPm3T5kFqu-JHiY";
     // Type of Point Of Interest we are looking for
     String API_TYPE = "restaurant";
-    // Defines the distance (in meters) within which to bias place results.
+    // Defines the distance in meters within which to bias place results.
     String API_RADIUS = "100";
 
     //----------------------------------------------------------------------------------
