@@ -1,6 +1,7 @@
 package com.jpz.go4lunch.fragments;
 
 
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -114,8 +116,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Prevent the My Location button from appearing by calling
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        // Turn on the My Location layer and the related control on the map
+        // If permissions are granted, turn on My Location and the related control on the map
         updateLocationUI();
+
+        // Hide POI of business on the map
+        hideBusinessPOI();
     }
 
     //----------------------------------------------------------------------------------
@@ -233,6 +238,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         try {
             if (getActivity() != null)
                 if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
+                    // Go to My Location and give the related control on the map
                     googleMap.setMyLocationEnabled(true);
                     getDeviceLocation();
                 } else {
@@ -246,4 +252,22 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    private void hideBusinessPOI() {
+        if (getActivity() != null)
+            try {
+                // Customise the styling of the base map using a JSON object defined
+                // in a raw resource file.
+                boolean success = googleMap.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                getActivity(), R.raw.style_json));
+
+                if (!success) {
+                    Log.e(TAG, "Style parsing failed.");
+                }
+            } catch (Resources.NotFoundException e) {
+                Log.e(TAG, "Can't find style. Error: ", e);
+            }
+    }
+
 }
