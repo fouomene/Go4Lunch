@@ -1,13 +1,16 @@
 package com.jpz.go4lunch.fragments;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -48,6 +52,7 @@ import io.reactivex.observers.DisposableObserver;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static android.content.Context.LOCATION_SERVICE;
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
 
@@ -319,12 +324,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     private String convertLocation() {
-        //if (lastKnownLocation != null) {
-            //currentLatLng = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-            currentLatLng = "48.874793,2.346896";
-            //Log.i("Tag", "Lat & lng  =  " + lastKnownLocation.getLatitude() + lastKnownLocation.getLongitude());
-        //}
-
+        currentLatLng = getLastKnownLocation().getLatitude() + "," + getLastKnownLocation().getLongitude();
         return currentLatLng;
     }
 
@@ -386,6 +386,27 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         background.draw(canvas);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private Location getLastKnownLocation() {
+         Location location = null;
+        if (getContext() != null) {
+            LocationManager mLocationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+            List<String> providers = mLocationManager.getProviders(true);
+            for (String provider : providers) {
+                if (getActivity() != null)
+                    if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
+                        location = mLocationManager.getLastKnownLocation(provider);
+                    }
+                if (location == null) {
+                    continue;
+                }
+                if (lastKnownLocation == null || location.getAccuracy() < lastKnownLocation.getAccuracy()) {
+                    lastKnownLocation = location;
+                }
+            }
+        }
+        return lastKnownLocation;
     }
 
 }
