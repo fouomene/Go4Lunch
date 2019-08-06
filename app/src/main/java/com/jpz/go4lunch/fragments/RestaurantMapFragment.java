@@ -1,14 +1,17 @@
 package com.jpz.go4lunch.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -142,15 +146,16 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         fetchRestaurantsOnMap();
 
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                startDetailsRestaurantActivity();
-                // Return false to indicate that we have not consumed the event and that we wish
-                // for the default behavior to occur.
-                return false;
-            }
-        });
+        if (googleMap != null)
+            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    startDetailsRestaurantActivity();
+                    // Return false to indicate that we have not consumed the event and that we wish
+                    // for the default behavior to occur.
+                    return false;
+                }
+            });
     }
 
     //----------------------------------------------------------------------------------
@@ -252,7 +257,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 } else {
                     if (getActivity() != null)
                         EasyPermissions.requestPermissions(getActivity(),
-                                getString(R.string.permission_location_access),
+                                getString(R.string.rationale_permission_location_access),
                                 RC_LOCATION, PERMS);
                 }
             } catch (SecurityException e) {
@@ -275,7 +280,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                     googleMap.setMyLocationEnabled(false);
                     googleMap = null;
                     EasyPermissions.requestPermissions(getActivity(),
-                                    getString(R.string.permission_location_access),
+                                    getString(R.string.rationale_permission_location_access),
                                     RC_LOCATION, PERMS);
                 }
         } catch (SecurityException e)  {
@@ -286,14 +291,15 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private void hideBusinessPOI() {
         if (getActivity() != null)
             try {
-                // Customise the styling of the base map using a JSON object defined
-                // in a raw resource file.
-                boolean success = googleMap.setMapStyle(
-                        MapStyleOptions.loadRawResourceStyle(
-                                getActivity(), R.raw.style_json));
-
-                if (!success) {
-                    Log.e(TAG, "Style parsing failed.");
+                if (googleMap != null) {
+                    // Customise the styling of the base map using a JSON object defined
+                    // in a raw resource file.
+                    boolean success = googleMap.setMapStyle(
+                            MapStyleOptions.loadRawResourceStyle(
+                                    getActivity(), R.raw.style_json));
+                    if (!success) {
+                        Log.e(TAG, "Style parsing failed.");
+                    }
                 }
             } catch (Resources.NotFoundException e) {
                 Log.e(TAG, "Can't find style. Error: ", e);
@@ -303,16 +309,22 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private void updateRestaurantsUI(List<FieldRestaurant> restaurantList) {
         // Add the list from the request and update the map with the restaurants
         for (FieldRestaurant fieldRestaurant : restaurantList) {
-            googleMap.addMarker(new MarkerOptions()
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant))
-                    .position(fieldRestaurant.latLng));
-            Log.i(TAG,"list of latLng = " + fieldRestaurant.latLng);
+            if (googleMap != null) {
+                googleMap.addMarker(new MarkerOptions()
+                        .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                        .position(fieldRestaurant.latLng));
+                Log.i(TAG,"list of latLng = " + fieldRestaurant.latLng);
+            }
         }
     }
 
     private String convertLocation() {
-        //currentLatLng = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-        currentLatLng = "48.874793,2.346896";
+        //if (lastKnownLocation != null) {
+            //currentLatLng = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+            currentLatLng = "48.874793,2.346896";
+            //Log.i("Tag", "Lat & lng  =  " + lastKnownLocation.getLatitude() + lastKnownLocation.getLongitude());
+        //}
+
         return currentLatLng;
     }
 
@@ -343,6 +355,37 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private void startDetailsRestaurantActivity() {
         Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
         startActivity(intent);
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+
+        // Create background
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_map_pin);
+        if (background == null) {
+            Log.e(TAG, "Requested vector resource was not found");
+            return BitmapDescriptorFactory.defaultMarker();
+        }
+        background.setBounds(0, 0,
+                background.getIntrinsicWidth(), background.getIntrinsicHeight());
+
+        // Create vector
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        if (vectorDrawable == null) {
+            Log.e(TAG, "Requested vector resource was not found");
+            return BitmapDescriptorFactory.defaultMarker();
+        }
+        int left = (background.getIntrinsicWidth() - vectorDrawable.getIntrinsicWidth()) / 2;
+        int top = (background.getIntrinsicHeight() - vectorDrawable.getIntrinsicHeight()) / 3;
+        vectorDrawable.setBounds(left, top, left + vectorDrawable.getIntrinsicWidth(),
+                top + vectorDrawable.getIntrinsicHeight());
+
+        // Create Bitmap with background and vector then draw them
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(),
+                background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 }
