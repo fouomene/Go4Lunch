@@ -21,8 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,16 +39,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 import com.jpz.go4lunch.models.FieldRestaurant;
-import com.jpz.go4lunch.utils.APIClient;
 
+import java.util.Arrays;
 import java.util.List;
 
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -72,7 +76,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
     private static final String KEY_CAMERA_POSITION = "camera_position";
 
+    private PlacesClient placesClient;
+    private FindCurrentPlaceRequest request;
     private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private FieldRestaurant fieldRestaurant = new FieldRestaurant();
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -82,11 +90,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 16;
-
-    // Declare Disposable a list of fields
-    private Disposable disposable;
-
-    private String currentLatLng;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -121,6 +124,22 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         if(getActivity() != null)
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
+        if (getActivity() != null) {
+            // Initialize the SDK
+            Places.initialize(getActivity(), getString(R.string.google_api_key));
+
+            // Create a new Places client instance
+            placesClient = Places.createClient(getActivity());
+        }
+
+        // Use fields to define the data types to return.
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.NAME);
+
+        // Use the builder to create a FindCurrentPlaceRequest.
+        request = FindCurrentPlaceRequest.newInstance(placeFields);
+
+        findCurrentPlace();
+
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -149,7 +168,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        fetchRestaurantsOnMap();
+        //fetchRestaurantsOnMap();
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -311,45 +330,52 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             }
     }
 
-    private void updateRestaurantsUI(List<FieldRestaurant> restaurantList) {
-        // Add the list from the request and update the map with the restaurants
-        for (FieldRestaurant fieldRestaurant : restaurantList) {
-            if (googleMap != null) {
-                googleMap.addMarker(new MarkerOptions()
-                        .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
-                        .position(fieldRestaurant.latLng));
-                Log.i(TAG,"list of latLng = " + fieldRestaurant.latLng);
+    @AfterPermissionGranted(RC_LOCATION)
+    private void findCurrentPlace() {
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+        if (getActivity() != null)
+            try {
+                if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
+                    Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+                    placeResponse.addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            FindCurrentPlaceResponse response = task.getResult();
+
+                            for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+                                if (placeLikelihood.getPlace().getTypes() != null && placeLikelihood.getPlace().getLatLng() != null)
+                                    if (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)) {
+                                        fieldRestaurant.latLng =
+                                                new LatLng(placeLikelihood.getPlace().getLatLng().latitude,
+                                                        placeLikelihood.getPlace().getLatLng().longitude);
+
+                                        Log.i(TAG, String.format("Place '%s' has likelihood: %f and coordinates = " + fieldRestaurant.latLng,
+                                                placeLikelihood.getPlace().getName(),
+                                                placeLikelihood.getLikelihood()));
+
+                                        if (googleMap != null) {
+                                            googleMap.addMarker(new MarkerOptions()
+                                                    .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                                                    .position(fieldRestaurant.latLng));
+                                        }
+                                    }
+                            }
+                        } else {
+                            Exception exception = task.getException();
+                            if (exception instanceof ApiException) {
+                                ApiException apiException = (ApiException) exception;
+                                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                            }
+                        }
+                    });
+                } else {
+                    EasyPermissions.requestPermissions(getActivity(),
+                            getString(R.string.rationale_permission_location_access),
+                            RC_LOCATION, PERMS);
+                }
+            } catch (SecurityException e) {
+                Log.e("Exception: %s", e.getMessage());
             }
-        }
-    }
-
-    private String convertLocation() {
-        currentLatLng = getLastKnownLocation().getLatitude() + "," + getLastKnownLocation().getLongitude();
-        return currentLatLng;
-    }
-
-    // HTTP (RxJAVA)
-    private void fetchRestaurantsOnMap() {
-        // Execute the stream subscribing to Observable defined inside APIClient
-        this.disposable = APIClient.getNearbySearchRestaurantsOnMap(convertLocation())
-                .subscribeWith(new DisposableObserver<List<FieldRestaurant>>() {
-                    @Override
-                    public void onNext(List<FieldRestaurant> fieldRestaurantList) {
-                        Log.i(TAG,"On Next NearbySearch");
-                        // Update UI with the list of NearbySearch
-                        updateRestaurantsUI(fieldRestaurantList);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG,"On Error NearbySearch" + Log.getStackTraceString(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.i(TAG,"On Complete NearbySearch");
-                    }
-                });
     }
 
     private void startDetailsRestaurantActivity() {
@@ -395,7 +421,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             List<String> providers = mLocationManager.getProviders(true);
             for (String provider : providers) {
                 if (getActivity() != null)
-                    if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
+                    if(ContextCompat.checkSelfPermission(getActivity(),
+                            Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
                         location = mLocationManager.getLastKnownLocation(provider);
                     }
                 if (location == null) {
