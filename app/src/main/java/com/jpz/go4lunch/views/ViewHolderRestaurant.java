@@ -40,7 +40,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
     public void updateViewHolder(FieldRestaurant fieldRestaurant, RequestManager glide,
                                  AdapterListRestaurant.Listener callback){
         // Update widgets
-        name.setText(fieldRestaurant.name);
+        name.setText(fieldRestaurant.id);
         distance.setText(fieldRestaurant.distance);
         type.setText(fieldRestaurant.type);
         address.setText(fieldRestaurant.address);

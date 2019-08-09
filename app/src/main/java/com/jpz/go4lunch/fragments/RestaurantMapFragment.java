@@ -1,16 +1,13 @@
 package com.jpz.go4lunch.fragments;
 
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -50,13 +47,13 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 import com.jpz.go4lunch.models.FieldRestaurant;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static android.content.Context.LOCATION_SERVICE;
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
 
@@ -70,17 +67,22 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private MapView mMapView;
     private GoogleMap googleMap;
     private CameraPosition cameraPosition;
+    private Marker marker;
 
     // Keys for storing activity state
     private static final String MAPVIEW_BUNDLE_KEY = "map_view_bundle_key";
     private static final String KEY_LOCATION = "location";
     private static final String KEY_CAMERA_POSITION = "camera_position";
+    public static final String BUNDLE_RESTAURANT_ID = "Bundle_Restaurant_Id";
 
+    // Places
     private PlacesClient placesClient;
     private FindCurrentPlaceRequest request;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private FieldRestaurant fieldRestaurant = new FieldRestaurant();
+    private List<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
+    private String restaurantId;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -120,11 +122,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        // Construct a FusedLocationProviderClient
-        if(getActivity() != null)
+        if (getActivity() != null) {
+            // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
-        if (getActivity() != null) {
             // Initialize the SDK
             Places.initialize(getActivity(), getString(R.string.google_api_key));
 
@@ -133,7 +134,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         }
 
         // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.NAME);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
 
         // Use the builder to create a FindCurrentPlaceRequest.
         request = FindCurrentPlaceRequest.newInstance(placeFields);
@@ -173,6 +174,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
+                    // Retrieve the data from the marker.
+                    restaurantId = (String) marker.getTag();
                     startDetailsRestaurantActivity();
                     // Return false to indicate that we have not consumed the event and that we wish
                     // for the default behavior to occur.
@@ -344,18 +347,24 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
                                 if (placeLikelihood.getPlace().getTypes() != null && placeLikelihood.getPlace().getLatLng() != null)
                                     if (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)) {
+
                                         fieldRestaurant.latLng =
                                                 new LatLng(placeLikelihood.getPlace().getLatLng().latitude,
                                                         placeLikelihood.getPlace().getLatLng().longitude);
 
-                                        Log.i(TAG, String.format("Place '%s' has likelihood: %f and coordinates = " + fieldRestaurant.latLng,
-                                                placeLikelihood.getPlace().getName(),
-                                                placeLikelihood.getLikelihood()));
+                                        fieldRestaurant.id = placeLikelihood.getPlace().getId();
+
+                                        //fieldRestaurantList.add(fieldRestaurant);
+                                        //Log.i(TAG, "fieldResto = " + fieldRestaurant);
+                                        //saveRestaurantsId(fieldRestaurant);
+                                        Log.i(TAG, "Place has id = " + fieldRestaurant.id);
 
                                         if (googleMap != null) {
-                                            googleMap.addMarker(new MarkerOptions()
-                                                    .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                                            marker = googleMap.addMarker(new MarkerOptions()
+                                                    .icon(bitmapDescriptorFromVector(getActivity(),
+                                                            R.drawable.ic_restaurant))
                                                     .position(fieldRestaurant.latLng));
+                                            marker.setTag(fieldRestaurant.id);
                                         }
                                     }
                             }
@@ -379,6 +388,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     private void startDetailsRestaurantActivity() {
         Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
+        intent.putExtra(BUNDLE_RESTAURANT_ID, restaurantId);
         startActivity(intent);
     }
 
@@ -413,26 +423,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private Location getLastKnownLocation() {
-         Location location = null;
-        if (getContext() != null) {
-            LocationManager mLocationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
-            List<String> providers = mLocationManager.getProviders(true);
-            for (String provider : providers) {
-                if (getActivity() != null)
-                    if(ContextCompat.checkSelfPermission(getActivity(),
-                            Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
-                        location = mLocationManager.getLastKnownLocation(provider);
-                    }
-                if (location == null) {
-                    continue;
-                }
-                if (lastKnownLocation == null || location.getAccuracy() < lastKnownLocation.getAccuracy()) {
-                    lastKnownLocation = location;
-                }
-            }
-        }
-        return lastKnownLocation;
+    private void saveRestaurantsId(FieldRestaurant restaurant) {
+        fieldRestaurant.idList = new ArrayList<>();
+        fieldRestaurant.idList.add(restaurant.id);
+        Log.i(TAG, "la list = " + fieldRestaurant.idList);
     }
 
 }

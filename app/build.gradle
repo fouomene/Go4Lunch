@@ -37,15 +37,10 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-core:17.0.1'
 
-    // Firebase UI
-    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
-
-    // Firebase Authentication
-    implementation 'com.google.firebase:firebase-auth:18.1.0'
+    // FirebaseUI for Firebase Auth
+    implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
 
     // Google Mobile Services
-    // Authentication
-    implementation 'com.google.android.gms:play-services-auth:17.0.0'
     // Maps
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     // Location
