@@ -138,8 +138,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Use the builder to create a FindCurrentPlaceRequest.
         request = FindCurrentPlaceRequest.newInstance(placeFields);
 
-        findCurrentPlace();
-
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +166,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        //fetchRestaurantsOnMap();
+        // Show the restaurants near the user location
+        findCurrentPlace();
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
