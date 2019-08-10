@@ -50,7 +50,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryLight"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_nav_drawer"
         app:itemIconTint="@android:color/white"

@@ -75,7 +75,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
         configureRecyclerView();
 
-        fetchPlace();
+        //fetchPlace();
 
         //getRestaurantsId(fieldRestaurant.idList);
 
