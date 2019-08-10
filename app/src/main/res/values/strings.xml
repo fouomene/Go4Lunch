@@ -5,12 +5,17 @@
     <string name="facebook_application_id" translatable="false">468791053912314</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">fb468791053912314</string>
 
-    <!-- Used for Connexion Activity -->
+    <!--Connexion Activity -->
     <string name="authentication_succeed">Successful authentication</string>
     <string name="authentication_failed">Authentication failed</string>
     <string name="connexion_failure">Connexion failure</string>
     <string name="account_exists">Account exists with different credential</string>
     <string name="sign_in_cancelled">Sign in cancelled</string>
+
+    <!-- Details Restaurant Activity -->
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
@@ -38,5 +43,9 @@
     <string name="business_lunch">Business lunch</string>
     <string name="hot_food_in_a_bowl">Hot food in a bowl</string>
     <string name="photo_profile">Photo profile</string>
+    <string name="restaurant_photo">Photo of the restaurant</string>
+    <string name="primary_color">Primary color</string>
+    <string name="workmate_photo">Photo of workmate</string>
+    <string name="workmate_icon">Workmate icon</string>
 
 </resources>

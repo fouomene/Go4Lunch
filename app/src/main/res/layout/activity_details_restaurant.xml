@@ -1,9 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.DetailsRestaurantActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/details_guideline_forty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/details_guideline_fifty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/details_guideline_sixty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/details_guideline_eighty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8"/>
+
+    <ImageView
+        android:id="@+id/details_image_restaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_forty"
+        android:contentDescription="@string/restaurant_photo"/>
+
+    <ImageView
+        android:id="@+id/details_background_color"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_fifty"
+        android:contentDescription="@string/primary_color"/>
+
+    <TextView
+        android:id="@+id/details_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="name"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/details_opinions"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_type"/>
+
+    <TextView
+        android:id="@+id/details_opinions"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="opinions"
+        app:layout_constraintStart_toEndOf="@+id/details_name"
+        app:layout_constraintEnd_toEndOf="@+id/details_guideline_eighty"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_type"/>
+
+    <TextView
+        android:id="@+id/details_type"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="type"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/details_address"
+        app:layout_constraintTop_toBottomOf="@+id/details_name"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_fifty"/>
+
+    <TextView
+        android:id="@+id/details_address"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="address"
+        android:textColor="@android:color/white"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintStart_toEndOf="@+id/details_type"
+        app:layout_constraintEnd_toStartOf="@id/details_guideline_eighty"
+        app:layout_constraintTop_toBottomOf="@+id/details_name"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_fifty"/>
+
+    <Button
+        android:id="@+id/details_button_call"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/call"
+        android:textColor="@color/colorPrimary"
+        android:drawableTop="@drawable/ic_phone"
+        android:background="@android:color/white"
+        android:paddingTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/details_button_like"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_fifty"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_sixty"/>
+
+    <Button
+        android:id="@+id/details_button_like"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/like"
+        android:textColor="@color/colorPrimary"
+        android:drawableTop="@drawable/ic_star"
+        android:background="@android:color/white"
+        android:paddingTop="8dp"
+        app:layout_constraintStart_toEndOf="@id/details_button_call"
+        app:layout_constraintEnd_toStartOf="@id/details_button_website"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_fifty"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_sixty"/>
+
+    <Button
+        android:id="@+id/details_button_website"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="@string/website"
+        android:textColor="@color/colorPrimary"
+        android:drawableTop="@drawable/ic_public"
+        android:background="@android:color/white"
+        android:paddingTop="8dp"
+        app:layout_constraintStart_toEndOf="@id/details_button_like"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_fifty"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_sixty"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/details_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:focusable="true"
+        android:clickable="true"
+        app:backgroundTint="@android:color/white"
+        app:srcCompat="@drawable/ic_check_circle"
+        app:layout_constraintStart_toEndOf="@id/details_guideline_eighty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_guideline_forty"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

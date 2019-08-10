@@ -73,7 +73,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final String MAPVIEW_BUNDLE_KEY = "map_view_bundle_key";
     private static final String KEY_LOCATION = "location";
     private static final String KEY_CAMERA_POSITION = "camera_position";
-    public static final String BUNDLE_RESTAURANT_ID = "Bundle_Restaurant_Id";
+    public static final String KEY_RESTAURANT_ID = "Bundle_Restaurant_Id";
 
     // Places
     private PlacesClient placesClient;
@@ -388,7 +388,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     private void startDetailsRestaurantActivity() {
         Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
-        intent.putExtra(BUNDLE_RESTAURANT_ID, restaurantId);
+        intent.putExtra(KEY_RESTAURANT_ID, restaurantId);
         startActivity(intent);
     }
 

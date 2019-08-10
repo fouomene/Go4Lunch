@@ -20,7 +20,7 @@
         android:focusable="true"
         android:clickable="true"
         app:backgroundTint="@android:color/white"
-        android:src="@drawable/ic_my_location"
+        app:srcCompat="@drawable/ic_my_location"
         android:layout_gravity="end|bottom"/>
 
 </FrameLayout>

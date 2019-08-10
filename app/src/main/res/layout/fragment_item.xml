@@ -60,7 +60,8 @@
             app:layout_constraintStart_toStartOf="@id/item_guideline_eighty"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="@string/restaurant_photo"/>
 
         <TextView
             android:id="@+id/item_type"
@@ -88,11 +89,12 @@
             android:id="@+id/item_image_workmate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_person_outline"
+            app:srcCompat="@drawable/ic_person_outline"
             app:layout_constraintStart_toStartOf="@+id/item_guideline_sixty"
             app:layout_constraintEnd_toEndOf="@+id/item_guideline_eighty"
             app:layout_constraintTop_toBottomOf="@+id/item_distance"
-            app:layout_constraintBottom_toTopOf="@+id/item_hours"/>
+            app:layout_constraintBottom_toTopOf="@+id/item_hours"
+            android:contentDescription="@string/workmate_icon"/>
 
         <TextView
             android:id="@+id/item_workmates"

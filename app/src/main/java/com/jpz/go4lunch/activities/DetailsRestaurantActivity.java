@@ -17,7 +17,7 @@ import com.jpz.go4lunch.models.FieldRestaurant;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jpz.go4lunch.fragments.RestaurantMapFragment.BUNDLE_RESTAURANT_ID;
+import static com.jpz.go4lunch.fragments.RestaurantMapFragment.KEY_RESTAURANT_ID;
 
 public class DetailsRestaurantActivity extends AppCompatActivity {
 
@@ -36,7 +36,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
         // Get the transferred data from the source activity and define a Place ID.
         Intent intent = getIntent();
-        String placeId = intent.getStringExtra(BUNDLE_RESTAURANT_ID);
+        String placeId = intent.getStringExtra(KEY_RESTAURANT_ID);
 
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
