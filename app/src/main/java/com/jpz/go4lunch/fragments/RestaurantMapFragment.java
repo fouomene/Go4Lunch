@@ -34,7 +34,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -91,7 +90,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 16;
+    private static final int DEFAULT_ZOOM = 17;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -141,12 +140,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get the current location of the device and set the position of the map
-                getDeviceLocation();
-            }
+        floatingActionButton.setOnClickListener((View v) -> {
+            // Get the current location of the device and set the position of the map
+            getDeviceLocation();
         });
 
         return view;
@@ -158,8 +154,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     public void onMapReady(GoogleMap map) {
         googleMap = map;
 
-        // Prevent the My Location button from appearing by calling
+        // Prevent to show the My Location button, the MapToolbar and the Compass
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
 
         // If permissions are granted, turn on My Location and the related control on the map
         updateLocationUI();
@@ -171,16 +169,13 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         findCurrentPlace();
 
         if (googleMap != null)
-            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    // Retrieve the data from the marker.
-                    restaurantId = (String) marker.getTag();
-                    startDetailsRestaurantActivity();
-                    // Return false to indicate that we have not consumed the event and that we wish
-                    // for the default behavior to occur.
-                    return false;
-                }
+            googleMap.setOnMarkerClickListener((Marker marker) -> {
+                // Retrieve the data from the marker.
+                restaurantId = (String) marker.getTag();
+                startDetailsRestaurantActivity();
+                // Return false to indicate that we have not consumed the event and that we wish
+                // for the default behavior to occur.
+                return false;
             });
     }
 
@@ -253,9 +248,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             try {
                 if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                    locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
+                    locationResult.addOnCompleteListener(getActivity(), (@NonNull Task<Location> task) -> {
                             if (task.isSuccessful() && task.getResult() != null) {
                                 // Set the map's camera position to the current location of the device.
                                 lastKnownLocation = task.getResult();
@@ -278,7 +271,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                                     googleMap.moveCamera(CameraUpdateFactory
                                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                             }
-                        }
                     });
                 } else {
                     if (getActivity() != null)

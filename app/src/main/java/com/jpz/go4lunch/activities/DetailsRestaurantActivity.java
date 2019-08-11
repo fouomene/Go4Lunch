@@ -1,14 +1,18 @@
 package com.jpz.go4lunch.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
@@ -17,6 +21,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 
 import java.util.Arrays;
@@ -35,6 +40,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private PlacesClient placesClient;
     private FetchPlaceRequest request;
     private PhotoMetadata photoMetadata;
+
+    private String phoneNumber;
+    private Uri uriWebsite;
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -59,7 +67,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         String placeId = intent.getStringExtra(KEY_RESTAURANT_ID);
 
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.PHOTO_METADATAS,Place.Field.ADDRESS);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME,Place.Field.ADDRESS,
+                Place.Field.PHOTO_METADATAS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
 
         // Construct a request object, passing the place ID and fields array.
         request = FetchPlaceRequest.newInstance(placeId, placeFields);
@@ -68,16 +77,47 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         placesClient = Places.createClient(this);
 
         fetchPlace();
+
+        // Display the phone number
+        call.setOnClickListener((View v) -> {
+            String dial = "tel:" + phoneNumber;
+            startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(dial)));
+        });
+
+        like.setOnClickListener((View v) -> {
+            // Save like on Firebase
+        });
+
+        // Display the website
+        website.setOnClickListener((View v) -> {
+            if (uriWebsite == null)
+                Toast.makeText(this, getString(R.string.no_website), Toast.LENGTH_SHORT).show();
+            else {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriWebsite.toString()));
+                startActivity(webIntent);
+            }
+        });
+
+        FloatingActionButton floatingActionButton = findViewById(R.id.details_fab);
+        floatingActionButton.setOnClickListener((View v) -> {
+                boolean isChecked = true;
+                if (isChecked)
+                    floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
+                else floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+        });
     }
 
     private void fetchPlace() {
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
-            Log.i(TAG, "Place found: " + place.getName());
 
             // Get data
             name.setText(place.getName());
             address.setText(place.getAddress());
+            //address.setText(getAddress(place));
+            phoneNumber = place.getPhoneNumber();
+            uriWebsite = place.getWebsiteUri();
+            Log.i(TAG, "Uri " + place.getWebsiteUri());
 
             // Get the photo metadata.
             if (place.getPhotoMetadatas() != null)
@@ -100,5 +140,15 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
             });
         });
     }
+/*
+    private String getAddress(Place place) {
+        String address;
+        if (place.getAddressComponents() != null)
+        address = place.getAddressComponents().asList().get(0).getName() + " " +
+                place.getAddressComponents().asList().get(1).getName();
+        else address = null;
+        return address;
+    }
+*/
 
 }

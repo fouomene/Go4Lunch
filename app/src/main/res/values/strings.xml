@@ -16,6 +16,7 @@
     <string name="call">CALL</string>
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
+    <string name="no_website">There is no website for this restaurant.</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
