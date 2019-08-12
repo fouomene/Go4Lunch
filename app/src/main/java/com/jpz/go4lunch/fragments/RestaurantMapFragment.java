@@ -66,22 +66,26 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private MapView mMapView;
     private GoogleMap googleMap;
     private CameraPosition cameraPosition;
-    private Marker marker;
 
     // Keys for storing activity state
     private static final String MAPVIEW_BUNDLE_KEY = "map_view_bundle_key";
     private static final String KEY_LOCATION = "location";
     private static final String KEY_CAMERA_POSITION = "camera_position";
-    public static final String KEY_RESTAURANT_ID = "Bundle_Restaurant_Id";
+
+    // Key for Intent
+    public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
 
     // Places
     private PlacesClient placesClient;
     private FindCurrentPlaceRequest request;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    private FieldRestaurant fieldRestaurant = new FieldRestaurant();
-    private List<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
+    private OnListIdListener mCallback;
+
+    private FieldRestaurant fieldRestaurant = new FieldRestaurant("id");
+    private ArrayList<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
     private String restaurantId;
+    private LatLng restaurantLatLng;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -167,6 +171,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         // Show the restaurants near the user location
         findCurrentPlace();
+
+        mCallback.onListId(fieldRestaurantList);
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -337,26 +343,26 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
 
-                                if (placeLikelihood.getPlace().getTypes() != null && placeLikelihood.getPlace().getLatLng() != null)
-                                    if (placeLikelihood.getPlace().getTypes().contains(Place.Type.RESTAURANT)) {
+                                if (placeLikelihood.getPlace().getTypes() != null
+                                        && placeLikelihood.getPlace().getLatLng() != null)
+                                    if (placeLikelihood.getPlace().getTypes()
+                                            .contains(Place.Type.RESTAURANT)) {
 
-                                        fieldRestaurant.latLng =
-                                                new LatLng(placeLikelihood.getPlace().getLatLng().latitude,
-                                                        placeLikelihood.getPlace().getLatLng().longitude);
+                                        // Collect the LatLng of the places likelihood
+                                        restaurantLatLng = new LatLng(placeLikelihood
+                                                        .getPlace().getLatLng().latitude,
+                                                        placeLikelihood
+                                                                .getPlace().getLatLng().longitude);
 
+                                        // Collect the identities of the places likelihood
                                         fieldRestaurant.id = placeLikelihood.getPlace().getId();
 
-                                        //fieldRestaurantList.add(fieldRestaurant);
-                                        //Log.i(TAG, "fieldResto = " + fieldRestaurant);
-                                        //saveRestaurantsId(fieldRestaurant);
+                                        saveListId(fieldRestaurant);
+
                                         Log.i(TAG, "Place has id = " + fieldRestaurant.id);
 
                                         if (googleMap != null) {
-                                            marker = googleMap.addMarker(new MarkerOptions()
-                                                    .icon(bitmapDescriptorFromVector(getActivity(),
-                                                            R.drawable.ic_restaurant))
-                                                    .position(fieldRestaurant.latLng));
-                                            marker.setTag(fieldRestaurant.id);
+                                            addMarkers();
                                         }
                                     }
                             }
@@ -377,6 +383,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 Log.e("Exception: %s", e.getMessage());
             }
     }
+
+    //----------------------------------------------------------------------------------
 
     private void startDetailsRestaurantActivity() {
         Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
@@ -415,10 +423,41 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void saveRestaurantsId(FieldRestaurant restaurant) {
-        fieldRestaurant.idList = new ArrayList<>();
-        fieldRestaurant.idList.add(restaurant.id);
-        Log.i(TAG, "la list = " + fieldRestaurant.idList);
+    private void saveListId(FieldRestaurant restaurant) {
+        fieldRestaurantList.add(restaurant);
+        Log.i(TAG, "la list = " + fieldRestaurantList);
+    }
+
+
+    private void addMarkers() {
+        Marker marker = googleMap.addMarker(new MarkerOptions()
+                .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                .position(restaurantLatLng));
+        marker.setTag(fieldRestaurant.id);
+    }
+
+    //---------------------------------------------------------------
+    // Callback Interface with methods
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // Call the method that creating callback after being attached to parent activity
+        this.createCallbackToParentActivity();
+    }
+
+    private void createCallbackToParentActivity() {
+        try {
+            // Parent activity will automatically subscribe to callback
+            mCallback = (OnListIdListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(e.toString()+ " must implement OnListIdListener");
+        }
+    }
+
+    // Declare interface that will be implemented by any container activity
+    public interface OnListIdListener {
+        void onListId(ArrayList<FieldRestaurant> fieldRestaurantArrayList);
     }
 
 }

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.jpz.go4lunch.activities.MainActivity.KEY_LIST_ID;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,13 +38,14 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     // Declare View, Adapter & a list of fields
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
-    private List<FieldRestaurant> fieldRestaurantList;
+    private ArrayList<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
+
 
     // Places
     private PlacesClient placesClient;
     private FetchPlaceRequest request;
 
-    private FieldRestaurant fieldRestaurant = new FieldRestaurant();
+    private FieldRestaurant fieldRestaurant = new FieldRestaurant("id");
 
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
@@ -61,19 +64,23 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
 
         // Define a Place ID.
-        //String placeId = fieldRestaurant.id;
+        String placeId = fieldRestaurant.id;
 
         // Specify the fields to return.
-        //List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
 
         // Construct a request object, passing the place ID and fields array.
-        //request = FetchPlaceRequest.newInstance(placeId, placeFields);
+        request = FetchPlaceRequest.newInstance(placeId, placeFields);
 
         if (getActivity() != null)
             // Create a new Places client instance
             placesClient = Places.createClient(getActivity());
 
         configureRecyclerView();
+
+        if (getArguments() != null)
+            fieldRestaurantList = getArguments().getParcelableArrayList(KEY_LIST_ID);
+        Log.i("Tag ListFragment", "la liste récupérée = " + fieldRestaurantList);
 
         //fetchPlace();
 
@@ -97,7 +104,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void getRestaurantsId(List<FieldRestaurant> restaurantList) {
+    private void updateUI(List<FieldRestaurant> restaurantList) {
         // Add the list from the request and notify the adapter
         fieldRestaurantList.addAll(restaurantList);
         adapterListRestaurant.notifyDataSetChanged();

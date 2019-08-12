@@ -36,19 +36,26 @@ import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
+import com.jpz.go4lunch.models.FieldRestaurant;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        EasyPermissions.PermissionCallbacks, RestaurantMapFragment.OnListIdListener {
 
     // Static data for ACCESS_FINE_LOCATION
     public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
     public static final int RC_LOCATION = 123;
+
+    // Key for Bundle
+    public static final String KEY_LIST_ID = "key_list_id";
+    private Bundle bundle = new Bundle();
 
     // FirebaseUtils class
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
@@ -136,32 +143,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void configureBottomView(){
-        bottomNav.setOnNavigationItemSelectedListener
-                (new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Fragment selectedFragment;
-
-                // Check the fragment selected
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_map:
-                        selectedFragment = new RestaurantMapFragment();
-                        break;
-                    case R.id.nav_list:
-                        selectedFragment = new RestaurantListFragment();
-                        break;
-                    case R.id.nav_workmates:
-                        selectedFragment = new WorkmatesFragment();
-                        break;
-                    default:
-                        selectedFragment = new RestaurantMapFragment();
-
-                }
-                // Add it to FrameLayout fragment_container
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        selectedFragment).commit();
-                return true;
+        bottomNav.setOnNavigationItemSelectedListener ((@NonNull MenuItem menuItem) -> {
+            Fragment selectedFragment;
+            // Check the fragment selected
+            switch (menuItem.getItemId()) {
+                case R.id.nav_map:
+                    selectedFragment = new RestaurantMapFragment();
+                    break;
+                case R.id.nav_list:
+                    selectedFragment = new RestaurantListFragment();
+                    selectedFragment.setArguments(bundle);
+                    break;
+                case R.id.nav_workmates:
+                    selectedFragment = new WorkmatesFragment();
+                    break;
+                default:
+                    selectedFragment = new RestaurantMapFragment();
             }
+            // Add it to FrameLayout fragment_container
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    selectedFragment).commit();
+            return true;
         });
     }
 
@@ -281,5 +283,12 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new RestaurantMapFragment()).commit();
         }
+    }
+
+    //----------------------------------------------------------------------------------
+
+    @Override
+    public void onListId(ArrayList<FieldRestaurant> fieldRestaurantArrayList) {
+        bundle.putParcelableArrayList(KEY_LIST_ID, fieldRestaurantArrayList);
     }
 }
