@@ -23,6 +23,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.utils.ConvertMethods;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private PlacesClient placesClient;
     private FetchPlaceRequest request;
     private PhotoMetadata photoMetadata;
+
+    // Utils
+    private ConvertMethods convertMethods;
 
     private String phoneNumber;
     private Uri uriWebsite;
@@ -67,7 +71,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         String placeId = intent.getStringExtra(KEY_RESTAURANT_ID);
 
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME,Place.Field.ADDRESS,
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME,Place.Field.ADDRESS_COMPONENTS,
                 Place.Field.PHOTO_METADATAS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
 
         // Construct a request object, passing the place ID and fields array.
@@ -113,8 +117,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
             // Get data
             name.setText(place.getName());
-            address.setText(place.getAddress());
-            //address.setText(getAddress(place));
+            address.setText(convertMethods.getAddress(place));
             phoneNumber = place.getPhoneNumber();
             uriWebsite = place.getWebsiteUri();
             Log.i(TAG, "Uri " + place.getWebsiteUri());
@@ -140,15 +143,5 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
             });
         });
     }
-/*
-    private String getAddress(Place place) {
-        String address;
-        if (place.getAddressComponents() != null)
-        address = place.getAddressComponents().asList().get(0).getName() + " " +
-                place.getAddressComponents().asList().get(1).getName();
-        else address = null;
-        return address;
-    }
-*/
 
 }

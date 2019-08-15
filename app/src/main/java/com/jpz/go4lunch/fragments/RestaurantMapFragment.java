@@ -344,27 +344,25 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                             for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
 
                                 if (placeLikelihood.getPlace().getTypes() != null
-                                        && placeLikelihood.getPlace().getLatLng() != null)
-                                    if (placeLikelihood.getPlace().getTypes()
-                                            .contains(Place.Type.RESTAURANT)) {
+                                        && placeLikelihood.getPlace().getLatLng() != null
+                                        && placeLikelihood.getPlace().getTypes()
+                                        .contains(Place.Type.RESTAURANT)) {
 
-                                        // Collect the LatLng of the places likelihood
-                                        restaurantLatLng = new LatLng(placeLikelihood
-                                                        .getPlace().getLatLng().latitude,
-                                                        placeLikelihood
-                                                                .getPlace().getLatLng().longitude);
+                                    // Collect the LatLng of the places likelihood
+                                    restaurantLatLng = new LatLng
+                                            (placeLikelihood.getPlace().getLatLng().latitude,
+                                                    placeLikelihood.getPlace().getLatLng().longitude);
 
-                                        // Collect the identities of the places likelihood
-                                        fieldRestaurant.id = placeLikelihood.getPlace().getId();
+                                    // Collect the identities of the places likelihood
+                                    fieldRestaurant.id = placeLikelihood.getPlace().getId();
+                                    Log.i(TAG, "Place has id = " + fieldRestaurant.id);
 
-                                        saveListId(fieldRestaurant);
+                                    saveListId(fieldRestaurant);
 
-                                        Log.i(TAG, "Place has id = " + fieldRestaurant.id);
-
-                                        if (googleMap != null) {
-                                            addMarkers();
-                                        }
+                                    if (googleMap != null) {
+                                        addMarkers();
                                     }
+                                }
                             }
                         } else {
                             Exception exception = task.getException();
@@ -374,11 +372,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                             }
                         }
                     });
-                } else {
+                } else
                     EasyPermissions.requestPermissions(getActivity(),
-                            getString(R.string.rationale_permission_location_access),
-                            RC_LOCATION, PERMS);
-                }
+                            getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
             } catch (SecurityException e) {
                 Log.e("Exception: %s", e.getMessage());
             }

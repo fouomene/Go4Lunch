@@ -84,8 +84,6 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
         //fetchPlace();
 
-        //getRestaurantsId(fieldRestaurant.idList);
-
         return view;
     }
 
@@ -126,7 +124,6 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
                 Place place = response.getPlace();
                 Log.i(TAG, "Place found: " + place.getName());
 
-                //getRestaurantsId(fieldRestaurantList);
 
             }).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {
