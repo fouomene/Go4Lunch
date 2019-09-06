@@ -43,7 +43,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private PhotoMetadata photoMetadata;
 
     // Utils
-    private ConvertMethods convertMethods;
+    private ConvertMethods convertMethods = new ConvertMethods();
 
     private String phoneNumber;
     private Uri uriWebsite;
