@@ -45,6 +45,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 import com.jpz.go4lunch.models.FieldRestaurant;
+import com.jpz.go4lunch.utils.CurrentPlaceSingleton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,18 +131,18 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
             // Initialize the SDK
-            Places.initialize(getActivity(), getString(R.string.google_api_key));
+            //Places.initialize(getActivity(), getString(R.string.google_api_key));
 
             // Create a new Places client instance
-            placesClient = Places.createClient(getActivity());
+            //placesClient = Places.createClient(getActivity());
         }
-
+/*
         // Use fields to define the data types to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
 
         // Use the builder to create a FindCurrentPlaceRequest.
         request = FindCurrentPlaceRequest.newInstance(placeFields);
-
+*/
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
         floatingActionButton.setOnClickListener((View v) -> {
@@ -170,7 +171,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         hideBusinessPOI();
 
         // Show the restaurants near the user location
-        findCurrentPlace();
+        //findCurrentPlace();
+        findCurrentPlaceWithSingleton();
 
         mCallback.onListId(fieldRestaurantList);
 
@@ -330,6 +332,51 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             }
     }
 
+
+    @AfterPermissionGranted(RC_LOCATION)
+    private void findCurrentPlaceWithSingleton() {
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+
+        if (getActivity() != null)
+
+            if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
+
+                Log.i(TAG, "result Singleton = " + CurrentPlaceSingleton.getInstance(getActivity()).getFindCurrentPlace(getActivity()));
+
+                /*
+                for (PlaceLikelihood placeLikelihood :
+                        CurrentPlaceSingleton.getInstance(getActivity()).getFindCurrentPlace(getActivity())) {
+
+                    if (placeLikelihood.getPlace().getTypes() != null
+                            && placeLikelihood.getPlace().getLatLng() != null
+                            && placeLikelihood.getPlace().getTypes()
+                            .contains(Place.Type.RESTAURANT)) {
+
+                        // Collect the LatLng of the places likelihood
+                        restaurantLatLng = new LatLng
+                                (placeLikelihood.getPlace().getLatLng().latitude,
+                                        placeLikelihood.getPlace().getLatLng().longitude);
+
+                        // Collect the identities of the places likelihood
+                        fieldRestaurant.id = placeLikelihood.getPlace().getId();
+                        Log.i(TAG, "Place has id = " + fieldRestaurant.id);
+
+                        saveListId(fieldRestaurant);
+
+                        if (googleMap != null) {
+                            addMarkers();
+                        }
+                    }
+                }
+                */
+
+            } else
+                EasyPermissions.requestPermissions(getActivity(),
+                        getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
+    }
+
+
+    /*
     @AfterPermissionGranted(RC_LOCATION)
     private void findCurrentPlace() {
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
@@ -357,7 +404,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                                     fieldRestaurant.id = placeLikelihood.getPlace().getId();
                                     Log.i(TAG, "Place has id = " + fieldRestaurant.id);
 
-                                    saveListId(fieldRestaurant);
+                                    //saveListId(fieldRestaurant);
 
                                     if (googleMap != null) {
                                         addMarkers();
@@ -379,6 +426,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 Log.e("Exception: %s", e.getMessage());
             }
     }
+    */
 
     //----------------------------------------------------------------------------------
 

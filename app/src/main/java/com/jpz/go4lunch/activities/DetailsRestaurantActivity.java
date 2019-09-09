@@ -47,6 +47,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
     private String phoneNumber;
     private Uri uriWebsite;
+    boolean fabIsChecked = false;
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -104,10 +105,14 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
         FloatingActionButton floatingActionButton = findViewById(R.id.details_fab);
         floatingActionButton.setOnClickListener((View v) -> {
-                boolean isChecked = true;
-                if (isChecked)
+                if (!fabIsChecked) {
                     floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
-                else floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+                    fabIsChecked = true;
+                }
+                else {
+                    floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+                    fabIsChecked = false;
+                }
         });
     }
 
