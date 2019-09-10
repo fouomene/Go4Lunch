@@ -19,14 +19,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -35,12 +33,6 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
@@ -48,8 +40,6 @@ import com.jpz.go4lunch.models.FieldRestaurant;
 import com.jpz.go4lunch.utils.CurrentPlaceSingleton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -77,16 +67,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
 
     // Places
-    private PlacesClient placesClient;
-    private FindCurrentPlaceRequest request;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     private OnListIdListener mCallback;
 
-    private FieldRestaurant fieldRestaurant = new FieldRestaurant("id");
-    private ArrayList<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
     private String restaurantId;
-    private LatLng restaurantLatLng;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -129,20 +114,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         if (getActivity() != null) {
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-            // Initialize the SDK
-            //Places.initialize(getActivity(), getString(R.string.google_api_key));
-
-            // Create a new Places client instance
-            //placesClient = Places.createClient(getActivity());
         }
-/*
-        // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
 
-        // Use the builder to create a FindCurrentPlaceRequest.
-        request = FindCurrentPlaceRequest.newInstance(placeFields);
-*/
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
         floatingActionButton.setOnClickListener((View v) -> {
@@ -173,8 +146,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Show the restaurants near the user location
         //findCurrentPlace();
         findCurrentPlaceWithSingleton();
-
-        mCallback.onListId(fieldRestaurantList);
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -332,101 +303,18 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             }
     }
 
-
     @AfterPermissionGranted(RC_LOCATION)
     private void findCurrentPlaceWithSingleton() {
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-
+        // Call findCurrentPlace in the Singleton and handle the response (first check that the user has granted permission).
         if (getActivity() != null)
-
-            if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
-
-                Log.i(TAG, "result Singleton = " + CurrentPlaceSingleton.getInstance(getActivity()).getFindCurrentPlace(getActivity()));
-
-                /*
-                for (PlaceLikelihood placeLikelihood :
-                        CurrentPlaceSingleton.getInstance(getActivity()).getFindCurrentPlace(getActivity())) {
-
-                    if (placeLikelihood.getPlace().getTypes() != null
-                            && placeLikelihood.getPlace().getLatLng() != null
-                            && placeLikelihood.getPlace().getTypes()
-                            .contains(Place.Type.RESTAURANT)) {
-
-                        // Collect the LatLng of the places likelihood
-                        restaurantLatLng = new LatLng
-                                (placeLikelihood.getPlace().getLatLng().latitude,
-                                        placeLikelihood.getPlace().getLatLng().longitude);
-
-                        // Collect the identities of the places likelihood
-                        fieldRestaurant.id = placeLikelihood.getPlace().getId();
-                        Log.i(TAG, "Place has id = " + fieldRestaurant.id);
-
-                        saveListId(fieldRestaurant);
-
-                        if (googleMap != null) {
-                            addMarkers();
-                        }
-                    }
-                }
-                */
-
-            } else
+            if (EasyPermissions.hasPermissions(getActivity(), PERMS))
+                for (int i = 0; i < CurrentPlaceSingleton.getInstance(getActivity()).getLatLngCurrentPlace().size(); i++)
+                    addMarkers(CurrentPlaceSingleton.getInstance(getActivity()).getLatLngCurrentPlace().get(i),
+                            CurrentPlaceSingleton.getInstance(getActivity()).getIdCurrentPlace().get(i));
+            else
                 EasyPermissions.requestPermissions(getActivity(),
                         getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
     }
-
-
-    /*
-    @AfterPermissionGranted(RC_LOCATION)
-    private void findCurrentPlace() {
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (getActivity() != null)
-            try {
-                if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
-                    Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-                    placeResponse.addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            FindCurrentPlaceResponse response = task.getResult();
-
-                            for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-
-                                if (placeLikelihood.getPlace().getTypes() != null
-                                        && placeLikelihood.getPlace().getLatLng() != null
-                                        && placeLikelihood.getPlace().getTypes()
-                                        .contains(Place.Type.RESTAURANT)) {
-
-                                    // Collect the LatLng of the places likelihood
-                                    restaurantLatLng = new LatLng
-                                            (placeLikelihood.getPlace().getLatLng().latitude,
-                                                    placeLikelihood.getPlace().getLatLng().longitude);
-
-                                    // Collect the identities of the places likelihood
-                                    fieldRestaurant.id = placeLikelihood.getPlace().getId();
-                                    Log.i(TAG, "Place has id = " + fieldRestaurant.id);
-
-                                    //saveListId(fieldRestaurant);
-
-                                    if (googleMap != null) {
-                                        addMarkers();
-                                    }
-                                }
-                            }
-                        } else {
-                            Exception exception = task.getException();
-                            if (exception instanceof ApiException) {
-                                ApiException apiException = (ApiException) exception;
-                                Log.e(TAG, "Place not found: " + apiException.getStatusCode());
-                            }
-                        }
-                    });
-                } else
-                    EasyPermissions.requestPermissions(getActivity(),
-                            getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
-            } catch (SecurityException e) {
-                Log.e("Exception: %s", e.getMessage());
-            }
-    }
-    */
 
     //----------------------------------------------------------------------------------
 
@@ -467,17 +355,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void saveListId(FieldRestaurant restaurant) {
-        fieldRestaurantList.add(restaurant);
-        Log.i(TAG, "la list = " + fieldRestaurantList);
-    }
-
-
-    private void addMarkers() {
+    private void addMarkers(LatLng latLng, String id) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
-                .position(restaurantLatLng));
-        marker.setTag(fieldRestaurant.id);
+                .position(latLng));
+        marker.setTag(id);
     }
 
     //---------------------------------------------------------------

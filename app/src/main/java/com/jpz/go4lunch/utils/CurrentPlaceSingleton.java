@@ -14,6 +14,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,38 +23,41 @@ public class CurrentPlaceSingleton {
 
     private static CurrentPlaceSingleton ourInstance;
 
-    private LatLng restaurantLatLng;
-    private String id;
+    private ArrayList<LatLng> latLngList = new ArrayList<>();
+    private ArrayList<String> listId = new ArrayList<>();
 
     private static final String TAG = CurrentPlaceSingleton.class.getSimpleName();
 
     // Private constructor
     private CurrentPlaceSingleton(Context context) {
-        context = context.getApplicationContext();
+        getFindCurrentPlace(context.getApplicationContext());
     }
 
     public static synchronized CurrentPlaceSingleton getInstance(Context context) {
         if (ourInstance == null)
             ourInstance = new CurrentPlaceSingleton(context);
-
         return ourInstance;
     }
 
-    public String getFindCurrentPlace(Context context) {
-        return findCurrentPlace(context);
+    private void getFindCurrentPlace(Context context) {
+        findCurrentPlace(context);
     }
 
-    private String findCurrentPlace(Context context) {
+    public ArrayList<String> getIdCurrentPlace() {
+        return listId;
+    }
 
+    public ArrayList<LatLng> getLatLngCurrentPlace() {
+        return latLngList;
+    }
+
+    private void findCurrentPlace(Context context) {
         // Initialize the SDK
         Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
-
         // Create a new Places client instance
         PlacesClient placesClient = Places.createClient(context.getApplicationContext());
-
         // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.NAME, Place.Field.ID);
-
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
@@ -63,13 +67,7 @@ public class CurrentPlaceSingleton {
             placeResponse.addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     FindCurrentPlaceResponse response = task.getResult();
-                    Log.i(TAG, "response = " + response.getPlaceLikelihoods().get(0));
 
-                    if (response.getPlaceLikelihoods().get(0).getPlace().getTypes() != null &&
-                            response.getPlaceLikelihoods().get(0).getPlace().getTypes().contains(Place.Type.RESTAURANT))
-                        id = response.getPlaceLikelihoods().get(0).getPlace().getId();
-
-                    /*
                     for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
 
                         if (placeLikelihood.getPlace().getTypes() != null
@@ -78,17 +76,19 @@ public class CurrentPlaceSingleton {
                                 .contains(Place.Type.RESTAURANT)) {
 
                             // Collect the LatLng of the places likelihood
-                            restaurantLatLng = new LatLng
+                            LatLng latLng = new LatLng
                                     (placeLikelihood.getPlace().getLatLng().latitude,
                                             placeLikelihood.getPlace().getLatLng().longitude);
+                            latLngList.add(latLng);
+                            Log.i(TAG, "Place's latLng = " + latLng);
 
                             // Collect the identities of the places likelihood
-                            id = placeLikelihood.getPlace().getId();
-                            Log.i("Tag", "Place has id = " + fieldRestaurant.id);
-
+                            String id = placeLikelihood.getPlace().getId();
+                            listId.add(id);
+                            Log.i(TAG, "Place's id = " + id);
+                            Log.i(TAG, "list of id's = " + listId);
                         }
                     }
-                    */
 
                 } else {
                     Exception exception = task.getException();
@@ -102,11 +102,5 @@ public class CurrentPlaceSingleton {
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
-
-        Log.i(TAG, "return the id = " + id);
-        return id;
     }
-
-
-
 }
