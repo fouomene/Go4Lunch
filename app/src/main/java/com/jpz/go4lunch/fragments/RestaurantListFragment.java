@@ -8,26 +8,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
-import com.jpz.go4lunch.models.FieldRestaurant;
+import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static com.jpz.go4lunch.activities.MainActivity.KEY_LIST_ID;
 
 
 /**
@@ -38,16 +30,9 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     // Declare View, Adapter & a list of fields
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
-    private ArrayList<FieldRestaurant> fieldRestaurantList = new ArrayList<>();
 
+    private List<Place> placeList;
 
-    // Places
-    private PlacesClient placesClient;
-    private FetchPlaceRequest request;
-
-    private FieldRestaurant fieldRestaurant = new FieldRestaurant("id");
-
-    private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -62,27 +47,8 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
-
-        // Define a Place ID.
-        String placeId = fieldRestaurant.id;
-
-        // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
-
-        // Construct a request object, passing the place ID and fields array.
-        request = FetchPlaceRequest.newInstance(placeId, placeFields);
-
-        if (getActivity() != null)
-            // Create a new Places client instance
-            placesClient = Places.createClient(getActivity());
-
         configureRecyclerView();
-
-        if (getArguments() != null)
-            fieldRestaurantList = getArguments().getParcelableArrayList(KEY_LIST_ID);
-        Log.i("Tag ListFragment", "la liste récupérée = " + fieldRestaurantList);
-
-        //fetchPlace();
+        updateUI(CurrentPlace.getInstance().getPlaces());
 
         return view;
     }
@@ -92,50 +58,23 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     private void configureRecyclerView(){
         // Reset list
-        this.fieldRestaurantList = new ArrayList<>();
+        this.placeList = new ArrayList<>();
         // Create the adapter by passing the list of restaurants
-        this.adapterListRestaurant = new AdapterListRestaurant(fieldRestaurantList,
-                Glide.with(this), this);
+        this.adapterListRestaurant = new AdapterListRestaurant(placeList, Glide.with(this), this);
         // Attach the adapter to the recyclerView to populate items
         this.recyclerView.setAdapter(adapterListRestaurant);
         // Set layout manager to position the items
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void updateUI(List<FieldRestaurant> restaurantList) {
+    private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        fieldRestaurantList.addAll(restaurantList);
+        placeList.clear();
+        placeList.addAll(places);
         adapterListRestaurant.notifyDataSetChanged();
     }
 
     // ----------------------------------------------------------------------------
-
-    private void fetchPlace() {
-
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
-
-        //for (String id : fieldRestaurant.getIdList()) {
-
-            //fieldRestaurant.id = id;
-
-            request = FetchPlaceRequest.newInstance(fieldRestaurant.id, placeFields);
-
-            placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                Place place = response.getPlace();
-                Log.i(TAG, "Place found: " + place.getName());
-
-
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    int statusCode = apiException.getStatusCode();
-                    // Handle error with given status code.
-                    Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
-                }
-            });
-        //}
-    }
-
 
     @Override
     public void onClickItem(int position) {

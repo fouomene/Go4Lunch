@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
@@ -19,39 +18,31 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class CurrentPlaceSingleton {
+public class CurrentPlace {
 
-    private static CurrentPlaceSingleton ourInstance;
-
-    private ArrayList<LatLng> latLngList = new ArrayList<>();
-    private ArrayList<String> listId = new ArrayList<>();
-
-    private static final String TAG = CurrentPlaceSingleton.class.getSimpleName();
+    private static final String TAG = CurrentPlace.class.getSimpleName();
+    private static CurrentPlace ourInstance;
+    private ArrayList<Place> places = new ArrayList<>();
 
     // Private constructor
-    private CurrentPlaceSingleton(Context context) {
-        getFindCurrentPlace(context.getApplicationContext());
+    private CurrentPlace() {
     }
 
-    public static synchronized CurrentPlaceSingleton getInstance(Context context) {
+    public static synchronized CurrentPlace getInstance() {
         if (ourInstance == null)
-            ourInstance = new CurrentPlaceSingleton(context);
+            ourInstance = new CurrentPlace();
         return ourInstance;
     }
 
-    private void getFindCurrentPlace(Context context) {
-        findCurrentPlace(context);
+    public ArrayList<Place> getPlaces() {
+        return places;
     }
 
-    public ArrayList<String> getIdCurrentPlace() {
-        return listId;
-    }
-
-    public ArrayList<LatLng> getLatLngCurrentPlace() {
-        return latLngList;
-    }
-
-    private void findCurrentPlace(Context context) {
+    public void findCurrentPlace(Context context) {
+        /*
+        if (places != null)
+            return;
+        */
         // Initialize the SDK
         Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
         // Create a new Places client instance
@@ -75,18 +66,10 @@ public class CurrentPlaceSingleton {
                                 && placeLikelihood.getPlace().getTypes()
                                 .contains(Place.Type.RESTAURANT)) {
 
-                            // Collect the LatLng of the places likelihood
-                            LatLng latLng = new LatLng
-                                    (placeLikelihood.getPlace().getLatLng().latitude,
-                                            placeLikelihood.getPlace().getLatLng().longitude);
-                            latLngList.add(latLng);
-                            Log.i(TAG, "Place's latLng = " + latLng);
-
-                            // Collect the identities of the places likelihood
-                            String id = placeLikelihood.getPlace().getId();
-                            listId.add(id);
-                            Log.i(TAG, "Place's id = " + id);
-                            Log.i(TAG, "list of id's = " + listId);
+                            if (places == null) {
+                                places = new ArrayList<>();
+                            }
+                            places.add(placeLikelihood.getPlace());
                         }
                     }
 

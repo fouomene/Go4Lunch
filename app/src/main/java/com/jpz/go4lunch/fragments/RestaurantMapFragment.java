@@ -33,13 +33,11 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
-import com.jpz.go4lunch.models.FieldRestaurant;
-import com.jpz.go4lunch.utils.CurrentPlaceSingleton;
-
-import java.util.ArrayList;
+import com.jpz.go4lunch.utils.CurrentPlace;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -68,8 +66,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
-
-    private OnListIdListener mCallback;
 
     private String restaurantId;
 
@@ -114,6 +110,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         if (getActivity() != null) {
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+            CurrentPlace.getInstance().findCurrentPlace(getActivity());
+
         }
 
         // Declare FloatingActionButton and its behavior
@@ -144,8 +143,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         hideBusinessPOI();
 
         // Show the restaurants near the user location
-        //findCurrentPlace();
-        findCurrentPlaceWithSingleton();
+        findCurrentPlace();
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -304,13 +302,15 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     @AfterPermissionGranted(RC_LOCATION)
-    private void findCurrentPlaceWithSingleton() {
+    private void findCurrentPlace() {
         // Call findCurrentPlace in the Singleton and handle the response (first check that the user has granted permission).
         if (getActivity() != null)
             if (EasyPermissions.hasPermissions(getActivity(), PERMS))
-                for (int i = 0; i < CurrentPlaceSingleton.getInstance(getActivity()).getLatLngCurrentPlace().size(); i++)
-                    addMarkers(CurrentPlaceSingleton.getInstance(getActivity()).getLatLngCurrentPlace().get(i),
-                            CurrentPlaceSingleton.getInstance(getActivity()).getIdCurrentPlace().get(i));
+
+                for (Place places : CurrentPlace.getInstance().getPlaces()) {
+                    addMarkers(places.getLatLng(), places.getId());
+                }
+
             else
                 EasyPermissions.requestPermissions(getActivity(),
                         getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
@@ -360,30 +360,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
                 .position(latLng));
         marker.setTag(id);
-    }
-
-    //---------------------------------------------------------------
-    // Callback Interface with methods
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // Call the method that creating callback after being attached to parent activity
-        this.createCallbackToParentActivity();
-    }
-
-    private void createCallbackToParentActivity() {
-        try {
-            // Parent activity will automatically subscribe to callback
-            mCallback = (OnListIdListener) getActivity();
-        } catch (ClassCastException e) {
-            throw new ClassCastException(e.toString()+ " must implement OnListIdListener");
-        }
-    }
-
-    // Declare interface that will be implemented by any container activity
-    public interface OnListIdListener {
-        void onListId(ArrayList<FieldRestaurant> fieldRestaurantArrayList);
     }
 
 }
