@@ -48,7 +48,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
         configureRecyclerView();
-        updateUI(CurrentPlace.getInstance().getPlaces());
+        //updateUI(CurrentPlace.getInstance().getPlaces());
 
         return view;
     }

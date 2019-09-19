@@ -57,12 +57,12 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         //context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, RequestManager glide, AdapterListRestaurant.Listener callback, Context context){
+    public void updateViewHolder(Place place, RequestManager glide, AdapterListRestaurant.Listener callback){
 
         Log.i(TAG, "place  = " + place);
 
         // Update widgets
-        name.setText(fetchPlaceDetails(place, context));
+        name.setText(place.getName());
         distance.setText("distance");
         type.setText("type");
         address.setText(convertMethods.getAddress(place));

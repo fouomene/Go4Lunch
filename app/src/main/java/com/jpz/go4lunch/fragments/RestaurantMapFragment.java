@@ -39,6 +39,8 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
+import java.util.List;
+
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -49,7 +51,7 @@ import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback {
+public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback, CurrentPlace.CurrentPlaceListListener {
 
     // Google Mobile Services Objects
     private MapView mMapView;
@@ -67,6 +69,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
 
+    // Interface Listener from CurrentPlace
+    private CurrentPlace.CurrentPlaceListListener currentPlaceListListener;
+
+    // The restaurant Id, used for DetailsActivity
     private String restaurantId;
 
     // The geographical location where the device is currently located. That is, the last-known
@@ -90,6 +96,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
 
+        // Initialize currentPlaceListListener
+        currentPlaceListListener = this;
+
         mMapView = view.findViewById(R.id.map_view);
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
@@ -107,13 +116,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        if (getActivity() != null) {
+        if (getActivity() != null)
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-            CurrentPlace.getInstance().findCurrentPlace(getActivity());
-
-        }
 
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
@@ -142,8 +147,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        // Show the restaurants near the user location
-        findCurrentPlace();
+        // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance().addListener(currentPlaceListListener);
+        if (getActivity() != null)
+            // ...to allow fetching places in the method below :
+            CurrentPlace.getInstance().findCurrentPlace(getActivity());
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -157,6 +165,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     //----------------------------------------------------------------------------------
+    // LifeCycle of Map
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -214,6 +223,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     //----------------------------------------------------------------------------------
+    // Methods for location and configure Map
 
     @AfterPermissionGranted(RC_LOCATION)
     private void getDeviceLocation() {
@@ -302,15 +312,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     @AfterPermissionGranted(RC_LOCATION)
-    private void findCurrentPlace() {
-        // Call findCurrentPlace in the Singleton and handle the response (first check that the user has granted permission).
+    private void findCurrentPlace(List<Place> placeList) {
         if (getActivity() != null)
             if (EasyPermissions.hasPermissions(getActivity(), PERMS))
-
-                for (Place places : CurrentPlace.getInstance().getPlaces()) {
-                    addMarkers(places.getLatLng(), places.getId());
-                }
-
+                for (Place place : placeList)
+                    addMarkers(place.getLatLng(), place.getId());
             else
                 EasyPermissions.requestPermissions(getActivity(),
                         getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
@@ -323,6 +329,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         intent.putExtra(KEY_RESTAURANT_ID, restaurantId);
         startActivity(intent);
     }
+
+    //----------------------------------------------------------------------------------
+    // Methods to build and show markers on Map
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
 
@@ -360,6 +369,15 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
                 .position(latLng));
         marker.setTag(id);
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Use the Interface to attach the list of places
+    @Override
+    public void onPlacesFetch(List<Place> places) {
+        // Show the restaurants near the user location with the places from Interface
+        findCurrentPlace(places);
     }
 
 }
