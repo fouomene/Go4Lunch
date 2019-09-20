@@ -53,20 +53,58 @@ public class CurrentPlace {
 
     // Method to add a currentPlaceListListener (initialized in RestaurantMapFragment) in the list of listeners.
     public void addListener(CurrentPlaceListListener currentPlaceListListener) {
-        listeners.add(currentPlaceListListener);
+
+        if (listeners.isEmpty())
+            listeners.add(0, currentPlaceListListener);
+
+        if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment") &&
+                listeners.iterator().next().getClass().getName().contains("RestaurantMapFragment"))
+            listeners.set(0, currentPlaceListListener);
+
+        if (currentPlaceListListener.getClass().getName().contains("RestaurantListFragment") &&
+                !listeners.iterator().next().getClass().getName().contains("RestaurantListFragment"))
+            listeners.add(1, currentPlaceListListener);
+
+        if (currentPlaceListListener.getClass().getName().contains("RestaurantListFragment") &&
+                listeners.iterator().next().getClass().getName().contains("RestaurantListFragment"))
+            listeners.set(1, currentPlaceListListener);
+
+        /*
+        if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment") &&
+                !listeners.iterator().next().getClass().getName().contains("RestaurantMapFragment")) {
+            listeners.add(currentPlaceListListener);
+        } else
+            listeners.set(0, currentPlaceListListener);
+         */
+
     }
 
     public void findCurrentPlace(Context context) {
-        /*
-        if (places != null)
+
+        Log.i(TAG, "placeList in findCurrentPlace = " + placeList);
+
+        // If a list of places was already created, fetch places in the listener with it.
+        if (!placeList.isEmpty()) {
+            // For the currentPlaceListListener from the RestaurantMapFragment, fetch the list of places.
+            for (CurrentPlaceListListener currentPlaceListListener : listeners) {
+                Log.i(TAG, "currentPlaceListListener in loop = " + currentPlaceListListener);
+
+                currentPlaceListListener.onPlacesFetch(placeList);
+            }
             return;
-        */
+        }
+
         // Initialize the SDK
         Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
         // Create a new Places client instance
         PlacesClient placesClient = Places.createClient(context.getApplicationContext());
         // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
+
+        //List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
+
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID,
+                Place.Field.NAME, Place.Field.PHOTO_METADATAS);
+
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 

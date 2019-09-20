@@ -65,7 +65,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         name.setText(place.getName());
         distance.setText("distance");
         type.setText("type");
-        address.setText(convertMethods.getAddress(place));
+        //address.setText(convertMethods.getAddress(place));
         workmates.setText("wormates");
         hours.setText("hours");
         opinions.setText("opinions");
@@ -85,44 +85,5 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         AdapterListRestaurant.Listener callback = callbackWeakRef.get();
         if (callback != null) callback.onClickItem(getAdapterPosition());
     }
-
-    //----------------------------------------------------------------------------------
-
-
-    private String fetchPlaceDetails(Place place, Context context) {
-
-        if (place.getId() != null) {
-
-            // Specify the fields to return.
-            List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
-
-            // Construct a request object, passing the place ID and fields array.
-            FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
-
-            // Create a new Places client instance
-            PlacesClient placesClient = Places.createClient(context);
-
-            placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                placeDetail = response.getPlace().getName();
-                Log.i(TAG, "Place detail found: " + response.getPlace().getName());
-
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    int statusCode = apiException.getStatusCode();
-                    // Handle error with given status code.
-                    Log.e(TAG, "Place detail not found: " + statusCode + exception.getMessage());
-                }
-            });
-
-        }
-
-        Log.i(TAG, "placeDetail = " + placeDetail);
-
-        return placeDetail;
-
-    }
-
-
 
 }

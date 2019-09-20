@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +26,14 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener {
+public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener, CurrentPlace.CurrentPlaceListListener {
 
-    // Declare View, Adapter & a list of fields
+    // Declare View, Adapter & a list of places
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
-
     private List<Place> placeList;
 
+    private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -48,7 +49,18 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
         configureRecyclerView();
-        //updateUI(CurrentPlace.getInstance().getPlaces());
+
+        // Initialize currentPlaceListListener
+        CurrentPlace.CurrentPlaceListListener currentPlaceListListener = this;
+
+        Log.i(TAG, "currentPlaceListListener = " + currentPlaceListListener);
+
+        // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance().addListener(currentPlaceListListener);
+
+        if (getActivity() != null)
+            // ...to allow fetching places in the method below :
+            CurrentPlace.getInstance().findCurrentPlace(getActivity());
 
         return view;
     }
@@ -69,7 +81,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        placeList.clear();
+        //placeList.clear();
         placeList.addAll(places);
         adapterListRestaurant.notifyDataSetChanged();
     }
@@ -79,5 +91,13 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     @Override
     public void onClickItem(int position) {
 
+    }
+
+    // ----------------------------------------------------------------------------
+
+    // Use the Interface to attach the list of places
+    @Override
+    public void onPlacesFetch(List<Place> places) {
+        updateUI(places);
     }
 }

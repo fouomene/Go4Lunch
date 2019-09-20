@@ -147,8 +147,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
+        Log.i(TAG, "currentPlaceListListener = " + currentPlaceListListener);
+
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance().addListener(currentPlaceListListener);
+
         if (getActivity() != null)
             // ...to allow fetching places in the method below :
             CurrentPlace.getInstance().findCurrentPlace(getActivity());
@@ -376,7 +379,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // Use the Interface to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
-        // Show the restaurants near the user location with the places from Interface
+        Log.i(TAG, "places from Interface = " + places);
+        // Show the restaurants near the user location with the places from CurrentPlaceListListener
         findCurrentPlace(places);
     }
 

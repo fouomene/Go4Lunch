@@ -61,7 +61,7 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
         View view = inflater.inflate(R.layout.fragment_item, parent, false);
 
         // Create a new Places client instance
-        placesClient = Places.createClient(context);
+        //placesClient = Places.createClient(context);
 
         return new ViewHolderRestaurant(view);
     }
@@ -69,12 +69,14 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
     @Override
     public void onBindViewHolder(@NonNull ViewHolderRestaurant holder, int position) {
         //Context context = holder.itemView.getContext();
+        // Create a new Places client instance
+        //placesClient = Places.createClient(context);
 
         //Log.i(TAG, "placeList 1st index  = " + fetchPlaceDetails(placeList.get(position)));
 
-        holder.updateViewHolder(fetchPlaceDetails(placeList.get(position)), this.glide, this.callback);
+        //holder.updateViewHolder(fetchPlaceDetails(placeList.get(position)), this.glide, this.callback);
 
-        //holder.updateViewHolder(this.placeList.get(position), this.glide, this.callback, context);
+        holder.updateViewHolder(this.placeList.get(position), this.glide, this.callback);
     }
 
     @Override
@@ -87,7 +89,7 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
         return this.placeList.get(position);
     }
 
-
+    // ----------------------------------------------------------------------------
 
     private Place fetchPlaceDetails(Place place) {
 
