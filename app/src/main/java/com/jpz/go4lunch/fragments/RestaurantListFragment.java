@@ -65,7 +65,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         return view;
     }
 
-    // ----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
     // Configure RecyclerViews, Adapters, LayoutManager & glue it together
 
     private void configureRecyclerView(){
@@ -81,19 +81,18 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        //placeList.clear();
         placeList.addAll(places);
         adapterListRestaurant.notifyDataSetChanged();
     }
 
-    // ----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
 
     @Override
     public void onClickItem(int position) {
 
     }
 
-    // ----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
 
     // Use the Interface to attach the list of places
     @Override

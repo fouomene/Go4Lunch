@@ -379,7 +379,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // Use the Interface to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
-        Log.i(TAG, "places from Interface = " + places);
+        //Log.i(TAG, "places from Interface = " + places);
         // Show the restaurants near the user location with the places from CurrentPlaceListListener
         findCurrentPlace(places);
     }

@@ -54,34 +54,22 @@ public class CurrentPlace {
     // Method to add a currentPlaceListListener (initialized in RestaurantMapFragment) in the list of listeners.
     public void addListener(CurrentPlaceListListener currentPlaceListListener) {
 
+        // If the list is empty, add the listener from MapFragment in the index 0
         if (listeners.isEmpty())
             listeners.add(0, currentPlaceListListener);
-
-        if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment") &&
-                listeners.iterator().next().getClass().getName().contains("RestaurantMapFragment"))
+        // Else there is already a listener, replace the listener from MapFragment
+        else if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment"))
             listeners.set(0, currentPlaceListListener);
-
-        if (currentPlaceListListener.getClass().getName().contains("RestaurantListFragment") &&
-                !listeners.iterator().next().getClass().getName().contains("RestaurantListFragment"))
+        // Else there is already a listener, add the listener from ListFragment in the index 1
+        else if (listeners.size() == 1 && currentPlaceListListener.getClass().getName().contains("RestaurantListFragment"))
             listeners.add(1, currentPlaceListListener);
-
-        if (currentPlaceListListener.getClass().getName().contains("RestaurantListFragment") &&
-                listeners.iterator().next().getClass().getName().contains("RestaurantListFragment"))
+        // Else there is already 2 listeners, replace the listener from ListFragment
+        else if (listeners.size() == 2 && currentPlaceListListener.getClass().getName().contains("RestaurantListFragment"))
             listeners.set(1, currentPlaceListListener);
-
-        /*
-        if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment") &&
-                !listeners.iterator().next().getClass().getName().contains("RestaurantMapFragment")) {
-            listeners.add(currentPlaceListListener);
-        } else
-            listeners.set(0, currentPlaceListListener);
-         */
-
     }
 
     public void findCurrentPlace(Context context) {
-
-        Log.i(TAG, "placeList in findCurrentPlace = " + placeList);
+        //Log.i(TAG, "placeList in findCurrentPlace = " + placeList);
 
         // If a list of places was already created, fetch places in the listener with it.
         if (!placeList.isEmpty()) {
