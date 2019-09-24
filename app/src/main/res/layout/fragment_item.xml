@@ -13,7 +13,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="6dp">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/item_guideline_sixty"
@@ -33,9 +34,9 @@
             android:id="@+id/item_name"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="name"
+            android:text="@string/restaurant_name"
+            android:textColor="@android:color/black"
             android:textSize="16sp"
-            android:textStyle="bold"
             android:ellipsize="end"
             android:singleLine="true"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,21 +48,31 @@
             android:id="@+id/item_distance"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="distance"
+            android:text="@string/restaurant_distance"
             app:layout_constraintStart_toStartOf="@+id/item_guideline_sixty"
             app:layout_constraintEnd_toEndOf="@+id/item_guideline_eighty"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/item_type"/>
 
-        <ImageView
-            android:id="@+id/item_image_restaurant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:adjustViewBounds="true"
             app:layout_constraintStart_toStartOf="@id/item_guideline_eighty"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:contentDescription="@string/restaurant_photo"/>
+            android:layout_marginStart="2dp"
+            app:cardCornerRadius="4dp">
+
+            <ImageView
+                android:id="@+id/item_image_restaurant"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/restaurant_photo"/>
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/item_type"
@@ -77,7 +88,7 @@
             android:id="@+id/item_address"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="address"
+            android:text="@string/restaurant_address"
             android:ellipsize="end"
             android:singleLine="true"
             app:layout_constraintStart_toEndOf="@+id/item_type"
@@ -110,7 +121,7 @@
             android:id="@+id/item_hours"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="hours"
+            android:text="@string/restaurant_hours"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/item_guideline_sixty"
             app:layout_constraintTop_toBottomOf="@id/item_type"

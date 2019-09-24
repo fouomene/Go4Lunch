@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
@@ -72,7 +71,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         // Reset list
         this.placeList = new ArrayList<>();
         // Create the adapter by passing the list of restaurants
-        this.adapterListRestaurant = new AdapterListRestaurant(placeList, Glide.with(this), this);
+        this.adapterListRestaurant = new AdapterListRestaurant(placeList, this);
         // Attach the adapter to the recyclerView to populate items
         this.recyclerView.setAdapter(adapterListRestaurant);
         // Set layout manager to position the items

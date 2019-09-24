@@ -61,9 +61,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         placesClient = Places.createClient(itemView.getContext());
     }
 
-    public void updateViewHolder(Place place, RequestManager glide, AdapterListRestaurant.Listener callback){
-
-        //Log.i(TAG, "place  = " + place);
+    public void updateViewHolder(Place place, AdapterListRestaurant.Listener callback){
 
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME,
@@ -107,12 +105,6 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         workmates.setText("wormates");
         hours.setText("hours");
         opinions.setText("opinions");
-
-        /*
-        if (place.getPhotoMetadatas() != null)
-            glide.load(place.getPhotoMetadatas().get(0)).into(restaurantImage);
-
-         */
 
         // Create a new weak Reference to our Listener
         this.callbackWeakRef = new WeakReference<>(callback);

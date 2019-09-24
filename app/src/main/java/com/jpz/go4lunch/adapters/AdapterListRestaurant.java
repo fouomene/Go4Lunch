@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.RequestManager;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.views.ViewHolderRestaurant;
@@ -25,12 +24,8 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
     // For data
     private List<Place> placeList;
 
-    // Declaring a Glide object
-    private RequestManager glide;
-
-    public AdapterListRestaurant(List<Place> placeList, RequestManager glide, Listener callback) {
+    public AdapterListRestaurant(List<Place> placeList, Listener callback) {
         this.placeList = placeList;
-        this.glide = glide;
         this.callback = callback;
     }
 
@@ -52,8 +47,7 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolderRestaurant holder, int position) {
-
-        holder.updateViewHolder(this.placeList.get(position), this.glide, this.callback);
+        holder.updateViewHolder(this.placeList.get(position), this.callback);
     }
 
     @Override
