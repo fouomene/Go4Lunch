@@ -87,12 +87,7 @@ public class CurrentPlace {
         // Create a new Places client instance
         PlacesClient placesClient = Places.createClient(context.getApplicationContext());
         // Use fields to define the data types to return.
-
-        //List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
-
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID,
-                Place.Field.NAME, Place.Field.PHOTO_METADATAS);
-
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
         // Use the builder to create a FindCurrentPlaceRequest.
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 

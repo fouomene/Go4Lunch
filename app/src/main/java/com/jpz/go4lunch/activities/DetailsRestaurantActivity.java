@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +17,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -130,13 +128,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
             // Get the photo metadata.
             if (place.getPhotoMetadatas() != null)
                 photoMetadata = place.getPhotoMetadatas().get(0);
-
-            // Create a FetchPhotoRequest.
-            FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                    .build();
-            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-                Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                restaurantImage.setImageBitmap(bitmap);
+            convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
 
             }).addOnFailureListener((exception) -> {
                 if (exception instanceof ApiException) {
@@ -146,7 +138,6 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
                     Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
                 }
             });
-        });
     }
 
 }
