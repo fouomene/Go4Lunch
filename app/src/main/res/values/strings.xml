@@ -19,9 +19,11 @@
     <string name="no_website">There is no website for this restaurant.</string>
     <string name="restaurant_name">Name of the restaurant</string>
     <string name="restaurant_address">Address of the restaurant</string>
-    <string name="restaurant_distance">Distance from the user to the restaurant</string>
+    <string name="restaurant_distance">Distance from the restaurant</string>
     <string name="restaurant_hours">Restaurant hours</string>
     <string name="not_disclosed">Not disclosed</string>
+    <string name="closed_lunch_time">Closed for lunch time</string>
+    <string name="closing_soon">Closing soon</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>

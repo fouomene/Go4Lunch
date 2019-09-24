@@ -1,6 +1,8 @@
 package com.jpz.go4lunch.views;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -74,14 +76,13 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place placeDetail = response.getPlace();
 
-            // Get data.
-
+            // Get data from the request.
             name.setText(placeDetail.getName());
-
-            hours.setText(convertMethods.recoverDayOfWeek(placeDetail, context));
-            if (placeDetail.getOpeningHours() != null)
-                Log.i(TAG, "Hours = " + placeDetail.getOpeningHours().getWeekdayText());
-
+            hours.setText(convertMethods.closureHour(placeDetail, context));
+            if (convertMethods.closureHour(placeDetail, context).contains("Clos")) {
+                hours.setTextColor(Color.RED);
+                hours.setTypeface(Typeface.DEFAULT_BOLD);
+            }
             address.setText(convertMethods.getAddress(placeDetail));
 
             // Get the photo metadata.
