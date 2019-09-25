@@ -22,7 +22,7 @@
     <string name="restaurant_distance">Distance from the restaurant</string>
     <string name="restaurant_hours">Restaurant hours</string>
     <string name="not_disclosed">Not disclosed</string>
-    <string name="closed_lunch_time">Closed for lunch time</string>
+    <string name="closed">Closed</string>
     <string name="closing_soon">Closing soon</string>
     <string name="open_until_hour_minute">Open until %1$d.%2$dpm</string>
     <string name="open_until_hour">Open until %1$dpm</string>

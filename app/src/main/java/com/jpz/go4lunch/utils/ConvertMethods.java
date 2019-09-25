@@ -16,8 +16,10 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class ConvertMethods {
     // Class to convert restaurant data
@@ -69,48 +71,27 @@ public class ConvertMethods {
     public String closureHour(Place place, Context context) {
         String closureHour;
 
-        Date today = Calendar.getInstance().getTime();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(today);
-
-        int thisDay = calendar.get(Calendar.DAY_OF_WEEK);
+        // Set date format for full weekday
+        String dateFormat = "EEEE";
+        // Create a SimpleDateFormat with full weekday
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        // Get the weekday in uppercase
+        String weekday = sdf.format(calendar.getTime()).toUpperCase();
 
         // Prevent the user if there is no data
         if (place.getOpeningHours() == null)
             closureHour = context.getString(R.string.not_disclosed);
+        // Else get today's closing time
+        else closureHour = hourCalculation(place, DayOfWeek.valueOf(weekday),context);
 
-        else switch (thisDay) {
-            case 1: // Sunday
-                closureHour = hourCalculation(place, DayOfWeek.SUNDAY, context);
-                break;
-            case 2: // Monday
-                closureHour = hourCalculation(place, DayOfWeek.MONDAY, context);
-                break;
-            case 3: // Tuesday
-                closureHour = hourCalculation(place, DayOfWeek.TUESDAY, context);
-                break;
-            case 4: // Wednesday
-                closureHour = hourCalculation(place, DayOfWeek.WEDNESDAY, context);
-                break;
-            case 5: // Thursday
-                closureHour = hourCalculation(place, DayOfWeek.THURSDAY, context);
-                break;
-            case 6: // Friday
-                closureHour = hourCalculation(place, DayOfWeek.FRIDAY, context);
-                break;
-            case 7: // Saturday
-                closureHour = hourCalculation(place, DayOfWeek.SATURDAY, context);
-                break;
-            default:
-                closureHour = context.getString(R.string.closed_lunch_time);
-        }
         return closureHour;
     }
 
     // Calculate closure hour
     private String hourCalculation(Place place, DayOfWeek dayOfWeek, Context context) {
         // Closed by default
-        String closureHour = context.getString(R.string.closed_lunch_time);
+        String closureHour = context.getString(R.string.closed);
 
         // Set the calendar for now
         Calendar now = Calendar.getInstance();
@@ -121,7 +102,7 @@ public class ConvertMethods {
             for (int i = 0; i < (place.getOpeningHours().getPeriods().size() - 1); i++) {
 
                 // Verify opening day and opening hour for lunch
-                if (place.getOpeningHours().getPeriods().get(i).getClose().getDay() == dayOfWeek
+                if (place.getOpeningHours().getPeriods().get(i).getOpen().getDay() == dayOfWeek
                         && place.getOpeningHours().getPeriods().get(i).getOpen().getTime().getHours() < 13) {
 
                     int restaurantCloseHour = place.getOpeningHours().getPeriods().get(i).getClose().getTime().getHours();
@@ -148,7 +129,7 @@ public class ConvertMethods {
 
                     // If difference is negative, the restaurant is closed for lunch time
                     else if (diff < 0)
-                        closureHour = context.getString(R.string.closed_lunch_time);
+                        closureHour = context.getString(R.string.closed);
 
                     // Else display closure hour without the minutes
                     else if (restaurantCloseMinute == 0)
