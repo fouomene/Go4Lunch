@@ -78,11 +78,15 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
 
             // Get data from the request.
             name.setText(placeDetail.getName());
+
             hours.setText(convertMethods.closureHour(placeDetail, context));
             if (convertMethods.closureHour(placeDetail, context).contains("Clos")) {
-                hours.setTextColor(Color.RED);
+                hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
                 hours.setTypeface(Typeface.DEFAULT_BOLD);
             }
+            if (convertMethods.closureHour(placeDetail, context).contains("Open"))
+                hours.setTypeface(null, Typeface.ITALIC);
+
             address.setText(convertMethods.getAddress(placeDetail));
 
             // Get the photo metadata.

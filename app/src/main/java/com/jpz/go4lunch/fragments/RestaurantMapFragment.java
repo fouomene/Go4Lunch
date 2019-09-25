@@ -2,7 +2,6 @@ package com.jpz.go4lunch.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -36,7 +35,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
+import com.jpz.go4lunch.utils.ConvertMethods;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.util.List;
@@ -64,7 +63,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final String KEY_CAMERA_POSITION = "camera_position";
 
     // Key for Intent
-    public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
+    //public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
 
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -83,6 +82,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // not granted.
     private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 17;
+
+    // Utils
+    private ConvertMethods convertMethods = new ConvertMethods();
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -160,7 +162,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             googleMap.setOnMarkerClickListener((Marker marker) -> {
                 // Retrieve the data from the marker.
                 restaurantId = (String) marker.getTag();
-                startDetailsRestaurantActivity();
+                // Start DetailsRestaurantActivity when click the user click on a restaurant
+                convertMethods.startDetailsRestaurantActivity(getActivity(), restaurantId);
                 // Return false to indicate that we have not consumed the event and that we wish
                 // for the default behavior to occur.
                 return false;
@@ -326,14 +329,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     //----------------------------------------------------------------------------------
-
-    private void startDetailsRestaurantActivity() {
-        Intent intent = new Intent(getActivity(), DetailsRestaurantActivity.class);
-        intent.putExtra(KEY_RESTAURANT_ID, restaurantId);
-        startActivity(intent);
-    }
-
-    //----------------------------------------------------------------------------------
     // Methods to build and show markers on Map
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -376,10 +371,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     //----------------------------------------------------------------------------------
 
-    // Use the Interface to attach the list of places
+    // Use the Interface CurrentPlace to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
-        //Log.i(TAG, "places from Interface = " + places);
         // Show the restaurants near the user location with the places from CurrentPlaceListListener
         findCurrentPlace(places);
     }

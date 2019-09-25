@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
 
     private void configureBottomView(){
         bottomNav.setOnNavigationItemSelectedListener ((@NonNull MenuItem menuItem) -> {
-            Fragment selectedFragment;
+            Fragment selectedFragment = new Fragment();
             // Check the fragment selected
             switch (menuItem.getItemId()) {
                 case R.id.nav_map:
@@ -149,8 +149,6 @@ public class MainActivity extends AppCompatActivity
                 case R.id.nav_workmates:
                     selectedFragment = new WorkmatesFragment();
                     break;
-                default:
-                    selectedFragment = new RestaurantMapFragment();
             }
             // Add it to FrameLayout fragment_container
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,

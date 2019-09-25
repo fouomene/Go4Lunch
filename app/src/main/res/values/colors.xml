@@ -5,4 +5,6 @@
     <color name="colorPrimaryLight">#ff8a50</color>
 
     <color name="colorAccent">#69efad</color>
+
+    <color name="crimson">#dc143c</color>
 </resources>

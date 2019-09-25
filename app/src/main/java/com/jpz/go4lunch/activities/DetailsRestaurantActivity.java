@@ -26,7 +26,7 @@ import com.jpz.go4lunch.utils.ConvertMethods;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jpz.go4lunch.fragments.RestaurantMapFragment.KEY_RESTAURANT_ID;
+import static com.jpz.go4lunch.utils.ConvertMethods.KEY_RESTAURANT_ID;
 
 public class DetailsRestaurantActivity extends AppCompatActivity {
 
@@ -58,9 +58,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         type = findViewById(R.id.details_type);
         address = findViewById(R.id.details_address);
         opinions = findViewById(R.id.details_opinions);
-
         restaurantImage = findViewById(R.id.details_image_restaurant);
-
         call = findViewById(R.id.details_button_call);
         like = findViewById(R.id.details_button_like);
         website = findViewById(R.id.details_button_website);

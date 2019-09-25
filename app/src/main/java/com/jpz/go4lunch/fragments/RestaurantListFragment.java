@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
+import com.jpz.go4lunch.utils.ConvertMethods;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
     private List<Place> placeList;
+
+    // Utils
+    private ConvertMethods convertMethods = new ConvertMethods();
 
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
@@ -86,16 +90,19 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     //----------------------------------------------------------------------------------
 
+    // Start DetailsRestaurantActivity when click the user click on a restaurant
     @Override
     public void onClickItem(int position) {
-
+        String restaurantId = adapterListRestaurant.getPosition(position).getId();
+        convertMethods.startDetailsRestaurantActivity(getActivity(), restaurantId);
     }
 
     //----------------------------------------------------------------------------------
 
-    // Use the Interface to attach the list of places
+    // Use the Interface CurrentPlace to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
+        // Update UI with the list of restaurant from the current place
         updateUI(places);
     }
 }

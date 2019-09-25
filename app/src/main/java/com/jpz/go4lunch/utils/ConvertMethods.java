@@ -1,6 +1,7 @@
 package com.jpz.go4lunch.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
@@ -13,12 +14,16 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 
 import java.util.Calendar;
 import java.util.Date;
 
 public class ConvertMethods {
     // Class to convert restaurant data
+
+    // Key for Intent
+    public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
 
     private static final String TAG = ConvertMethods.class.getSimpleName();
 
@@ -120,6 +125,7 @@ public class ConvertMethods {
                         && place.getOpeningHours().getPeriods().get(i).getOpen().getTime().getHours() < 13) {
 
                     int restaurantCloseHour = place.getOpeningHours().getPeriods().get(i).getClose().getTime().getHours();
+                    int restaurantCloseHourPM = (place.getOpeningHours().getPeriods().get(i).getClose().getTime().getHours() - 12);
                     int restaurantCloseMinute = place.getOpeningHours().getPeriods().get(i).getClose().getTime().getMinutes();
 
                     // Set the calendar for restaurant closure hour
@@ -130,25 +136,36 @@ public class ConvertMethods {
                     restaurantCloseCalendar.set(Calendar.MINUTE, restaurantCloseMinute);
                     restaurantCloseCalendar.set(Calendar.SECOND, 0);
 
-                    Date restaurantDate = restaurantCloseCalendar.getTime();
-                    restaurantCloseCalendar.setTime(restaurantDate);
+                    //Date restaurantDate = restaurantCloseCalendar.getTime();
+                    //restaurantCloseCalendar.setTime(restaurantDate);
 
                     // Calculation between the closing time of the restaurant and now
                     long diff = restaurantCloseCalendar.getTimeInMillis() - now.getTimeInMillis();
-                   
+
                     // If the difference is less than 30 minutes, prevent the user
                     if (diff > 0 && diff < 30 * 60 * 1000)
                         closureHour = context.getString(R.string.closing_soon);
 
-                    // If difference is negative, the restaurant is closed
+                    // If difference is negative, the restaurant is closed for lunch time
                     else if (diff < 0)
                         closureHour = context.getString(R.string.closed_lunch_time);
 
-                    // Else display closure hour
-                    else closureHour = "Open until " + restaurantCloseHour + "." + restaurantCloseMinute + "pm";
+                    // Else display closure hour without the minutes
+                    else if (restaurantCloseMinute == 0)
+                        closureHour = context.getString(R.string.open_until_hour, restaurantCloseHourPM);
+
+                    // Else display closure hour with the hours and minutes
+                    else closureHour = context.getString(R.string.open_until_hour_minute, restaurantCloseHourPM, restaurantCloseMinute);
                 }
             }
         return closureHour;
+    }
+
+    // Start DetailsRestaurantActivity when click the user click on a restaurant (from the map or list)
+    public void startDetailsRestaurantActivity(Context context, String restaurantId) {
+        Intent intent = new Intent(context, DetailsRestaurantActivity.class);
+        intent.putExtra(KEY_RESTAURANT_ID, restaurantId);
+        context.startActivity(intent);
     }
 
 }

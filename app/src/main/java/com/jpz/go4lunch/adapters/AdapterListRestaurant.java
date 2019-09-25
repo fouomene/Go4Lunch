@@ -16,8 +16,6 @@ import java.util.List;
 
 public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestaurant> {
 
-    private static final String TAG = AdapterListRestaurant.class.getSimpleName();
-
     // Declaring callback
     private final Listener callback;
 
