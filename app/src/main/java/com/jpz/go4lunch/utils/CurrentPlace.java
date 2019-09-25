@@ -53,19 +53,12 @@ public class CurrentPlace {
 
     // Method to add a currentPlaceListListener (initialized in RestaurantMapFragment) in the list of listeners.
     public void addListener(CurrentPlaceListListener currentPlaceListListener) {
+        listeners.add(currentPlaceListListener);
+    }
 
-        // If the list is empty, add the listener from MapFragment in the index 0
-        if (listeners.isEmpty())
-            listeners.add(0, currentPlaceListListener);
-        // Else there is already a listener, replace the listener from MapFragment
-        else if (currentPlaceListListener.getClass().getName().contains("RestaurantMapFragment"))
-            listeners.set(0, currentPlaceListListener);
-        // Else there is already a listener, add the listener from ListFragment in the index 1
-        else if (listeners.size() == 1 && currentPlaceListListener.getClass().getName().contains("RestaurantListFragment"))
-            listeners.add(1, currentPlaceListListener);
-        // Else there is already 2 listeners, replace the listener from ListFragment
-        else if (listeners.size() == 2 && currentPlaceListListener.getClass().getName().contains("RestaurantListFragment"))
-            listeners.set(1, currentPlaceListListener);
+    public void removeListener(CurrentPlaceListListener currentPlaceListListener) {
+        listeners.remove(currentPlaceListListener);
+
     }
 
     public void findCurrentPlace(Context context) {

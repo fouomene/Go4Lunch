@@ -53,13 +53,8 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
         configureRecyclerView();
 
-        // Initialize currentPlaceListListener
-        CurrentPlace.CurrentPlaceListListener currentPlaceListListener = this;
-
-        Log.i(TAG, "currentPlaceListListener = " + currentPlaceListListener);
-
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance().addListener(currentPlaceListListener);
+        CurrentPlace.getInstance().addListener(this);
 
         if (getActivity() != null)
             // ...to allow fetching places in the method below :
@@ -104,5 +99,11 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     public void onPlacesFetch(List<Place> places) {
         // Update UI with the list of restaurant from the current place
         updateUI(places);
+    }
+
+    @Override
+    public void onDestroy() {
+        CurrentPlace.getInstance().removeListener(this);
+        super.onDestroy();
     }
 }

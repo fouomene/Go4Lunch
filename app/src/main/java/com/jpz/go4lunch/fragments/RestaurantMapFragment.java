@@ -68,9 +68,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    // Interface Listener from CurrentPlace
-    private CurrentPlace.CurrentPlaceListListener currentPlaceListListener;
-
     // The restaurant Id, used for DetailsActivity
     private String restaurantId;
 
@@ -97,9 +94,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
-
-        // Initialize currentPlaceListListener
-        currentPlaceListListener = this;
 
         mMapView = view.findViewById(R.id.map_view);
         // *** IMPORTANT ***
@@ -149,10 +143,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        Log.i(TAG, "currentPlaceListListener = " + currentPlaceListListener);
-
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance().addListener(currentPlaceListListener);
+        CurrentPlace.getInstance().addListener(this);
 
         if (getActivity() != null)
             // ...to allow fetching places in the method below :
@@ -219,6 +211,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onDestroy() {
         mMapView.onDestroy();
+        CurrentPlace.getInstance().removeListener(this);
         super.onDestroy();
     }
 
