@@ -1,7 +1,6 @@
 package com.jpz.go4lunch.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
@@ -79,12 +78,12 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
             // Get data from the request.
             name.setText(placeDetail.getName());
 
-            hours.setText(convertMethods.closureHour(placeDetail, context));
-            if (convertMethods.closureHour(placeDetail, context).contains("Clos")) {
+            hours.setText(convertMethods.openingHours(placeDetail, context));
+            if (convertMethods.openingHours(placeDetail, context).contains("Clos")) {
                 hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
                 hours.setTypeface(Typeface.DEFAULT_BOLD);
             }
-            if (convertMethods.closureHour(placeDetail, context).contains("Open"))
+            if (convertMethods.openingHours(placeDetail, context).contains("Open"))
                 hours.setTypeface(null, Typeface.ITALIC);
 
             address.setText(convertMethods.getAddress(placeDetail));

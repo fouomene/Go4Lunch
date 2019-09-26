@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
+import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
@@ -17,8 +18,12 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ConvertMethods {
@@ -47,7 +52,9 @@ public class ConvertMethods {
         return address;
     }
 
-    // Load photo and display it
+    //--------------------------------------------------------------------------------------
+
+    // Load a photo and display it
     public void fetchPhoto(PlacesClient placesClient, PhotoMetadata photo, ImageView imageView) {
         // Create a FetchPhotoRequest.
         FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photo)
@@ -67,9 +74,12 @@ public class ConvertMethods {
         });
     }
 
-    // Recover the closer hour
-    public String closureHour(Place place, Context context) {
-        String closureHour;
+    //--------------------------------------------------------------------------------------
+
+    // Recover the opening hours
+    public String openingHours(Place place, Context context) {
+
+        String openingHours;
 
         Calendar calendar = Calendar.getInstance();
         // Set date format for full weekday
@@ -81,66 +91,137 @@ public class ConvertMethods {
 
         // Prevent the user if there is no data
         if (place.getOpeningHours() == null)
-            closureHour = context.getString(R.string.not_disclosed);
+            openingHours = context.getString(R.string.not_disclosed);
         // Else get today's closing time
-        else closureHour = hourCalculation(place, DayOfWeek.valueOf(weekday),context);
+        else openingHours = getHours(getPeriods(place, DayOfWeek.valueOf(weekday)), context);
 
-        return closureHour;
+        return openingHours;
+    }
+
+    // Get a list of periods
+    private List<Period> getPeriods(Place place, DayOfWeek dayOfWeek) {
+
+        List<Period> periodList = new ArrayList<>();
+
+        if (place.getOpeningHours() != null)
+            for (int i = 0; i < (place.getOpeningHours().getPeriods().size()); i++) {
+                // If today the restaurant is open, get the periods
+                if (place.getOpeningHours().getPeriods().get(i).getOpen().getDay() == dayOfWeek)
+                    periodList.add(place.getOpeningHours().getPeriods().get(i));
+            }
+        return periodList;
     }
 
     // Calculate closure hour
-    private String hourCalculation(Place place, DayOfWeek dayOfWeek, Context context) {
-        // Closed by default
-        String closureHour = context.getString(R.string.closed);
+    private String getHours(List<Period> periodList, Context context) {
 
+        String closureHour;
         // Set the calendar for now
-        Calendar now = Calendar.getInstance();
-        Date today = now.getTime();
-        now.setTime(today);
+        Calendar actualHour = Calendar.getInstance();
+        Date today = actualHour.getTime();
+        actualHour.setTime(today);
 
-        if (place.getOpeningHours() != null)
-            for (int i = 0; i < (place.getOpeningHours().getPeriods().size() - 1); i++) {
+        List<Integer> closeTimeList = new ArrayList<>();
 
-                // Verify opening day and opening hour for lunch
-                if (place.getOpeningHours().getPeriods().get(i).getOpen().getDay() == dayOfWeek
-                        && place.getOpeningHours().getPeriods().get(i).getOpen().getTime().getHours() < 13) {
+        // If there is no period, the restaurant is closed
+        if (periodList.isEmpty())
+            closureHour = context.getString(R.string.closed);
 
-                    int restaurantCloseHour = place.getOpeningHours().getPeriods().get(i).getClose().getTime().getHours();
-                    int restaurantCloseHourPM = (place.getOpeningHours().getPeriods().get(i).getClose().getTime().getHours() - 12);
-                    int restaurantCloseMinute = place.getOpeningHours().getPeriods().get(i).getClose().getTime().getMinutes();
+        // If there is one period, calculate the closure hour
+        else if (periodList.size() == 1)
+            closureHour = displayHours(periodList.get(0), context);
 
-                    // Set the calendar for restaurant closure hour
-                    Calendar restaurantCloseCalendar = Calendar.getInstance();
-                    restaurantCloseCalendar.setTimeInMillis(System.currentTimeMillis());
-
-                    restaurantCloseCalendar.set(Calendar.HOUR_OF_DAY, restaurantCloseHour);
-                    restaurantCloseCalendar.set(Calendar.MINUTE, restaurantCloseMinute);
-                    restaurantCloseCalendar.set(Calendar.SECOND, 0);
-
-                    //Date restaurantDate = restaurantCloseCalendar.getTime();
-                    //restaurantCloseCalendar.setTime(restaurantDate);
-
-                    // Calculation between the closing time of the restaurant and now
-                    long diff = restaurantCloseCalendar.getTimeInMillis() - now.getTimeInMillis();
-
-                    // If the difference is less than 30 minutes, prevent the user
-                    if (diff > 0 && diff < 30 * 60 * 1000)
-                        closureHour = context.getString(R.string.closing_soon);
-
-                    // If difference is negative, the restaurant is closed for lunch time
-                    else if (diff < 0)
-                        closureHour = context.getString(R.string.closed);
-
-                    // Else display closure hour without the minutes
-                    else if (restaurantCloseMinute == 0)
-                        closureHour = context.getString(R.string.open_until_hour, restaurantCloseHourPM);
-
-                    // Else display closure hour with the hours and minutes
-                    else closureHour = context.getString(R.string.open_until_hour_minute, restaurantCloseHourPM, restaurantCloseMinute);
-                }
+        // If there is several period, compare closing hours
+        else {
+            // Get a comparison of a list of closing periods
+            for (int i = 0; i < periodList.size(); i++) {
+                int closeTime = periodList.get(i).getClose().getTime().getHours();
+                // Add the close time a list
+                closeTimeList.add(closeTime);
             }
+
+            // Then sort the list by order
+            Collections.sort(closeTimeList, new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    return o1.compareTo(o2);
+                }
+            });
+
+            // And get closureHour from the first index of the list
+            closureHour = displayHours(periodList.get(0), context);
+        }
         return closureHour;
     }
+
+    // Manage UI
+    private String displayHours(Period period, Context context){
+
+        // Closed by default
+        String openingHours = context.getString(R.string.closed);
+
+        // Set the calendar for now
+        Calendar actualHour = Calendar.getInstance();
+        Date today = actualHour.getTime();
+        actualHour.setTime(today);
+
+        if (period.getOpen() != null && period.getClose() != null) {
+
+            // Get the opening hours of the period
+            int openHour = period.getOpen().getTime().getHours();
+            int openMinute = period.getOpen().getTime().getMinutes();
+            // Set the calendar with opening time
+            Calendar openCalendar = Calendar.getInstance();
+            openCalendar.setTimeInMillis(System.currentTimeMillis());
+            openCalendar.set(Calendar.HOUR_OF_DAY, openHour);
+            openCalendar.set(Calendar.MINUTE, openMinute);
+            openCalendar.set(Calendar.SECOND, 0);
+
+            // Get the closing hours of the period
+            int closeHour = period.getClose().getTime().getHours();
+            int closeHourPM = (period.getClose().getTime().getHours() - 12);
+            int closeMinute = period.getClose().getTime().getMinutes();
+            // Set the calendar with closure hour
+            Calendar closeCalendar = Calendar.getInstance();
+            closeCalendar.setTimeInMillis(System.currentTimeMillis());
+            closeCalendar.set(Calendar.HOUR_OF_DAY, closeHour);
+            closeCalendar.set(Calendar.MINUTE, closeMinute);
+            closeCalendar.set(Calendar.SECOND, 0);
+
+            //Date restaurantDate = restaurantCloseCalendar.getTime();
+            //restaurantCloseCalendar.setTime(restaurantDate);
+
+            // Comparison between the closing time of the restaurant and the actual hour
+            long comparison = closeCalendar.getTimeInMillis() - actualHour.getTimeInMillis();
+
+            // If comparison is negative, the restaurant is closed
+            if (comparison < 0)
+                openingHours = context.getString(R.string.closed);
+
+            // Else if the comparison is positive but is less than 30 minutes, prevent the user of close closure
+            else if (comparison > 0 && comparison < 30 * 60 * 1000)
+                openingHours = context.getString(R.string.closing_soon);
+
+            // Else if the restaurant is open and the closure hour is "time o'clock", display the closure hour without the minutes
+            else if (actualHour.getTimeInMillis() >= openCalendar.getTimeInMillis() && closeMinute == 0)
+                openingHours = context.getString(R.string.open_until_hour, closeHourPM);
+
+            // Else if the restaurant is open and display the closure hour with the hours and minutes
+            else if (actualHour.getTimeInMillis() >= openCalendar.getTimeInMillis())
+                openingHours = context.getString(R.string.open_until_hour_minute, closeHourPM, closeMinute);
+
+            // Else if the restaurant is closed and the closure hour is "time o'clock", display the opening hours without the minutes
+            else if (actualHour.getTimeInMillis() < openCalendar.getTimeInMillis() && closeMinute == 0)
+                openingHours = context.getString(R.string.open_from_to_hour, openHour, closeHourPM);
+
+            // Else if the restaurant is closed and display opening hours with the hours and minutes
+            else if (actualHour.getTimeInMillis() < openCalendar.getTimeInMillis())
+                openingHours = context.getString(R.string.open_from_to_hour_minute, openHour, openMinute, closeHour, closeMinute);
+        }
+        return openingHours;
+    }
+
+    //--------------------------------------------------------------------------------------
 
     // Start DetailsRestaurantActivity when click the user click on a restaurant (from the map or list)
     public void startDetailsRestaurantActivity(Context context, String restaurantId) {
