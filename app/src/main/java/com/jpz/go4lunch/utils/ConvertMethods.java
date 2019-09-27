@@ -179,17 +179,14 @@ public class ConvertMethods {
 
             // Get the closing hours of the period
             int closeHour = period.getClose().getTime().getHours();
-            int closeHourPM = (period.getClose().getTime().getHours() - 12);
             int closeMinute = period.getClose().getTime().getMinutes();
+            int closeHourPM = (period.getClose().getTime().getHours() - 12);
             // Set the calendar with closure hour
             Calendar closeCalendar = Calendar.getInstance();
             closeCalendar.setTimeInMillis(System.currentTimeMillis());
             closeCalendar.set(Calendar.HOUR_OF_DAY, closeHour);
             closeCalendar.set(Calendar.MINUTE, closeMinute);
             closeCalendar.set(Calendar.SECOND, 0);
-
-            //Date restaurantDate = restaurantCloseCalendar.getTime();
-            //restaurantCloseCalendar.setTime(restaurantDate);
 
             // Comparison between the closing time of the restaurant and the actual hour
             long comparison = closeCalendar.getTimeInMillis() - actualHour.getTimeInMillis();
@@ -210,13 +207,8 @@ public class ConvertMethods {
             else if (actualHour.getTimeInMillis() >= openCalendar.getTimeInMillis())
                 openingHours = context.getString(R.string.open_until_hour_minute, closeHourPM, closeMinute);
 
-            // Else if the restaurant is closed and the closure hour is "time o'clock", display the opening hours without the minutes
-            else if (actualHour.getTimeInMillis() < openCalendar.getTimeInMillis() && closeMinute == 0)
-                openingHours = context.getString(R.string.open_from_to_hour, openHour, closeHourPM);
-
-            // Else if the restaurant is closed and display opening hours with the hours and minutes
-            else if (actualHour.getTimeInMillis() < openCalendar.getTimeInMillis())
-                openingHours = context.getString(R.string.open_from_to_hour_minute, openHour, openMinute, closeHour, closeMinute);
+            // Otherwise, the restaurant is not open for the moment
+            else openingHours = context.getString(R.string.not_open_yet);
         }
         return openingHours;
     }

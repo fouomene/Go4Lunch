@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +34,6 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
-
-    private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -100,6 +97,8 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         // Update UI with the list of restaurant from the current place
         updateUI(places);
     }
+
+    //----------------------------------------------------------------------------------
 
     @Override
     public void onDestroy() {

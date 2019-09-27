@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -19,13 +18,13 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
 import com.jpz.go4lunch.utils.ConvertMethods;
+import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.List;
 
 
-public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class ViewHolderRestaurant extends RecyclerView.ViewHolder
+        implements View.OnClickListener, CurrentPlace.PlaceDetailsListener {
     // Represent an item (line) in the RecyclerView
 
     private static final String TAG = ViewHolderRestaurant.class.getSimpleName();
@@ -64,43 +63,33 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
 
     public void updateViewHolder(Place place, AdapterListRestaurant.Listener callback){
 
-        // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.OPENING_HOURS,
-                Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
+        // Add the placeDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance().addDetailsListener(this);
+        Log.w(TAG, "this : " + this);
 
-        if (place.getId() != null)
-            // Construct a request object, passing the place ID and fields array.
-            request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
+        // ...to allow fetching details in the method below :
+        CurrentPlace.getInstance().fetchDetailsPlace(place, placesClient, request);
 
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place placeDetail = response.getPlace();
+        /*
+        name.setText(place.getName());
 
-            // Get data from the request.
-            name.setText(placeDetail.getName());
+        hours.setText(convertMethods.openingHours(place, context));
+        if (convertMethods.openingHours(place, context).contains("Clos")) {
+            hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
+            hours.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+        if (convertMethods.openingHours(place, context).contains("Open"))
+            hours.setTypeface(null, Typeface.ITALIC);
 
-            hours.setText(convertMethods.openingHours(placeDetail, context));
-            if (convertMethods.openingHours(placeDetail, context).contains("Clos")) {
-                hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
-                hours.setTypeface(Typeface.DEFAULT_BOLD);
-            }
-            if (convertMethods.openingHours(placeDetail, context).contains("Open"))
-                hours.setTypeface(null, Typeface.ITALIC);
+        address.setText(convertMethods.getAddress(place));
 
-            address.setText(convertMethods.getAddress(placeDetail));
+        // Get the photo metadata
+        if (place.getPhotoMetadatas() != null)
+            photoMetadata = place.getPhotoMetadatas().get(0);
+        convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
 
-            // Get the photo metadata.
-            if (placeDetail.getPhotoMetadatas() != null)
-                photoMetadata = placeDetail.getPhotoMetadatas().get(0);
-            convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
+         */
 
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    int statusCode = apiException.getStatusCode();
-                    // Handle error with given status code.
-                    Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
-                }
-            });
 
         // Update others widgets
         distance.setText("distance");
@@ -119,6 +108,34 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         // When a click happens, we fire our listener to get the item position in the list
         AdapterListRestaurant.Listener callback = callbackWeakRef.get();
         if (callback != null) callback.onClickItem(getAdapterPosition());
+    }
+
+    //----------------------------------------------------------------------------------
+
+    @Override
+    public void onPlaceDetailsFetch(Place placeDetails) {
+        updatePlaceUI(placeDetails);
+    }
+
+    //----------------------------------------------------------------------------------
+
+    private void updatePlaceUI(Place placeDetails) {
+        name.setText(placeDetails.getName());
+
+        hours.setText(convertMethods.openingHours(placeDetails, context));
+        if (convertMethods.openingHours(placeDetails, context).contains("Clos")) {
+            hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
+            hours.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+        if (convertMethods.openingHours(placeDetails, context).contains("Open"))
+            hours.setTypeface(null, Typeface.ITALIC);
+
+        address.setText(convertMethods.getAddress(placeDetails));
+
+        // Get the photo metadata
+        if (placeDetails.getPhotoMetadatas() != null)
+            photoMetadata = placeDetails.getPhotoMetadatas().get(0);
+        convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
     }
 
 }
