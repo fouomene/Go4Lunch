@@ -1,6 +1,5 @@
 package com.jpz.go4lunch.fragments;
 
-
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,11 +7,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
 import com.jpz.go4lunch.utils.ConvertMethods;
@@ -25,7 +27,8 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener, CurrentPlace.CurrentPlaceListListener {
+public class RestaurantListFragment extends Fragment
+        implements AdapterListRestaurant.Listener, CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
 
     // Declare View, Adapter & a list of places
     private RecyclerView recyclerView;
@@ -34,6 +37,11 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
+
+    // Places
+    private PlacesClient placesClient;
+
+    private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -94,8 +102,24 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     // Use the Interface CurrentPlace to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
-        // Update UI with the list of restaurant from the current place
-        updateUI(places);
+        // Use the list of places from CurrentPlace to call a Place Details request
+
+        // Create a new Places client instance
+        if (getActivity() != null)
+            placesClient = Places.createClient(getActivity());
+        // Add the placeDetailsListener...
+        CurrentPlace.getInstance().addDetailsListener(this);
+        Log.w(TAG, "this : " + this);
+        // ...to allow fetching details in the method below :
+        CurrentPlace.getInstance().fetchDetailsPlace(places, placesClient);
+    }
+
+    //----------------------------------------------------------------------------------
+
+    @Override
+    public void onPlaceDetailsFetch(List<Place> placeDetailsList) {
+        // Update UI with the list of restaurant from the Place Details request
+        updateUI(placeDetailsList);
     }
 
     //----------------------------------------------------------------------------------

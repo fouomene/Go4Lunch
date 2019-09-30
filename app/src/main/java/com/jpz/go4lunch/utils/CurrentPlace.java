@@ -32,30 +32,28 @@ public class CurrentPlace {
 
     // Interface to retrieve the details of a place when the task is complete.
     public interface PlaceDetailsListener {
-        void onPlaceDetailsFetch(Place placeDetails);
+        void onPlaceDetailsFetch(List<Place> placeDetailsList);
     }
 
     //----------------------------------------------------------------------------------
 
-    // This singleton CurrentPlace class contains the method to find places near the user location.
+    /**
+    This singleton CurrentPlace class contains the methods :
+     - to find the places near the user location,
+     - to get the details of these places.
+     */
 
     private static final String TAG = CurrentPlace.class.getSimpleName();
 
     private static CurrentPlace ourInstance;
 
     private List<Place> placeList = new ArrayList<>();
-
-    private List<Place> placeDetailsList = new ArrayList<>();
-
-    private PlaceDetailsListener placeDetailsListener;
-
-    //private List<PlaceDetailsListener> placeDetailsListenerList = new ArrayList<>();
-
     // List of listeners from the CurrentPlaceListListener
     private List<CurrentPlaceListListener> listeners = new ArrayList<>();
 
-    // List of listeners from the Interface
-    //private List<PlaceDetailsListener> detailsListeners = new ArrayList<>();
+    private List<Place> placeDetailsList = new ArrayList<>();
+    // Listener from the PlaceDetailsListener
+    private PlaceDetailsListener placeDetailsListener;
 
     // Private constructor
     private CurrentPlace() {
@@ -70,28 +68,21 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    // Method to add a currentPlaceListListener (initialized in th map or list fragment) in the list of listeners.
+    // Method to add a currentPlaceListListener (initialized in the map or list fragment) in the list of listeners.
     public void addListener(CurrentPlaceListListener currentPlaceListListener) {
         listeners.add(currentPlaceListListener);
     }
 
-    // Method to remove a currentPlaceListListener (initialized in th map or list fragment) in the list of listeners.
+    // Method to remove a currentPlaceListListener (initialized in the map or list fragment) in the list of listeners.
     public void removeListener(CurrentPlaceListListener currentPlaceListListener) {
         listeners.remove(currentPlaceListListener);
     }
 
     //----------------------------------------------------------------------------------
 
-    // Method to add a currentPlaceListListener (initialized in th map or list fragment) in the list of listeners.
+    // Method to add a placeDetailsListener (initialized in the list fragment).
     public void addDetailsListener(PlaceDetailsListener placeDetailsListener) {
-        //placeDetailsListenerList.add(placeDetailsListener);
         this.placeDetailsListener = placeDetailsListener;
-
-    }
-
-    // Method to remove a currentPlaceListListener (initialized in th map or list fragment) in the list of listeners.
-    public void removeDetailsListener(PlaceDetailsListener placeDetailsListener) {
-        //detailsListeners.remove(placeDetailsListener);
     }
 
     //----------------------------------------------------------------------------------
@@ -160,54 +151,33 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    public void fetchDetailsPlace(Place place, PlacesClient placesClient, FetchPlaceRequest request) {
-
-        /*
-        // If a placeDetail was already created, fetch it in the listener.
-        if (placeDetail == null) {
-            // For the currentPlaceDetailsListener from the RestaurantListFragment, fetch the place.
-            for (PlaceDetailsListener placeDetailsListener : detailsListeners) {
-                Log.i(TAG, "placeDetailsListener in loop = " + placeDetailsListener);
-                placeDetailsListener.onPlaceDetailsFetch(placeDetails);
-            }
-            return;
-        }
-         */
-
+    public void fetchDetailsPlace(List<Place> placeList, PlacesClient placesClient) {
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME, Place.Field.OPENING_HOURS,
-                Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
 
-        if (place.getId() != null)
-            // Construct a request object, passing the place ID and fields array.
-            request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
+        for (int i = 0; i < placeList.size(); i++) {
+            if (placeList.get(i).getId() != null) {
+                // Construct a request object, passing the place ID and fields array.
+                FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeList.get(i).getId(), placeFields);
 
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place placeDetails = response.getPlace();
-            Log.i(TAG, "Place details found: " + placeDetails.getName());
+                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                    Place placeDetails = response.getPlace();
+                    Log.i(TAG, "Place details found: " + placeDetails.getName());
 
-            //placeDetailsList.add(placeDetails);
+                    placeDetailsList.add(placeDetails);
 
-            /*
-            // For the placeDetailsListener from the ViewHolder, fetch the placeDetails.
-            for (PlaceDetailsListener placeDetailsListener : placeDetailsListener) {
-                placeDetailsListener.onPlaceDetailsFetch(placeDetails);
-                Log.i(TAG, "detailsListeners in fetchPlace = " + placeDetailsListenerList);
-                Log.w(TAG, "placeDetailsListener in fetchPlace = " + placeDetails.getName());
+                }).addOnFailureListener((exception) -> {
+                    if (exception instanceof ApiException) {
+                        ApiException apiException = (ApiException) exception;
+                        int statusCode = apiException.getStatusCode();
+                        // Handle error with given status code.
+                        Log.e(TAG, "Place details not found: " + exception.getMessage());
+                    }
+                });
             }
-             */
-
-            // For the placeDetailsListener from the ViewHolder, fetch the place.
-            placeDetailsListener.onPlaceDetailsFetch(placeDetails);
-
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                int statusCode = apiException.getStatusCode();
-                // Handle error with given status code.
-                Log.e(TAG, "Place details not found: " + exception.getMessage());
-            }
-        });
+        }
+        placeDetailsListener.onPlaceDetailsFetch(placeDetailsList);
     }
 
 }

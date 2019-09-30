@@ -2,7 +2,6 @@ package com.jpz.go4lunch.views;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,18 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
 import com.jpz.go4lunch.utils.ConvertMethods;
-import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.lang.ref.WeakReference;
 
 
-public class ViewHolderRestaurant extends RecyclerView.ViewHolder
-        implements View.OnClickListener, CurrentPlace.PlaceDetailsListener {
+public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener {
     // Represent an item (line) in the RecyclerView
 
     private static final String TAG = ViewHolderRestaurant.class.getSimpleName();
@@ -32,13 +28,13 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
 
+    // Views and Context
     private TextView name, distance, type, address, workmates, hours, opinions;
     private ImageView restaurantImage;
     private Context context;
 
     // Places
     private PlacesClient placesClient;
-    private FetchPlaceRequest request;
     private PhotoMetadata photoMetadata;
 
     // Declare a Weak Reference to our Callback
@@ -57,20 +53,12 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
 
         context = itemView.getContext();
 
-        // Create a new Places client instance
+        // Create a new Places client instance the photoRequest
         placesClient = Places.createClient(context);
     }
 
     public void updateViewHolder(Place place, AdapterListRestaurant.Listener callback){
-
-        // Add the placeDetailsListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance().addDetailsListener(this);
-        Log.w(TAG, "this : " + this);
-
-        // ...to allow fetching details in the method below :
-        CurrentPlace.getInstance().fetchDetailsPlace(place, placesClient, request);
-
-        /*
+        // Update Place widgets
         name.setText(place.getName());
 
         hours.setText(convertMethods.openingHours(place, context));
@@ -87,9 +75,6 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
         if (place.getPhotoMetadatas() != null)
             photoMetadata = place.getPhotoMetadatas().get(0);
         convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
-
-         */
-
 
         // Update others widgets
         distance.setText("distance");
@@ -108,34 +93,6 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
         // When a click happens, we fire our listener to get the item position in the list
         AdapterListRestaurant.Listener callback = callbackWeakRef.get();
         if (callback != null) callback.onClickItem(getAdapterPosition());
-    }
-
-    //----------------------------------------------------------------------------------
-
-    @Override
-    public void onPlaceDetailsFetch(Place placeDetails) {
-        updatePlaceUI(placeDetails);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    private void updatePlaceUI(Place placeDetails) {
-        name.setText(placeDetails.getName());
-
-        hours.setText(convertMethods.openingHours(placeDetails, context));
-        if (convertMethods.openingHours(placeDetails, context).contains("Clos")) {
-            hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
-            hours.setTypeface(Typeface.DEFAULT_BOLD);
-        }
-        if (convertMethods.openingHours(placeDetails, context).contains("Open"))
-            hours.setTypeface(null, Typeface.ITALIC);
-
-        address.setText(convertMethods.getAddress(placeDetails));
-
-        // Get the photo metadata
-        if (placeDetails.getPhotoMetadatas() != null)
-            photoMetadata = placeDetails.getPhotoMetadatas().get(0);
-        convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
     }
 
 }
