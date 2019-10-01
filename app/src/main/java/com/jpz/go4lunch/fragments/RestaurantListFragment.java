@@ -8,10 +8,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
@@ -21,16 +23,19 @@ import com.jpz.go4lunch.utils.CurrentPlace;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener, CurrentPlace.CurrentPlaceListListener {
 
-    // Declare View, Adapter & a list of places
+    // Declare View, Adapter, a list of places and a latLng
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
     private List<Place> placeList;
+    private LatLng deviceLatLng;
 
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
@@ -47,6 +52,11 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         View view = inflater.inflate(R.layout.fragment_restaurant_list, container, false);
 
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
+
+        // Get deviceLatLng value from the map
+        if (getArguments() != null)
+            deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
+        Log.w("LIST", "deviceLatLng = " + deviceLatLng);
 
         configureRecyclerView();
 
@@ -67,7 +77,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         // Reset list
         this.placeList = new ArrayList<>();
         // Create the adapter by passing the list of restaurants
-        this.adapterListRestaurant = new AdapterListRestaurant(placeList, this);
+        this.adapterListRestaurant = new AdapterListRestaurant(placeList, deviceLatLng, this);
         // Attach the adapter to the recyclerView to populate items
         this.recyclerView.setAdapter(adapterListRestaurant);
         // Set layout manager to position the items

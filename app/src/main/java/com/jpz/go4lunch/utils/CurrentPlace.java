@@ -55,7 +55,7 @@ public class CurrentPlace {
     private List<CurrentPlaceListListener> listeners = new ArrayList<>();
 
     // List of listeners from the Interface
-    //private List<PlaceDetailsListener> detailsListeners = new ArrayList<>();
+    private List<PlaceDetailsListener> detailsListenerList = new ArrayList<>();
 
     // Private constructor
     private CurrentPlace() {
@@ -84,7 +84,7 @@ public class CurrentPlace {
 
     // Method to add a currentPlaceListListener (initialized in th map or list fragment) in the list of listeners.
     public void addDetailsListener(PlaceDetailsListener placeDetailsListener) {
-        //placeDetailsListenerList.add(placeDetailsListener);
+        //detailsListenerList.add(placeDetailsListener);
         this.placeDetailsListener = placeDetailsListener;
 
     }
@@ -190,10 +190,23 @@ public class CurrentPlace {
 
             /*
             // For the placeDetailsListener from the ViewHolder, fetch the placeDetails.
-            for (PlaceDetailsListener placeDetailsListener : placeDetailsListener) {
+            for (PlaceDetailsListener placeDetailsListener : detailsListenerList) {
+                placeDetailsList.clear();
+                placeDetailsList.add(placeDetails);
+                placeDetailsListener.onPlaceDetailsFetch(placeDetailsList.get(0));
+                Log.i(TAG, "detailsListenerList.size in fetchPlace = " + detailsListenerList.size());
+
+                //placeDetailsListener.onPlaceDetailsFetch(placeDetailsList);
+                Log.i(TAG, "detailsListenerList in fetchPlace = " + detailsListenerList);
+                //Log.w(TAG, "placeDetailsList in fetchPlace = " + placeDetailsList);
+            }
+
+             */
+
+            /*
+            for (int i = 0; i < detailsListenerList.size(); i++) {
+                //placeDetailsList.add(placeDetails);
                 placeDetailsListener.onPlaceDetailsFetch(placeDetails);
-                Log.i(TAG, "detailsListeners in fetchPlace = " + placeDetailsListenerList);
-                Log.w(TAG, "placeDetailsListener in fetchPlace = " + placeDetails.getName());
             }
              */
 

@@ -1,7 +1,6 @@
 package com.jpz.go4lunch.views;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -21,6 +21,7 @@ import com.jpz.go4lunch.utils.ConvertMethods;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 
 public class ViewHolderRestaurant extends RecyclerView.ViewHolder
@@ -59,9 +60,13 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
 
         // Create a new Places client instance
         placesClient = Places.createClient(context);
+
+        // Add the placeDetailsListener in the list of listeners from CurrentPlace Singleton...
+        //CurrentPlace.getInstance().addDetailsListener(this);
+        //Log.w(TAG, "this : " + this);
     }
 
-    public void updateViewHolder(Place place, AdapterListRestaurant.Listener callback){
+    public void updateViewHolder(Place place, LatLng latLng, AdapterListRestaurant.Listener callback){
 
         // Add the placeDetailsListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance().addDetailsListener(this);
@@ -90,9 +95,11 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
 
          */
 
-
         // Update others widgets
-        distance.setText("distance");
+        if (place.getLatLng() != null)
+            distance.setText(context.getString(R.string.distance,  convertMethods.distanceCalculation
+                (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
+
         type.setText("type");
         workmates.setText("wormates");
         opinions.setText("opinions");
@@ -122,6 +129,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
     private void updatePlaceUI(Place placeDetails) {
         name.setText(placeDetails.getName());
 
+        /*
         hours.setText(convertMethods.openingHours(placeDetails, context));
         if (convertMethods.openingHours(placeDetails, context).contains("Clos")) {
             hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
@@ -136,6 +144,8 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder
         if (placeDetails.getPhotoMetadatas() != null)
             photoMetadata = placeDetails.getPhotoMetadatas().get(0);
         convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
+
+         */
     }
 
 }

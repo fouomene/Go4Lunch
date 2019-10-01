@@ -28,6 +28,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +45,7 @@ import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks {
+        implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks, RestaurantMapFragment.DeviceLocationListener {
 
     // Static data for ACCESS_FINE_LOCATION
     public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity
     // User profile
     private String username;
     private String email;
+
+    // DeviceLatLng data for the list of restaurant
+    private Fragment listFragment = new RestaurantListFragment();
+    public static final String LAT_LNG_BUNDLE_KEY = "lat_lng_bundle_key";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity
                     selectedFragment = new RestaurantMapFragment();
                     break;
                 case R.id.nav_list:
-                    selectedFragment = new RestaurantListFragment();
+                    selectedFragment = listFragment;
                     break;
                 case R.id.nav_workmates:
                     selectedFragment = new WorkmatesFragment();
@@ -273,6 +278,17 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new RestaurantMapFragment()).commit();
         }
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Transfer deviceLatLng value in RestaurantListFragment
+    @Override
+    public void onDeviceLocationFetch(LatLng latLng) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(LAT_LNG_BUNDLE_KEY, latLng);
+        listFragment.setArguments(bundle);
+        Log.i("MainActivity", "latlng = " + latLng);
     }
 
 }

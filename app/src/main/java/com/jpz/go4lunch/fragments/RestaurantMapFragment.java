@@ -62,9 +62,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final String KEY_LOCATION = "location";
     private static final String KEY_CAMERA_POSITION = "camera_position";
 
-    // Key for Intent
-    //public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
-
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -82,6 +79,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
+
+    // For DeviceLocationListener Interface
+    private DeviceLocationListener deviceLocationListener;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -250,6 +250,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                                 if (googleMap != null)
                                     googleMap.animateCamera(CameraUpdateFactory
                                         .newCameraPosition(cameraPosition));
+
+                                // Link the device location in the interface
+                                deviceLocationListener.onDeviceLocationFetch(currentLocation);
+
                             } else {
                                 Log.i(TAG, "Current location is null. Using defaults.");
                                 Log.e(TAG, "Exception: %s", task.getException());
@@ -371,4 +375,27 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         findCurrentPlace(places);
     }
 
+    //----------------------------------------------------------------------------------
+
+    // Interface to retrieve the device location when the task is complete.
+    public interface DeviceLocationListener {
+        void onDeviceLocationFetch(LatLng latLng);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        // Call the method that creating callback after being attached to parent activity
+        this.createCallbackToParentActivity();
+    }
+
+    // Create callback to parent activity
+    private void createCallbackToParentActivity(){
+        try {
+            //Parent activity will automatically subscribe to callback
+            deviceLocationListener = (DeviceLocationListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(e.toString()+ " must implement onDeviceLocationFetch");
+        }
+    }
 }
