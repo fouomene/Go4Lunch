@@ -12,6 +12,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.views.ViewHolderRestaurant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestaurant> {
@@ -20,10 +21,9 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
     private final Listener callback;
 
     // For data
-    private List<Place> placeList;
+    private List<Place> placeList = new ArrayList<>();
 
-    public AdapterListRestaurant(List<Place> placeList, Listener callback) {
-        this.placeList = placeList;
+    public AdapterListRestaurant(Listener callback) {
         this.callback = callback;
     }
 
@@ -51,6 +51,11 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
     @Override
     public int getItemCount() {
         return this.placeList.size();
+    }
+
+    public void setPlaces(List<Place> places) {
+        this.placeList = places;
+        notifyDataSetChanged();
     }
 
     // Return the position of an item in the list

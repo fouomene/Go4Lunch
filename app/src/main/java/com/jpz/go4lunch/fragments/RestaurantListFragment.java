@@ -12,15 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
 import com.jpz.go4lunch.utils.ConvertMethods;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,14 +30,12 @@ public class RestaurantListFragment extends Fragment
     // Declare View, Adapter & a list of places
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
-    private List<Place> placeList;
+    //private List<Place> placeList;
 
     // Utils
     private ConvertMethods convertMethods = new ConvertMethods();
 
     // Places
-    private PlacesClient placesClient;
-
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
@@ -59,11 +54,10 @@ public class RestaurantListFragment extends Fragment
         configureRecyclerView();
 
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance().addListener(this);
+        CurrentPlace.getInstance(getActivity()).addListener(this);
 
-        if (getActivity() != null)
-            // ...to allow fetching places in the method below :
-            CurrentPlace.getInstance().findCurrentPlace(getActivity());
+        // ...to allow fetching places in the method below :
+        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
 
         return view;
     }
@@ -73,9 +67,9 @@ public class RestaurantListFragment extends Fragment
 
     private void configureRecyclerView(){
         // Reset list
-        this.placeList = new ArrayList<>();
-        // Create the adapter by passing the list of restaurants
-        this.adapterListRestaurant = new AdapterListRestaurant(placeList, this);
+        //
+        // Create the adapter
+        this.adapterListRestaurant = new AdapterListRestaurant( this);
         // Attach the adapter to the recyclerView to populate items
         this.recyclerView.setAdapter(adapterListRestaurant);
         // Set layout manager to position the items
@@ -84,8 +78,7 @@ public class RestaurantListFragment extends Fragment
 
     private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        placeList.addAll(places);
-        adapterListRestaurant.notifyDataSetChanged();
+        adapterListRestaurant.setPlaces(places);
     }
 
     //----------------------------------------------------------------------------------
@@ -104,29 +97,26 @@ public class RestaurantListFragment extends Fragment
     public void onPlacesFetch(List<Place> places) {
         // Use the list of places from CurrentPlace to call a Place Details request
 
-        // Create a new Places client instance
-        if (getActivity() != null)
-            placesClient = Places.createClient(getActivity());
         // Add the placeDetailsListener...
-        CurrentPlace.getInstance().addDetailsListener(this);
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         Log.w(TAG, "this : " + this);
-        // ...to allow fetching details in the method below :
-        CurrentPlace.getInstance().fetchDetailsPlace(places, placesClient);
+
+        CurrentPlace.getInstance(getActivity()).findDetailsPlace(places);
     }
 
     //----------------------------------------------------------------------------------
 
     @Override
-    public void onPlaceDetailsFetch(List<Place> placeDetailsList) {
+    public void onPlaceDetailsFetch(List<Place> places) {
         // Update UI with the list of restaurant from the Place Details request
-        updateUI(placeDetailsList);
+        updateUI(places);
     }
 
     //----------------------------------------------------------------------------------
 
     @Override
     public void onDestroy() {
-        CurrentPlace.getInstance().removeListener(this);
+        CurrentPlace.getInstance(getActivity()).removeListener(this);
         super.onDestroy();
     }
 }

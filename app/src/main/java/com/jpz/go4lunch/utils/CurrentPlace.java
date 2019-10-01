@@ -32,7 +32,7 @@ public class CurrentPlace {
 
     // Interface to retrieve the details of a place when the task is complete.
     public interface PlaceDetailsListener {
-        void onPlaceDetailsFetch(List<Place> placeDetailsList);
+        void onPlaceDetailsFetch(List<Place> placeList);
     }
 
     //----------------------------------------------------------------------------------
@@ -47,22 +47,32 @@ public class CurrentPlace {
 
     private static CurrentPlace ourInstance;
 
+    // List of places for the CurrentPlaceListListener
     private List<Place> placeList = new ArrayList<>();
     // List of listeners from the CurrentPlaceListListener
     private List<CurrentPlaceListListener> listeners = new ArrayList<>();
 
+    // List of places for the PlaceDetailsListener
     private List<Place> placeDetailsList = new ArrayList<>();
     // Listener from the PlaceDetailsListener
     private PlaceDetailsListener placeDetailsListener;
 
+    //
+    private PlacesClient placesClient;
+    private FetchPlaceRequest request;
+
     // Private constructor
-    private CurrentPlace() {
+    private CurrentPlace(Context context) {
+        // Initialize the SDK
+        Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
+        // Create a new Places client instance
+        placesClient = Places.createClient(context.getApplicationContext());
     }
 
     // If there is no instance available : create new one, else return the old instance.
-    public static synchronized CurrentPlace getInstance() {
+    public static synchronized CurrentPlace getInstance(Context context) {
         if (ourInstance == null)
-            ourInstance = new CurrentPlace();
+            ourInstance = new CurrentPlace(context);
         return ourInstance;
     }
 
@@ -87,9 +97,7 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    public void findCurrentPlace(Context context) {
-        //Log.i(TAG, "placeList in findCurrentPlace = " + placeList);
-
+    public void findCurrentPlace() {
         // If a list of places was already created, fetch places in the listener with it.
         if (!placeList.isEmpty()) {
             // For the currentPlaceListListener from the map or list fragment, fetch the list of places.
@@ -100,10 +108,6 @@ public class CurrentPlace {
             return;
         }
 
-        // Initialize the SDK
-        Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
-        // Create a new Places client instance
-        PlacesClient placesClient = Places.createClient(context.getApplicationContext());
         // Use fields to define the data types to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.TYPES, Place.Field.LAT_LNG, Place.Field.ID);
         // Use the builder to create a FindCurrentPlaceRequest.
@@ -126,15 +130,14 @@ public class CurrentPlace {
                                 placeList = new ArrayList<>();
                             }
                             placeList.add(placeLikelihood.getPlace());
+                            //fetchDetailsPlace(placeLikelihood.getPlace().getId());
                             Log.i(TAG, "Place found: " + placeLikelihood.getPlace());
                         }
                     }
-
                     // For the currentPlaceListListener from the map or list fragment, fetch the list of places.
                     for (CurrentPlaceListListener currentPlaceListListener : listeners) {
                         currentPlaceListListener.onPlacesFetch(placeList);
                     }
-
                 } else {
                     Exception exception = task.getException();
                     if (exception instanceof ApiException) {
@@ -143,7 +146,6 @@ public class CurrentPlace {
                     }
                 }
             });
-
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
@@ -151,33 +153,40 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    public void fetchDetailsPlace(List<Place> placeList, PlacesClient placesClient) {
+    public void findDetailsPlace(List<Place> placeList) {
+        // If a list of places details was already created, fetch places details in the listener with it.
+        if (!placeDetailsList.isEmpty()) {
+            placeDetailsListener.onPlaceDetailsFetch(placeDetailsList);
+            return;
+        }
+
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
                 Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
 
-        for (int i = 0; i < placeList.size(); i++) {
-            if (placeList.get(i).getId() != null) {
+        for (Place place : placeList) {
+            if (place.getId() != null) {
                 // Construct a request object, passing the place ID and fields array.
-                FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeList.get(i).getId(), placeFields);
-
-                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                    Place placeDetails = response.getPlace();
-                    Log.i(TAG, "Place details found: " + placeDetails.getName());
-
-                    placeDetailsList.add(placeDetails);
-
-                }).addOnFailureListener((exception) -> {
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        int statusCode = apiException.getStatusCode();
-                        // Handle error with given status code.
-                        Log.e(TAG, "Place details not found: " + exception.getMessage());
-                    }
-                });
+                request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
             }
+            placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                Place placeDetails = response.getPlace();
+                Log.i(TAG, "Place details found: " + placeDetails.getName());
+
+                placeDetailsList.add(placeDetails);
+                placeDetailsListener.onPlaceDetailsFetch(placeDetailsList);
+
+                //placeList.set(index, placeDetails);
+                //placeDetailsListener.onPlaceDetailsFetch(placeList);
+            }).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    ApiException apiException = (ApiException) exception;
+                    int statusCode = apiException.getStatusCode();
+                    // Handle error with given status code.
+                    Log.e(TAG, "Place details not found: " + exception.getMessage());
+                }
+            });
         }
-        placeDetailsListener.onPlaceDetailsFetch(placeDetailsList);
     }
 
 }

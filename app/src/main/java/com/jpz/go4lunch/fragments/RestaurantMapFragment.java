@@ -1,6 +1,5 @@
 package com.jpz.go4lunch.fragments;
 
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -144,11 +143,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         hideBusinessPOI();
 
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance().addListener(this);
+        CurrentPlace.getInstance(getActivity()).addListener(this);
 
-        if (getActivity() != null)
-            // ...to allow fetching places in the method below :
-            CurrentPlace.getInstance().findCurrentPlace(getActivity());
+        // ...to allow fetching places in the method below :
+        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
 
         if (googleMap != null)
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -211,7 +209,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onDestroy() {
         mMapView.onDestroy();
-        CurrentPlace.getInstance().removeListener(this);
+        CurrentPlace.getInstance(getActivity()).removeListener(this);
         super.onDestroy();
     }
 
