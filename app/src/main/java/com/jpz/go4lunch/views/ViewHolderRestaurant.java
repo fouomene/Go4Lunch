@@ -52,7 +52,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         name.setText(place.getName());
 
         hours.setText(myUtils.openingHours(place, context));
-        if (myUtils.openingHours(place, context).contains("Clos") || myUtils.openingHours(place, context).contains("yet")) {
+        if (myUtils.openingHours(place, context).contains("Clos")) {
             hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
             hours.setTypeface(Typeface.DEFAULT_BOLD);
         }
