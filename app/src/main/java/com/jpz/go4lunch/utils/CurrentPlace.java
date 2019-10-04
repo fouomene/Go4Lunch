@@ -32,7 +32,7 @@ public class CurrentPlace {
 
     // Interface to retrieve the details of a place when the task is complete.
     public interface PlaceDetailsListener {
-        void onPlaceDetailsFetch(List<Place> placeList);
+        void onPlaceDetailsFetch(List<Place> places);
     }
 
     //----------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ public class CurrentPlace {
     // Listener from the PlaceDetailsListener
     private PlaceDetailsListener placeDetailsListener;
 
-    //
+    // Places
     private PlacesClient placesClient;
     private FetchPlaceRequest request;
 
@@ -162,7 +162,8 @@ public class CurrentPlace {
 
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
-                Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS);
+                Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
+                Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
 
         for (Place place : placeList) {
             if (place.getId() != null) {

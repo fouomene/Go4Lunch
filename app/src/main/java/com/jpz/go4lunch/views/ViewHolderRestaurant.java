@@ -10,13 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
-import com.jpz.go4lunch.utils.ConvertMethods;
+import com.jpz.go4lunch.utils.MyUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -24,19 +22,13 @@ import java.lang.ref.WeakReference;
 public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener {
     // Represent an item (line) in the RecyclerView
 
-    private static final String TAG = ViewHolderRestaurant.class.getSimpleName();
-
     // Utils
-    private ConvertMethods convertMethods = new ConvertMethods();
+    private MyUtils myUtils = new MyUtils();
 
     // Views and Context
     private TextView name, distance, type, address, workmates, hours, opinions;
     private ImageView restaurantImage;
     private Context context;
-
-    // Places
-    private PlacesClient placesClient;
-    private PhotoMetadata photoMetadata;
 
     // Declare a Weak Reference to our Callback
     private WeakReference<AdapterListRestaurant.Listener> callbackWeakRef;
@@ -53,34 +45,34 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         restaurantImage = itemView.findViewById(R.id.item_image_restaurant);
 
         context = itemView.getContext();
-
-        // Create a new Places client instance the photoRequest
-        placesClient = Places.createClient(context);
     }
 
     public void updateViewHolder(Place place, LatLng latLng, AdapterListRestaurant.Listener callback){
         // Update Place widgets
         name.setText(place.getName());
 
-        hours.setText(convertMethods.openingHours(place, context));
-        if (convertMethods.openingHours(place, context).contains("Clos")) {
+        hours.setText(myUtils.openingHours(place, context));
+        if (myUtils.openingHours(place, context).contains("Clos") || myUtils.openingHours(place, context).contains("yet")) {
             hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
             hours.setTypeface(Typeface.DEFAULT_BOLD);
         }
-        if (convertMethods.openingHours(place, context).contains("Open"))
+        if (myUtils.openingHours(place, context).contains("Open")) {
             hours.setTypeface(null, Typeface.ITALIC);
+        }
 
-        address.setText(convertMethods.getAddress(place));
+        address.setText(myUtils.getAddress(place));
 
         // Get the photo metadata
-        if (place.getPhotoMetadatas() != null)
-            photoMetadata = place.getPhotoMetadatas().get(0);
-        convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
+        if (place.getPhotoMetadatas() != null) {
+            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+            myUtils.fetchPhoto(context, photoMetadata, restaurantImage);
+        }
 
         // Update others widgets
-        if (place.getLatLng() != null)
-            distance.setText(context.getString(R.string.distance,  convertMethods.distanceCalculation
+        if (place.getLatLng() != null) {
+            distance.setText(context.getString(R.string.distance,  myUtils.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
+        }
 
         type.setText("type");
         workmates.setText("wormates");

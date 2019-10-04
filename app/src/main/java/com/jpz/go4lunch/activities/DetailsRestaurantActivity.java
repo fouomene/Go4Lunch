@@ -13,20 +13,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.utils.ConvertMethods;
+import com.jpz.go4lunch.utils.MyUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import static com.jpz.go4lunch.utils.MyUtils.KEY_PLACE;
 
-import static com.jpz.go4lunch.utils.ConvertMethods.KEY_RESTAURANT_ID;
 
 public class DetailsRestaurantActivity extends AppCompatActivity {
 
@@ -36,12 +30,10 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private Button call, like, website;
 
     // Places
-    private PlacesClient placesClient;
-    private FetchPlaceRequest request;
-    private PhotoMetadata photoMetadata;
+    private Place place;
 
     // Utils
-    private ConvertMethods convertMethods = new ConvertMethods();
+    private MyUtils myUtils = new MyUtils();
 
     private String phoneNumber;
     private Uri uriWebsite;
@@ -63,21 +55,11 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         like = findViewById(R.id.details_button_like);
         website = findViewById(R.id.details_button_website);
 
-        // Get the transferred data from the source activity and define a Place ID.
+        // Get the transferred Place data from the source activity
         Intent intent = getIntent();
-        String placeId = intent.getStringExtra(KEY_RESTAURANT_ID);
+        place = intent.getParcelableExtra(KEY_PLACE);
 
-        // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.NAME,Place.Field.ADDRESS_COMPONENTS,
-                Place.Field.PHOTO_METADATAS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
-
-        // Construct a request object, passing the place ID and fields array.
-        request = FetchPlaceRequest.newInstance(placeId, placeFields);
-
-        // Create a new Places client instance
-        placesClient = Places.createClient(this);
-
-        fetchPlace();
+        updateUI();
 
         // Display the phone number
         call.setOnClickListener((View v) -> {
@@ -91,9 +73,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
         // Display the website
         website.setOnClickListener((View v) -> {
-            if (uriWebsite == null)
+            if (uriWebsite == null) {
                 Toast.makeText(this, getString(R.string.no_website), Toast.LENGTH_SHORT).show();
-            else {
+            } else {
                 Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriWebsite.toString()));
                 startActivity(webIntent);
             }
@@ -101,41 +83,29 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
 
         FloatingActionButton floatingActionButton = findViewById(R.id.details_fab);
         floatingActionButton.setOnClickListener((View v) -> {
-                if (!fabIsChecked) {
-                    floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
-                    fabIsChecked = true;
-                }
-                else {
-                    floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
-                    fabIsChecked = false;
-                }
+            if (!fabIsChecked) {
+                floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
+                fabIsChecked = true;
+            } else {
+                floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+                fabIsChecked = false;
+            }
         });
     }
 
-    private void fetchPlace() {
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place place = response.getPlace();
+    private void updateUI() {
+        // Get Place data
+        name.setText(place.getName());
+        address.setText(myUtils.getAddress(place));
+        phoneNumber = place.getPhoneNumber();
+        uriWebsite = place.getWebsiteUri();
+        Log.i(TAG, "Uri " + place.getWebsiteUri());
 
-            // Get data
-            name.setText(place.getName());
-            address.setText(convertMethods.getAddress(place));
-            phoneNumber = place.getPhoneNumber();
-            uriWebsite = place.getWebsiteUri();
-            Log.i(TAG, "Uri " + place.getWebsiteUri());
-
-            // Get the photo metadata.
-            if (place.getPhotoMetadatas() != null)
-                photoMetadata = place.getPhotoMetadatas().get(0);
-            convertMethods.fetchPhoto(placesClient, photoMetadata, restaurantImage);
-
-            }).addOnFailureListener((exception) -> {
-                if (exception instanceof ApiException) {
-                    ApiException apiException = (ApiException) exception;
-                    int statusCode = apiException.getStatusCode();
-                    // Handle error with given status code.
-                    Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
-                }
-            });
+        // Get the photo metadata
+        if (place.getPhotoMetadatas() != null) {
+            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
+            myUtils.fetchPhoto(this, photoMetadata, restaurantImage);
+        }
     }
 
 }

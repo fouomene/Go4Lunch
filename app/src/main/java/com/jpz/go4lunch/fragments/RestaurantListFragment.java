@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
-import com.jpz.go4lunch.utils.ConvertMethods;
+import com.jpz.go4lunch.utils.MyUtils;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.util.List;
@@ -27,8 +27,8 @@ import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantListFragment extends Fragment
-        implements AdapterListRestaurant.Listener, CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
+public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener,
+        CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
 
     // Declare View, Adapter & a list of places
     private RecyclerView recyclerView;
@@ -37,7 +37,7 @@ public class RestaurantListFragment extends Fragment
     private LatLng deviceLatLng;
 
     // Utils
-    private ConvertMethods convertMethods = new ConvertMethods();
+    private MyUtils myUtils = new MyUtils();
 
     // Places
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
@@ -56,9 +56,7 @@ public class RestaurantListFragment extends Fragment
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
         // Get deviceLatLng value from the map
-        if (getArguments() != null)
-            deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
-        Log.w(TAG, "deviceLatLng = " + deviceLatLng);
+        if (getArguments() != null) deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
 
         configureRecyclerView();
 
@@ -92,8 +90,8 @@ public class RestaurantListFragment extends Fragment
     // Start DetailsRestaurantActivity when click the user click on a restaurant
     @Override
     public void onClickItem(int position) {
-        String restaurantId = adapterListRestaurant.getPosition(position).getId();
-        convertMethods.startDetailsRestaurantActivity(getActivity(), restaurantId);
+        Place place = adapterListRestaurant.getPosition(position);
+        myUtils.startDetailsRestaurantActivity(getActivity(), place);
     }
 
     //----------------------------------------------------------------------------------

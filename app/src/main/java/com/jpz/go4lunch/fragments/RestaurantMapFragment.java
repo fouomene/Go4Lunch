@@ -34,7 +34,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.utils.ConvertMethods;
+import com.jpz.go4lunch.utils.MyUtils;
 import com.jpz.go4lunch.utils.CurrentPlace;
 
 import java.util.List;
@@ -49,7 +49,8 @@ import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback, CurrentPlace.CurrentPlaceListListener {
+public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback,
+        CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
 
     // Google Mobile Services Objects
     private MapView mMapView;
@@ -64,9 +65,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // Places
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    // The restaurant Id, used for DetailsActivity
-    private String restaurantId;
-
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location lastKnownLocation;
@@ -77,7 +75,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final int DEFAULT_ZOOM = 17;
 
     // Utils
-    private ConvertMethods convertMethods = new ConvertMethods();
+    private MyUtils myUtils = new MyUtils();
 
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
@@ -111,9 +109,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        if (getActivity() != null)
+        if (getActivity() != null) {
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        }
 
         // Declare FloatingActionButton and its behavior
         FloatingActionButton floatingActionButton = view.findViewById(R.id.fragment_restaurant_map_fab);
@@ -144,20 +143,20 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance(getActivity()).addListener(this);
-
         // ...to allow fetching places in the method below :
         CurrentPlace.getInstance(getActivity()).findCurrentPlace();
 
-        if (googleMap != null)
+        if (googleMap != null) {
             googleMap.setOnMarkerClickListener((Marker marker) -> {
                 // Retrieve the data from the marker.
-                restaurantId = (String) marker.getTag();
+                Place place = (Place) marker.getTag();
                 // Start DetailsRestaurantActivity when click the user click on a restaurant
-                convertMethods.startDetailsRestaurantActivity(getActivity(), restaurantId);
+                myUtils.startDetailsRestaurantActivity(getActivity(), place);
                 // Return false to indicate that we have not consumed the event and that we wish
                 // for the default behavior to occur.
                 return false;
             });
+        }
     }
 
     //----------------------------------------------------------------------------------
@@ -228,47 +227,50 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        if (getActivity() != null)
-            try {
+        try {
+            if (getActivity() != null) {
                 if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                     locationResult.addOnCompleteListener(getActivity(), (@NonNull Task<Location> task) -> {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                // Set the map's camera position to the current location of the device.
-                                lastKnownLocation = task.getResult();
-                                final LatLng currentLocation =
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude());
-                                // Construct a CameraPosition focusing on the current location...
-                                // ...and animate the camera to that position.
-                                cameraPosition = new CameraPosition.Builder()
-                                        .target(currentLocation)
-                                        .zoom(DEFAULT_ZOOM)
-                                        .build();
-                                if (googleMap != null)
-                                    googleMap.animateCamera(CameraUpdateFactory
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.getResult();
+                            final LatLng currentLocation =
+                                    new LatLng(lastKnownLocation.getLatitude(),
+                                            lastKnownLocation.getLongitude());
+                            // Construct a CameraPosition focusing on the current location...
+                            // ...and animate the camera to that position.
+                            cameraPosition = new CameraPosition.Builder()
+                                    .target(currentLocation)
+                                    .zoom(DEFAULT_ZOOM)
+                                    .build();
+                            if (googleMap != null) {
+                                googleMap.animateCamera(CameraUpdateFactory
                                         .newCameraPosition(cameraPosition));
-
-                                // Link the device location in the interface
-                                deviceLocationListener.onDeviceLocationFetch(currentLocation);
-
-                            } else {
-                                Log.i(TAG, "Current location is null. Using defaults.");
-                                Log.e(TAG, "Exception: %s", task.getException());
-                                if (googleMap != null)
-                                    googleMap.moveCamera(CameraUpdateFactory
-                                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                             }
+
+                            // Link the device location in the interface
+                            deviceLocationListener.onDeviceLocationFetch(currentLocation);
+
+                        } else {
+                            Log.i(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            if (googleMap != null)
+                                googleMap.moveCamera(CameraUpdateFactory
+                                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                        }
                     });
                 } else {
-                    if (getActivity() != null)
+                    if (getActivity() != null) {
                         EasyPermissions.requestPermissions(getActivity(),
                                 getString(R.string.rationale_permission_location_access),
                                 RC_LOCATION, PERMS);
+                    }
                 }
-            } catch (SecurityException e) {
-                Log.e("Exception: %s", e.getMessage());
             }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
     }
 
     @AfterPermissionGranted(RC_LOCATION)
@@ -277,7 +279,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             return;
         }
         try {
-            if (getActivity() != null)
+            if (getActivity() != null) {
                 if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                     // Go to My Location and give the related control on the map
                     googleMap.setMyLocationEnabled(true);
@@ -286,17 +288,18 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                     googleMap.setMyLocationEnabled(false);
                     googleMap = null;
                     EasyPermissions.requestPermissions(getActivity(),
-                                    getString(R.string.rationale_permission_location_access),
-                                    RC_LOCATION, PERMS);
+                            getString(R.string.rationale_permission_location_access),
+                            RC_LOCATION, PERMS);
                 }
+            }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
     private void hideBusinessPOI() {
-        if (getActivity() != null)
-            try {
+        try {
+            if (getActivity() != null) {
                 if (googleMap != null) {
                     // Customise the styling of the base map using a JSON object defined
                     // in a raw resource file.
@@ -307,24 +310,34 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                         Log.e(TAG, "Style parsing failed.");
                     }
                 }
-            } catch (Resources.NotFoundException e) {
-                Log.e(TAG, "Can't find style. Error: ", e);
             }
-    }
-
-    @AfterPermissionGranted(RC_LOCATION)
-    private void findCurrentPlace(List<Place> placeList) {
-        if (getActivity() != null)
-            if (EasyPermissions.hasPermissions(getActivity(), PERMS))
-                for (Place place : placeList)
-                    addMarkers(place.getLatLng(), place.getId());
-            else
-                EasyPermissions.requestPermissions(getActivity(),
-                        getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
     }
 
     //----------------------------------------------------------------------------------
     // Methods to build and show markers on Map
+
+    @AfterPermissionGranted(RC_LOCATION)
+    private void findCurrentPlace(List<Place> placeList) {
+        if (getActivity() != null) {
+            if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
+                for (Place place : placeList)
+                    addMarkers(place.getLatLng(), place);
+            } else {
+                EasyPermissions.requestPermissions(getActivity(),
+                        getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
+            }
+        }
+    }
+
+    private void addMarkers(LatLng latLng, Place place) {
+        Marker marker = googleMap.addMarker(new MarkerOptions()
+                .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                .position(latLng));
+        marker.setTag(place);
+    }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
 
@@ -357,19 +370,21 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private void addMarkers(LatLng latLng, String id) {
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-                .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
-                .position(latLng));
-        marker.setTag(id);
-    }
-
     //----------------------------------------------------------------------------------
 
     // Use the Interface CurrentPlace to attach the list of places
     @Override
     public void onPlacesFetch(List<Place> places) {
-        // Show the restaurants near the user location with the places from CurrentPlaceListListener
+        // Use the list of places from CurrentPlace to call a Place Details request :
+        // Add the placeDetailsListener from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+        // ...to allow fetching details places in the method below :
+        CurrentPlace.getInstance(getActivity()).findDetailsPlace(places);
+    }
+
+    @Override
+    public void onPlaceDetailsFetch(List<Place> places) {
+        // Show the restaurants near the user location with the places from the Place Details request
         findCurrentPlace(places);
     }
 

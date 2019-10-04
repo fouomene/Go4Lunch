@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
@@ -26,13 +27,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ConvertMethods {
-    // Class to convert restaurant data
+public class MyUtils {
+    // Class to convert restaurant data and avoid duplicates for common methods
 
     // Key for Intent
-    public static final String KEY_RESTAURANT_ID = "key_restaurant_id";
+    public static final String KEY_PLACE = "key_place";
 
-    private static final String TAG = ConvertMethods.class.getSimpleName();
+    private static final String TAG = MyUtils.class.getSimpleName();
 
     // Format the address with the components
     public String getAddress(Place place) {
@@ -55,7 +56,9 @@ public class ConvertMethods {
     //--------------------------------------------------------------------------------------
 
     // Load a photo and display it
-    public void fetchPhoto(PlacesClient placesClient, PhotoMetadata photo, ImageView imageView) {
+    public void fetchPhoto(Context context, PhotoMetadata photo, ImageView imageView) {
+        // Create a new Places client instance
+        PlacesClient placesClient = Places.createClient(context);
         // Create a FetchPhotoRequest.
         FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photo)
                 .build();
@@ -240,9 +243,10 @@ public class ConvertMethods {
     //--------------------------------------------------------------------------------------
 
     // Start DetailsRestaurantActivity when click the user click on a restaurant (from the map or list)
-    public void startDetailsRestaurantActivity(Context context, String restaurantId) {
+    // and transfer Place data.
+    public void startDetailsRestaurantActivity(Context context, Place place) {
         Intent intent = new Intent(context, DetailsRestaurantActivity.class);
-        intent.putExtra(KEY_RESTAURANT_ID, restaurantId);
+        intent.putExtra(KEY_PLACE, place);
         context.startActivity(intent);
     }
 
