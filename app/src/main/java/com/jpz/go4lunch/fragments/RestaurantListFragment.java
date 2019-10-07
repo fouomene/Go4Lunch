@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener,
-        CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
+        CurrentPlace.PlacesDetailsListener {
 
     // Declare View, Adapter & a list of places
     private RecyclerView recyclerView;
@@ -38,9 +37,6 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     // Utils
     private MyUtils myUtils = new MyUtils();
-
-    // Places
-    private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -60,10 +56,10 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
         configureRecyclerView();
 
-        // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addListener(this);
+        // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        CurrentPlace.getInstance(getActivity()).findDetailsPlaces();
 
         return view;
     }
@@ -98,20 +94,8 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     // Use the Interface CurrentPlace to attach the list of places
     @Override
-    public void onPlacesFetch(List<Place> places) {
-        // Use the list of places from CurrentPlace to call a Place Details request :
-        // Add the placeDetailsListener from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
-        Log.w(TAG, "this : " + this);
-        // ...to allow fetching details places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlace(places);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    @Override
-    public void onPlaceDetailsFetch(List<Place> places) {
-        // Update UI with the list of restaurant from the Place Details request
+    public void onPlacesDetailsFetch(List<Place> places) {
+        // Update UI with the list of restaurant from the request
         updateUI(places);
     }
 

@@ -50,7 +50,7 @@ import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback,
-        CurrentPlace.CurrentPlaceListListener, CurrentPlace.PlaceDetailsListener {
+        CurrentPlace.PlacesDetailsListener {
 
     // Google Mobile Services Objects
     private MapView mMapView;
@@ -141,10 +141,10 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        // Add the currentPlaceListListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addListener(this);
+        // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        CurrentPlace.getInstance(getActivity()).findDetailsPlaces();
 
         if (googleMap != null) {
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -372,19 +372,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     //----------------------------------------------------------------------------------
 
-    // Use the Interface CurrentPlace to attach the list of places
     @Override
-    public void onPlacesFetch(List<Place> places) {
-        // Use the list of places from CurrentPlace to call a Place Details request :
-        // Add the placeDetailsListener from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
-        // ...to allow fetching details places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlace(places);
-    }
-
-    @Override
-    public void onPlaceDetailsFetch(List<Place> places) {
-        // Show the restaurants near the user location with the places from the Place Details request
+    public void onPlacesDetailsFetch(List<Place> places) {
+        // Show the restaurants near the user location with the places from the request
         findCurrentPlace(places);
     }
 
