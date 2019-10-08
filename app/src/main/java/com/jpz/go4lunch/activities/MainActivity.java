@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity
             String urlPicture = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
             String selectedPlace = workmate.getSelectedPlace();
 
-            WorkmateHelper.createWormate(uid, username, urlPicture, selectedPlace)
+            WorkmateHelper.createWorkmate(uid, username, urlPicture, selectedPlace)
                     .addOnFailureListener(e ->
                             Toast.makeText(getApplicationContext(),
                                     getString(R.string.fui_error_unknown), Toast.LENGTH_LONG).show());

@@ -12,13 +12,13 @@ public class WorkmateHelper {
 
     // --- COLLECTION REFERENCE ---
 
-    public static CollectionReference getWorkmatesCollection(){
+    private static CollectionReference getWorkmatesCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 
     // --- CREATE ---
 
-    public static Task<Void> createWormate(String uid, String username, String urlPicture, String place) {
+    public static Task<Void> createWorkmate(String uid, String username, String urlPicture, String place) {
         Workmate userToCreate = new Workmate(uid, username, urlPicture, place);
         return WorkmateHelper.getWorkmatesCollection().document(uid).set(userToCreate);
     }

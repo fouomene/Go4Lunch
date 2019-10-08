@@ -34,8 +34,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.utils.MyUtils;
 import com.jpz.go4lunch.utils.CurrentPlace;
+import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     private static final int DEFAULT_ZOOM = 17;
 
     // Utils
-    private MyUtils myUtils = new MyUtils();
+    private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
 
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
@@ -151,7 +151,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 // Retrieve the data from the marker.
                 Place place = (Place) marker.getTag();
                 // Start DetailsRestaurantActivity when click the user click on a restaurant
-                myUtils.startDetailsRestaurantActivity(getActivity(), place);
+                utilsNavigation.startDetailsRestaurantActivity(getActivity(), place);
                 // Return false to indicate that we have not consumed the event and that we wish
                 // for the default behavior to occur.
                 return false;
@@ -373,7 +373,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     //----------------------------------------------------------------------------------
 
     @Override
-    public void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList) {
+    public void onPlacesDetailsFetch(List<Place> places) {
         // Show the restaurants near the user location with the places from the request
         findCurrentPlace(places);
     }

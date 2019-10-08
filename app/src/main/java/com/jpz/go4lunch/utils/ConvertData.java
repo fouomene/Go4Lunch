@@ -1,22 +1,12 @@
 package com.jpz.go4lunch.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.util.Log;
-import android.widget.ImageView;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,13 +15,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MyUtils {
-    // Class to convert restaurant data and avoid duplicates for common methods
-
-    // Key for Intent
-    public static final String KEY_PLACE = "key_place";
-
-    private static final String TAG = MyUtils.class.getSimpleName();
+public class ConvertData {
+    // Class to convert data from Place and use it for UI purpose
 
     // Format the address with the components
     public String getAddress(Place place) {
@@ -49,35 +34,6 @@ public class MyUtils {
             address = streetNumber + " " + route;
         }
         return address;
-    }
-
-    //--------------------------------------------------------------------------------------
-
-    // Search a photo and display it
-    public void findAndFetchPhoto(Context context, PhotoMetadata photo, ImageView imageView) {
-        // Create a new Places client instance
-        PlacesClient placesClient = Places.createClient(context);
-        // Create a FetchPhotoRequest.
-        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photo)
-                .build();
-
-        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-            Bitmap bitmap = fetchPhotoResponse.getBitmap();
-            imageView.setImageBitmap(bitmap);
-
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                int statusCode = apiException.getStatusCode();
-                // Handle error with given status code.
-                Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
-            }
-        });
-    }
-
-    // Load a photo and display it
-    public void fetchPhoto(Bitmap bitmap, ImageView imageView) {
-        imageView.setImageBitmap(bitmap);
     }
 
     //--------------------------------------------------------------------------------------
@@ -203,16 +159,6 @@ public class MyUtils {
         double distance = R * c * 1000; // convert to meters
         distance = Math.pow(distance, 2);
         return (int) Math.sqrt(distance);
-    }
-
-    //--------------------------------------------------------------------------------------
-
-    // Start DetailsRestaurantActivity when click the user click on a restaurant (from the map or list)
-    // and transfer Place data.
-    public void startDetailsRestaurantActivity(Context context, Place place) {
-        Intent intent = new Intent(context, DetailsRestaurantActivity.class);
-        intent.putExtra(KEY_PLACE, place);
-        context.startActivity(intent);
     }
 
 }

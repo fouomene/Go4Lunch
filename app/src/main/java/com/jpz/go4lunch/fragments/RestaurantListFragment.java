@@ -1,6 +1,5 @@
 package com.jpz.go4lunch.fragments;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,8 +15,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
-import com.jpz.go4lunch.utils.MyUtils;
 import com.jpz.go4lunch.utils.CurrentPlace;
+import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 import java.util.List;
 
@@ -30,14 +29,13 @@ import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
 public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener,
         CurrentPlace.PlacesDetailsListener {
 
-    // Declare View, Adapter & a list of places
+    // Declare View, Adapter & a LatLng
     private RecyclerView recyclerView;
     private AdapterListRestaurant adapterListRestaurant;
-    //private List<Place> placeList;
     private LatLng deviceLatLng;
 
     // Utils
-    private MyUtils myUtils = new MyUtils();
+    private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -77,9 +75,9 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void updateUI(List<Place> places, List<Bitmap> bitmapList) {
+    private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        adapterListRestaurant.setPlaces(places, bitmapList);
+        adapterListRestaurant.setPlaces(places);
     }
 
     //----------------------------------------------------------------------------------
@@ -88,16 +86,16 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     @Override
     public void onClickItem(int position) {
         Place place = adapterListRestaurant.getPosition(position);
-        myUtils.startDetailsRestaurantActivity(getActivity(), place);
+        utilsNavigation.startDetailsRestaurantActivity(getActivity(), place);
     }
 
     //----------------------------------------------------------------------------------
 
     // Use the Interface CurrentPlace to attach the list of places
     @Override
-    public void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList) {
+    public void onPlacesDetailsFetch(List<Place> places) {
         // Update UI with the list of restaurant from the request
-        updateUI(places, bitmapList);
+        updateUI(places);
     }
 
     //----------------------------------------------------------------------------------

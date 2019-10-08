@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,16 +14,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.utils.MyUtils;
+import com.jpz.go4lunch.utils.CurrentPlace;
+import com.jpz.go4lunch.utils.ConvertData;
 
-import static com.jpz.go4lunch.utils.MyUtils.KEY_PLACE;
+import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
 
-public class DetailsRestaurantActivity extends AppCompatActivity {
+public class DetailsRestaurantActivity extends AppCompatActivity implements CurrentPlace.PlacePhotoListener {
 
     // Widgets
     private TextView name, opinions, type, address;
@@ -33,7 +34,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private Place place;
 
     // Utils
-    private MyUtils myUtils = new MyUtils();
+    private ConvertData convertData = new ConvertData();
 
     private String phoneNumber;
     private Uri uriWebsite;
@@ -96,16 +97,19 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
     private void updateUI() {
         // Get Place data
         name.setText(place.getName());
-        address.setText(myUtils.getAddress(place));
+        address.setText(convertData.getAddress(place));
         phoneNumber = place.getPhoneNumber();
         uriWebsite = place.getWebsiteUri();
         Log.i(TAG, "Uri " + place.getWebsiteUri());
-
-        // Get the photo metadata
+        // Use findPhotoPlace method to retrieve the photo of the restaurant
         if (place.getPhotoMetadatas() != null) {
-            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-            myUtils.findAndFetchPhoto(this, photoMetadata, restaurantImage);
+            CurrentPlace.getInstance(this).findPhotoPlace(place.getPhotoMetadatas().get(0), this);
         }
     }
 
+    @Override
+    public void onPhotoFetch(Bitmap bitmap) {
+        // Get the photo metadata and fetch it in the imageView
+        restaurantImage.setImageBitmap(bitmap);
+    }
 }

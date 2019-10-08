@@ -1,7 +1,6 @@
 package com.jpz.go4lunch.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,6 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
 
     // For data
     private List<Place> placeList = new ArrayList<>();
-    private List<Bitmap> bitmapList = new ArrayList<>();
-
     private LatLng latLng;
 
     public AdapterListRestaurant(LatLng latLng, Listener callback) {
@@ -51,7 +48,7 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolderRestaurant holder, int position) {
-        holder.updateViewHolder(this.placeList.get(position), this.bitmapList.get(position), this.latLng, this.callback);
+        holder.updateViewHolder(this.placeList.get(position), this.latLng, this.callback);
     }
 
     @Override
@@ -59,9 +56,8 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
         return this.placeList.size();
     }
 
-    public void setPlaces(List<Place> places, List<Bitmap> bitmapList) {
+    public void setPlaces(List<Place> places) {
         this.placeList = places;
-        this.bitmapList = bitmapList;
         notifyDataSetChanged();
     }
 

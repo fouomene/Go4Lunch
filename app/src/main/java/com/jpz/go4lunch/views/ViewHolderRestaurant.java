@@ -14,16 +14,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
-import com.jpz.go4lunch.utils.MyUtils;
+import com.jpz.go4lunch.utils.CurrentPlace;
+import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
 
 
-public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener,
+        CurrentPlace.PlacePhotoListener {
     // Represent an item (line) in the RecyclerView
 
     // Utils
-    private MyUtils myUtils = new MyUtils();
+    private ConvertData convertData = new ConvertData();
 
     // Views and Context
     private TextView name, distance, type, address, workmates, hours, opinions;
@@ -47,26 +49,29 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, Bitmap bitmap, LatLng latLng, AdapterListRestaurant.Listener callback){
+    public void updateViewHolder(Place place, LatLng latLng, AdapterListRestaurant.Listener callback){
         // Update Place widgets
         name.setText(place.getName());
 
-        hours.setText(myUtils.openingHours(place, context));
-        if (myUtils.openingHours(place, context).contains("Clos")) {
+        hours.setText(convertData.openingHours(place, context));
+        if (convertData.openingHours(place, context).contains("Clos")) {
             hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
             hours.setTypeface(Typeface.DEFAULT_BOLD);
         }
-        if (myUtils.openingHours(place, context).contains("Open")) {
+        if (convertData.openingHours(place, context).contains("Open")) {
             hours.setTypeface(null, Typeface.ITALIC);
         }
 
-        address.setText(myUtils.getAddress(place));
+        address.setText(convertData.getAddress(place));
 
-        myUtils.fetchPhoto(bitmap, restaurantImage);
+        // Use findPhotoPlace method to retrieve the photo of the restaurant
+        if (place.getPhotoMetadatas() != null) {
+            CurrentPlace.getInstance(context).findPhotoPlace(place.getPhotoMetadatas().get(0), this);
+        }
 
         // Update others widgets
         if (place.getLatLng() != null) {
-            distance.setText(context.getString(R.string.distance,  myUtils.distanceCalculation
+            distance.setText(context.getString(R.string.distance,  convertData.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
         }
 
@@ -87,4 +92,9 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         if (callback != null) callback.onClickItem(getAdapterPosition());
     }
 
+    @Override
+    public void onPhotoFetch(Bitmap bitmap) {
+        // Get the photo metadata and fetch it in the imageView
+        restaurantImage.setImageBitmap(bitmap);
+    }
 }

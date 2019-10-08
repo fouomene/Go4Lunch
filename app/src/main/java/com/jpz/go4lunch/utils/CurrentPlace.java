@@ -44,25 +44,15 @@ public class CurrentPlace {
     //----------------------------------------------------------------------------------
 
     // Interface to retrieve the photo from a list of places when the task is complete.
-    private interface PlacePhotoListener {
+    public interface PlacePhotoListener {
         void onPhotoFetch(Bitmap bitmap);
-    }
-
-    // List of Bitmap for the PlacePhotoListener
-    private List<Bitmap> bitmapList = new ArrayList<>();
-    // Listener from the PlacePhotoListener
-    private PlacePhotoListener placePhotoListener;
-
-    // Method to add a PlacePhotoListener (initialized in this class).
-    private void addPhotoListener(PlacePhotoListener placePhotoListener) {
-        this.placePhotoListener = placePhotoListener;
     }
 
     //----------------------------------------------------------------------------------
 
     // Interface to retrieve the details of a list of place when the task is complete.
     public interface PlacesDetailsListener {
-        void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList);
+        void onPlacesDetailsFetch(List<Place> places);
     }
 
     // List of places for the PlaceDetailsListener
@@ -158,13 +148,15 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    private void findPhotoPlace(PhotoMetadata photo) {
+    public void findPhotoPlace(PhotoMetadata photo, PlacePhotoListener placePhotoListener) {
         // Create a FetchPhotoRequest.
         FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photo)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
+            // Attach the bitmap (photo from the request)
             placePhotoListener.onPhotoFetch(bitmap);
+
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 ApiException apiException = (ApiException) exception;
@@ -180,15 +172,17 @@ public class CurrentPlace {
     public void findDetailsPlaces() {
         // If a list of places details was already created, fetch places details in the listener with it.
         if (!placeDetailsList.isEmpty()) {
-            // For the currentPlaceListListener from the map or list fragment, fetch the list of places.
+            // For the placeDetailsListener from the map or list fragment, fetch the list of places.
             for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
                 Log.i(TAG, "placeDetailsListener in loop = " + placeDetailsListener);
-                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
+                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
             }
             return;
         }
 
+        // Call the CurrentPlace request...
         findCurrentPlace();
+        // ...and use these places to call PlaceDetails requests
         this.addListener(places -> {
             // Specify the fields to return.
             List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
@@ -205,24 +199,9 @@ public class CurrentPlace {
                     Log.i(TAG, "Place details found: " + placeDetails.getName());
 
                     placeDetailsList.add(placeDetails);
-
-                    if (placeDetails.getPhotoMetadatas() != null) {
-                        findPhotoPlace(placeDetails.getPhotoMetadatas().get(0));
-                        this.addPhotoListener(bitmap -> {
-                            bitmapList.add(bitmap);
-                            // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
-                            for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
-                                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
-                            }
-                        });
-                    } else {
-                        // If there is no photoMetadata, crate an empty bitmap to conserve the associate range with the list of places.
-                        Bitmap bitmap = Bitmap.createBitmap(0, 0, Bitmap.Config.ARGB_8888);
-                        bitmapList.add(bitmap);
-                        // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
-                        for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
-                            placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
-                        }
+                    // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
+                    for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
+                        placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
                     }
 
                     }).addOnFailureListener((exception) -> {
