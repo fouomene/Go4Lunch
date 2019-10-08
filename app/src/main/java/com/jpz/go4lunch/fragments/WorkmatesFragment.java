@@ -9,14 +9,20 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jpz.go4lunch.R;
-
+import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.FirebaseUtils;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class WorkmatesFragment extends Fragment {
+
+    private TextView textView;
+    private Workmate workmate = new Workmate();
+    private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
 
     public WorkmatesFragment() {
@@ -27,8 +33,22 @@ public class WorkmatesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_workmates, container, false);
+        // Get the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_workmates, container, false);
+
+        textView = view.findViewById(R.id.text_view);
+
+        updateWorkmatesData();
+
+        textView.setText(workmate.getUsername());
+
+        return view;
+    }
+
+    private void updateWorkmatesData() {
+        if (firebaseUtils.getCurrentUser() != null) {
+            workmate.setUsername(firebaseUtils.getCurrentUser().getDisplayName());
+        }
     }
 
 }

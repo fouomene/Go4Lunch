@@ -33,10 +33,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
+import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import java.util.List;
@@ -94,10 +96,13 @@ public class MainActivity extends AppCompatActivity
         // Initialize FireBase User
         user = firebaseUtils.getCurrentUser();
 
+        // Display views and layouts
         configureToolbar();
         configureDrawerLayout();
         configureNavigationView();
         configureBottomView();
+
+        createWorkmateInFirestore();
 
         // Request permission when starting MainActivity which contains Google Maps services
         EasyPermissions.requestPermissions(this,
@@ -213,7 +218,6 @@ public class MainActivity extends AppCompatActivity
     // Update the user profile in the Nav Drawer Header
     private void updateUserProfile() {
         if (user != null) {
-
             //Get picture URL from Firebase
             if (user.getPhotoUrl() != null) {
                 Glide.with(this)
@@ -221,12 +225,10 @@ public class MainActivity extends AppCompatActivity
                         .apply(RequestOptions.circleCropTransform())
                         .into(photoProfile);
             }
-
             //Get username & email from Firebase
             username = TextUtils.isEmpty(user.getDisplayName()) ?
                     getString(R.string.info_no_username_found) : user.getDisplayName();
             Log.i("MainActivity", "username = " + user.getDisplayName());
-
             email = TextUtils.isEmpty(user.getEmail()) ?
                     getString(R.string.info_no_email_found) : user.getEmail();
             Log.i("MainActivity", "email = " + user.getEmail());
@@ -235,6 +237,26 @@ public class MainActivity extends AppCompatActivity
         nameProfile.setText(username);
         emailProfile.setText(email);
     }
+
+    //----------------------------------------------------------------------------------
+
+    // Http request that create workmate in Firestore when the user is identified
+    private void createWorkmateInFirestore(){
+        Workmate workmate = new Workmate();
+        if (user != null){
+            String uid = user.getUid();
+            String username = user.getDisplayName();
+            String urlPicture = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
+            String selectedPlace = workmate.getSelectedPlace();
+
+            WorkmateHelper.createWormate(uid, username, urlPicture, selectedPlace)
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getApplicationContext(),
+                                    getString(R.string.fui_error_unknown), Toast.LENGTH_LONG).show());
+        }
+    }
+
+    //----------------------------------------------------------------------------------
 
     private void startConnectionActivity() {
         Intent intent = new Intent(this, ConnectionActivity.class);
