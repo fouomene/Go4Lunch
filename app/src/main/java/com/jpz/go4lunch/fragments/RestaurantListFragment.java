@@ -1,5 +1,6 @@
 package com.jpz.go4lunch.fragments;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -76,9 +77,9 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void updateUI(List<Place> places) {
+    private void updateUI(List<Place> places, List<Bitmap> bitmapList) {
         // Add the list from the request and notify the adapter
-        adapterListRestaurant.setPlaces(places);
+        adapterListRestaurant.setPlaces(places, bitmapList);
     }
 
     //----------------------------------------------------------------------------------
@@ -94,9 +95,9 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     // Use the Interface CurrentPlace to attach the list of places
     @Override
-    public void onPlacesDetailsFetch(List<Place> places) {
+    public void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList) {
         // Update UI with the list of restaurant from the request
-        updateUI(places);
+        updateUI(places, bitmapList);
     }
 
     //----------------------------------------------------------------------------------

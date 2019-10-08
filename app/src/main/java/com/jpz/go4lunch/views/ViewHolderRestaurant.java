@@ -1,6 +1,7 @@
 package com.jpz.go4lunch.views;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.AdapterListRestaurant;
@@ -47,7 +47,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, LatLng latLng, AdapterListRestaurant.Listener callback){
+    public void updateViewHolder(Place place, Bitmap bitmap, LatLng latLng, AdapterListRestaurant.Listener callback){
         // Update Place widgets
         name.setText(place.getName());
 
@@ -62,11 +62,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
 
         address.setText(myUtils.getAddress(place));
 
-        // Get the photo metadata
-        if (place.getPhotoMetadatas() != null) {
-            PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-            myUtils.fetchPhoto(context, photoMetadata, restaurantImage);
-        }
+        myUtils.fetchPhoto(bitmap, restaurantImage);
 
         // Update others widgets
         if (place.getLatLng() != null) {

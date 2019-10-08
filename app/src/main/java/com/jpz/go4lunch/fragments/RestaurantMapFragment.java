@@ -373,7 +373,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     //----------------------------------------------------------------------------------
 
     @Override
-    public void onPlacesDetailsFetch(List<Place> places) {
+    public void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList) {
         // Show the restaurants near the user location with the places from the request
         findCurrentPlace(places);
     }

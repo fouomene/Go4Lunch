@@ -1,13 +1,16 @@
 package com.jpz.go4lunch.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
@@ -28,11 +31,53 @@ public class CurrentPlace {
         void onPlacesFetch(List<Place> places);
     }
 
+    // List of places for the CurrentPlaceListListener
+    private List<Place> placeList = new ArrayList<>();
+    // Listener from the CurrentPlaceListListener
+    private CurrentPlacesListener currentPlacesListener;
+
+    // Method to add a CurrentPlacesListener (initialized in this class).
+    private void addListener(CurrentPlacesListener currentPlacesListener) {
+        this.currentPlacesListener = currentPlacesListener;
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Interface to retrieve the photo from a list of places when the task is complete.
+    private interface PlacePhotoListener {
+        void onPhotoFetch(Bitmap bitmap);
+    }
+
+    // List of Bitmap for the PlacePhotoListener
+    private List<Bitmap> bitmapList = new ArrayList<>();
+    // Listener from the PlacePhotoListener
+    private PlacePhotoListener placePhotoListener;
+
+    // Method to add a PlacePhotoListener (initialized in this class).
+    private void addPhotoListener(PlacePhotoListener placePhotoListener) {
+        this.placePhotoListener = placePhotoListener;
+    }
+
     //----------------------------------------------------------------------------------
 
     // Interface to retrieve the details of a list of place when the task is complete.
     public interface PlacesDetailsListener {
-        void onPlacesDetailsFetch(List<Place> places);
+        void onPlacesDetailsFetch(List<Place> places, List<Bitmap> bitmapList);
+    }
+
+    // List of places for the PlaceDetailsListener
+    private List<Place> placeDetailsList = new ArrayList<>();
+    // List of listeners from the PlaceDetailsListener
+    private List<PlacesDetailsListener> placeDetailsListeners = new ArrayList<>();
+
+    // Method to add a PlacesDetailsListener (initialized in the map or list fragment) in the list of listeners.
+    public void addDetailsListener(PlacesDetailsListener placeDetailsListener) {
+        placeDetailsListeners.add(placeDetailsListener);
+    }
+
+    // Method to remove a PlacesDetailsListener (initialized in the map or list fragment) from the list of listeners.
+    public void removeListener(PlacesDetailsListener placeDetailsListener) {
+        placeDetailsListeners.remove(placeDetailsListener);
     }
 
     //----------------------------------------------------------------------------------
@@ -46,16 +91,6 @@ public class CurrentPlace {
     private static final String TAG = CurrentPlace.class.getSimpleName();
 
     private static CurrentPlace ourInstance;
-
-    // List of places for the CurrentPlaceListListener
-    private List<Place> placeList = new ArrayList<>();
-    // Listener from the CurrentPlaceListListener
-    private CurrentPlacesListener currentPlacesListener;
-
-    // List of places for the PlaceDetailsListener
-    private List<Place> placeDetailsList = new ArrayList<>();
-    // List of listeners from the PlaceDetailsListener
-    private List<PlacesDetailsListener> placeDetailsListeners = new ArrayList<>();
 
     // Places
     private PlacesClient placesClient;
@@ -74,25 +109,6 @@ public class CurrentPlace {
         if (ourInstance == null)
             ourInstance = new CurrentPlace(context);
         return ourInstance;
-    }
-
-    //----------------------------------------------------------------------------------
-
-    // Method to add a currentPlaceListListener (initialized in this class).
-    private void addListener(CurrentPlacesListener currentPlacesListener) {
-        this.currentPlacesListener = currentPlacesListener;
-    }
-
-    //----------------------------------------------------------------------------------
-
-    // Method to add a placeDetailsListener (initialized in the map or list fragment) in the list of listeners.
-    public void addDetailsListener(PlacesDetailsListener placeDetailsListener) {
-        placeDetailsListeners.add(placeDetailsListener);
-    }
-
-    // Method to remove a placeDetailsListener (initialized in the map or list fragment) from the list of listeners.
-    public void removeListener(PlacesDetailsListener placeDetailsListener) {
-        placeDetailsListeners.remove(placeDetailsListener);
     }
 
     //----------------------------------------------------------------------------------
@@ -142,38 +158,65 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
+    private void findPhotoPlace(PhotoMetadata photo) {
+        // Create a FetchPhotoRequest.
+        FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photo)
+                .build();
+        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+            Bitmap bitmap = fetchPhotoResponse.getBitmap();
+            placePhotoListener.onPhotoFetch(bitmap);
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                ApiException apiException = (ApiException) exception;
+                int statusCode = apiException.getStatusCode();
+                // Handle error with given status code.
+                Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
+            }
+        });
+    }
+
+    //----------------------------------------------------------------------------------
+
     public void findDetailsPlaces() {
         // If a list of places details was already created, fetch places details in the listener with it.
         if (!placeDetailsList.isEmpty()) {
             // For the currentPlaceListListener from the map or list fragment, fetch the list of places.
             for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
                 Log.i(TAG, "placeDetailsListener in loop = " + placeDetailsListener);
-                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
+                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
             }
             return;
         }
 
         findCurrentPlace();
         this.addListener(places -> {
-                // Specify the fields to return.
-                List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
-                        Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
-                        Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+            // Specify the fields to return.
+            List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
+                    Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
+                    Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
 
-                for (Place place : places) {
-                    if (place.getId() != null) {
-                        // Construct a request object, passing the place ID and fields array.
-                        request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
+            for (Place place : places) {
+                if (place.getId() != null) {
+                    // Construct a request object, passing the place ID and fields array.
+                    request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
+                }
+                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                    Place placeDetails = response.getPlace();
+                    Log.i(TAG, "Place details found: " + placeDetails.getName());
+
+                    placeDetailsList.add(placeDetails);
+
+                    if (placeDetails.getPhotoMetadatas() != null) {
+                        findPhotoPlace(placeDetails.getPhotoMetadatas().get(0));
                     }
-                    placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                        Place placeDetails = response.getPlace();
-                        Log.i(TAG, "Place details found: " + placeDetails.getName());
-
-                        placeDetailsList.add(placeDetails);
-                        // For the PlaceDetailsListener from the map or list fragment, fetch the list of places.
+                    this.addPhotoListener(bitmap -> {
+                        bitmapList.add(bitmap);
+                        // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
                         for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
-                            placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
+                            placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
                         }
+                    });
+
                     }).addOnFailureListener((exception) -> {
                         if (exception instanceof ApiException) {
                             ApiException apiException = (ApiException) exception;
@@ -182,8 +225,8 @@ public class CurrentPlace {
                             Log.e(TAG, "Place details not found: " + exception.getMessage());
                         }
                     });
-                }
-            });
+            }
+        });
     }
 
 }

@@ -104,7 +104,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity {
         // Get the photo metadata
         if (place.getPhotoMetadatas() != null) {
             PhotoMetadata photoMetadata = place.getPhotoMetadatas().get(0);
-            myUtils.fetchPhoto(this, photoMetadata, restaurantImage);
+            myUtils.findAndFetchPhoto(this, photoMetadata, restaurantImage);
         }
     }
 

@@ -53,8 +53,8 @@ public class MyUtils {
 
     //--------------------------------------------------------------------------------------
 
-    // Load a photo and display it
-    public void fetchPhoto(Context context, PhotoMetadata photo, ImageView imageView) {
+    // Search a photo and display it
+    public void findAndFetchPhoto(Context context, PhotoMetadata photo, ImageView imageView) {
         // Create a new Places client instance
         PlacesClient placesClient = Places.createClient(context);
         // Create a FetchPhotoRequest.
@@ -73,6 +73,11 @@ public class MyUtils {
                 Log.e(TAG, "Place not found: " + statusCode + exception.getMessage());
             }
         });
+    }
+
+    // Load a photo and display it
+    public void fetchPhoto(Bitmap bitmap, ImageView imageView) {
+        imageView.setImageBitmap(bitmap);
     }
 
     //--------------------------------------------------------------------------------------
