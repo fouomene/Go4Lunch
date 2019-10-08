@@ -208,14 +208,22 @@ public class CurrentPlace {
 
                     if (placeDetails.getPhotoMetadatas() != null) {
                         findPhotoPlace(placeDetails.getPhotoMetadatas().get(0));
-                    }
-                    this.addPhotoListener(bitmap -> {
+                        this.addPhotoListener(bitmap -> {
+                            bitmapList.add(bitmap);
+                            // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
+                            for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
+                                placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
+                            }
+                        });
+                    } else {
+                        // If there is no photoMetadata, crate an empty bitmap to conserve the associate range with the list of places.
+                        Bitmap bitmap = Bitmap.createBitmap(0, 0, Bitmap.Config.ARGB_8888);
                         bitmapList.add(bitmap);
                         // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
                         for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
                             placeDetailsListener.onPlacesDetailsFetch(placeDetailsList, bitmapList);
                         }
-                    });
+                    }
 
                     }).addOnFailureListener((exception) -> {
                         if (exception instanceof ApiException) {
