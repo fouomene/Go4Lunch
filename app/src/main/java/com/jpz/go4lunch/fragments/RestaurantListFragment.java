@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.adapters.AdapterListRestaurant;
+import com.jpz.go4lunch.adapters.RestaurantListAdapter;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
@@ -26,12 +26,12 @@ import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestaurantListFragment extends Fragment implements AdapterListRestaurant.Listener,
+public class RestaurantListFragment extends Fragment implements RestaurantListAdapter.Listener,
         CurrentPlace.PlacesDetailsListener {
 
     // Declare View, Adapter & a LatLng
     private RecyclerView recyclerView;
-    private AdapterListRestaurant adapterListRestaurant;
+    private RestaurantListAdapter restaurantListAdapter;
     private LatLng deviceLatLng;
 
     // Utils
@@ -68,16 +68,16 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
 
     private void configureRecyclerView(){
         // Create the adapter
-        this.adapterListRestaurant = new AdapterListRestaurant(deviceLatLng, this);
+        this.restaurantListAdapter = new RestaurantListAdapter(deviceLatLng, this);
         // Attach the adapter to the recyclerView to populate items
-        this.recyclerView.setAdapter(adapterListRestaurant);
+        this.recyclerView.setAdapter(restaurantListAdapter);
         // Set layout manager to position the items
         this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void updateUI(List<Place> places) {
         // Add the list from the request and notify the adapter
-        adapterListRestaurant.setPlaces(places);
+        restaurantListAdapter.setPlaces(places);
     }
 
     //----------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public class RestaurantListFragment extends Fragment implements AdapterListResta
     // Start DetailsRestaurantActivity when click the user click on a restaurant
     @Override
     public void onClickItem(int position) {
-        Place place = adapterListRestaurant.getPosition(position);
+        Place place = restaurantListAdapter.getPosition(position);
         utilsNavigation.startDetailsRestaurantActivity(getActivity(), place);
     }
 

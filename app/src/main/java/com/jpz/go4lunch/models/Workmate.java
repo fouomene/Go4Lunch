@@ -38,8 +38,6 @@ public class Workmate {
     }
 
     // Setters
-
-
     public void setUid(String uid) {
         this.uid = uid;
     }

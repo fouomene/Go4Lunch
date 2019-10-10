@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.views.ViewHolderRestaurant;
+import com.jpz.go4lunch.views.RestaurantViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestaurant> {
+public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
 
     // Declaring callback
     private final Listener callback;
@@ -25,7 +25,7 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
     private List<Place> placeList = new ArrayList<>();
     private LatLng latLng;
 
-    public AdapterListRestaurant(LatLng latLng, Listener callback) {
+    public RestaurantListAdapter(LatLng latLng, Listener callback) {
         this.latLng = latLng;
         this.callback = callback;
     }
@@ -37,17 +37,17 @@ public class AdapterListRestaurant extends RecyclerView.Adapter<ViewHolderRestau
 
     @NonNull
     @Override
-    public ViewHolderRestaurant onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RestaurantViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create ViewHolder and inflating its xml layout
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.fragment_item, parent, false);
+        View view = inflater.inflate(R.layout.restaurant_item, parent, false);
 
-        return new ViewHolderRestaurant(view);
+        return new RestaurantViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolderRestaurant holder, int position) {
+    public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
         holder.updateViewHolder(this.placeList.get(position), this.latLng, this.callback);
     }
 

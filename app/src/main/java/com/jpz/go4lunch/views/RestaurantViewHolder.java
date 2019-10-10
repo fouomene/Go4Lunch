@@ -13,16 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.adapters.AdapterListRestaurant;
+import com.jpz.go4lunch.adapters.RestaurantListAdapter;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
 
 
-public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements View.OnClickListener,
+public class RestaurantViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
         CurrentPlace.PlacePhotoListener {
-    // Represent an item (line) in the RecyclerView
+    // Represent an item (line) of a restaurant in the RecyclerView
 
     // Utils
     private ConvertData convertData = new ConvertData();
@@ -33,9 +33,9 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
     private Context context;
 
     // Declare a Weak Reference to our Callback
-    private WeakReference<AdapterListRestaurant.Listener> callbackWeakRef;
+    private WeakReference<RestaurantListAdapter.Listener> callbackWeakRef;
 
-    public ViewHolderRestaurant(@NonNull View itemView) {
+    public RestaurantViewHolder(@NonNull View itemView) {
         super(itemView);
         name = itemView.findViewById(R.id.item_name);
         distance = itemView.findViewById(R.id.item_distance);
@@ -49,7 +49,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, LatLng latLng, AdapterListRestaurant.Listener callback){
+    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback){
         // Update Place widgets
         name.setText(place.getName());
 
@@ -88,7 +88,7 @@ public class ViewHolderRestaurant extends RecyclerView.ViewHolder implements Vie
     @Override
     public void onClick(View v) {
         // When a click happens, we fire our listener to get the item position in the list
-        AdapterListRestaurant.Listener callback = callbackWeakRef.get();
+        RestaurantListAdapter.Listener callback = callbackWeakRef.get();
         if (callback != null) callback.onClickItem(getAdapterPosition());
     }
 

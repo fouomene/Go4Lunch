@@ -28,6 +28,9 @@
     <string name="open_until_hour">Open until %1$dpm</string>
     <string name="distance">%1$dm</string>
 
+    <!-- Workmate -->
+    <string name="workmate_choice">Workmate choice</string>
+
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
 
