@@ -9,6 +9,12 @@ public class Workmate {
     @Nullable private String urlPicture;
     @Nullable private String selectedPlace;
 
+    /*
+    Cloud Firestore will internally convert the objects to supported data types.
+    Each custom class must have a public constructor that takes no arguments. In addition,
+     the class must include a public getter for each property.
+     */
+
     public Workmate() {
 
     }

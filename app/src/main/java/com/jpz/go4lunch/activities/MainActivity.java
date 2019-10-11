@@ -47,7 +47,8 @@ import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks, RestaurantMapFragment.DeviceLocationListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        EasyPermissions.PermissionCallbacks, RestaurantMapFragment.DeviceLocationListener {
 
     // Static data for ACCESS_FINE_LOCATION
     public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -55,6 +56,11 @@ public class MainActivity extends AppCompatActivity
 
     // FirebaseUtils class
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
+
+    // Api Firestore
+    private WorkmateHelper workmateHelper = new WorkmateHelper();
+
+    private Workmate workmate = new Workmate();
 
     // Declare user
     private FirebaseUser user;
@@ -74,6 +80,8 @@ public class MainActivity extends AppCompatActivity
     // DeviceLatLng data for the list of restaurant
     private Fragment listFragment = new RestaurantListFragment();
     public static final String LAT_LNG_BUNDLE_KEY = "lat_lng_bundle_key";
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +110,11 @@ public class MainActivity extends AppCompatActivity
         configureNavigationView();
         configureBottomView();
 
-        createWorkmateInFirestore();
+        createOrUpdateWorkmateInFirestore();
+
+        // Set the restaurant choice from Firestore
+        workmateHelper.getRestaurantChoice(user.getUid());
+        Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
 
         // Request permission when starting MainActivity which contains Google Maps services
         EasyPermissions.requestPermissions(this,
@@ -240,19 +252,14 @@ public class MainActivity extends AppCompatActivity
 
     //----------------------------------------------------------------------------------
 
-    // Http request that create workmate in Firestore when the user is identified
-    private void createWorkmateInFirestore(){
-        Workmate workmate = new Workmate();
+    // Create or update the current user in Firestore when he is identified
+    private void createOrUpdateWorkmateInFirestore(){
         if (user != null){
             String uid = user.getUid();
             String username = user.getDisplayName();
             String urlPicture = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
-            String selectedPlace = workmate.getSelectedPlace();
-
-            WorkmateHelper.createWorkmate(uid, username, urlPicture, selectedPlace)
-                    .addOnFailureListener(e ->
-                            Toast.makeText(getApplicationContext(),
-                                    getString(R.string.fui_error_unknown), Toast.LENGTH_LONG).show());
+            // Set data
+            workmateHelper.setUidUsernamePhotoWithMerge(uid, username, urlPicture);
         }
     }
 

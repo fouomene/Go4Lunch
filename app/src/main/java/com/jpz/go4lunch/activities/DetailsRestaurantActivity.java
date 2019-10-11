@@ -18,6 +18,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.api.WorkmateHelper;
+import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
@@ -35,13 +36,17 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     // Places
     private Place place;
 
+    // Models nd Api
+    private Workmate workmate = new Workmate();
+    private WorkmateHelper workmateHelper = new WorkmateHelper();
+
     // Utils
     private ConvertData convertData = new ConvertData();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
     private String phoneNumber;
     private Uri uriWebsite;
-    boolean fabIsChecked = false;
+    boolean fabIsChecked;
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -85,7 +90,22 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
             }
         });
 
+
+        // Set the restaurant choice from Firestore
+        if (firebaseUtils.getCurrentUser() != null) {
+            workmateHelper.getRestaurantChoice(firebaseUtils.getCurrentUser().getUid());
+        }
+
         FloatingActionButton floatingActionButton = findViewById(R.id.details_fab);
+        // Check the choice of the restaurant and display the button according to the choice
+        verifyRestaurantChoice();
+        Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
+
+        if (fabIsChecked) {
+            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
+        } else floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+
+        // Listen to the user choice when click on the floatingActionButton
         floatingActionButton.setOnClickListener((View v) -> {
             if (!fabIsChecked) {
                 floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
@@ -116,6 +136,15 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     public void onPhotoFetch(Bitmap bitmap) {
         // Get the photo metadata and fetch it in the imageView
         restaurantImage.setImageBitmap(bitmap);
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Verify if the restaurant chosen is the same that the details restaurant
+    private void verifyRestaurantChoice() {
+        if (place.getName() != null && place.getName().equals(workmate.getSelectedPlace())) {
+            fabIsChecked = true;
+        }
     }
 
     private void chooseRestaurant() {
