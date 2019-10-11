@@ -30,8 +30,6 @@ public class WorkmateHelper {
         return WorkmateHelper.getWorkmatesCollection().document(uid).get();
     }
 
-
-
     public static Query getAllWorkmates(){
         return WorkmateHelper.getWorkmatesCollection()
                 .orderBy("uid");
@@ -55,8 +53,9 @@ public class WorkmateHelper {
 
     // --- UPDATE ---
 
+    // Update the choice of the workmate's restaurant
     public static Task<Void> updateRestaurant(String uid, String place) {
-        return WorkmateHelper.getWorkmatesCollection().document(uid).update("restaurant", place);
+        return WorkmateHelper.getWorkmatesCollection().document(uid).update("selectedPlace", place);
     }
 
     // --- DELETE ---

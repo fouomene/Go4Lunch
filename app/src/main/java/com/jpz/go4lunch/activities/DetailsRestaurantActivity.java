@@ -17,8 +17,10 @@ import android.widget.Toast;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
+import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
@@ -35,6 +37,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
 
     // Utils
     private ConvertData convertData = new ConvertData();
+    private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
     private String phoneNumber;
     private Uri uriWebsite;
@@ -86,9 +89,11 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         floatingActionButton.setOnClickListener((View v) -> {
             if (!fabIsChecked) {
                 floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
+                chooseRestaurant();
                 fabIsChecked = true;
             } else {
                 floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
+                clearRestaurantChoice();
                 fabIsChecked = false;
             }
         });
@@ -112,4 +117,17 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         // Get the photo metadata and fetch it in the imageView
         restaurantImage.setImageBitmap(bitmap);
     }
+
+    private void chooseRestaurant() {
+        if (firebaseUtils.getCurrentUser() != null) {
+            WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), place.getName());
+        }
+    }
+
+    private void clearRestaurantChoice() {
+        if (firebaseUtils.getCurrentUser() != null) {
+            WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), null);
+        }
+    }
+
 }
