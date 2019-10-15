@@ -48,15 +48,8 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     // Configure RecyclerView with a Query
     private void configureRecyclerView(){
         //Configure Adapter & RecyclerView
-        this.workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter(WorkmateHelper.getAllWorkmates()),
-                Glide.with(this), this);
-        workmatesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                // Scroll to bottom on new messages
-                recyclerView.smoothScrollToPosition(workmatesAdapter.getItemCount());
-            }
-        });
+        this.workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
+                (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(this.workmatesAdapter);
     }

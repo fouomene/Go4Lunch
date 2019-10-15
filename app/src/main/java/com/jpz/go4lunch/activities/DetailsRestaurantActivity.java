@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.api.RestaurantHelper;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.CurrentPlace;
@@ -35,19 +36,24 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private Button call, like, website;
     private FloatingActionButton floatingActionButton;
 
+    // Private Data
+    private String phoneNumber;
+    private Uri uriWebsite;
+    private boolean fabIsChecked;
+
     // Places
     private Place place;
 
     // Models
     private Workmate currentWorkmate = new Workmate();
 
+    // Api
+    private RestaurantHelper restaurantHelper = new RestaurantHelper();
+
     // Utils
     private ConvertData convertData = new ConvertData();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
-    private String phoneNumber;
-    private Uri uriWebsite;
-    boolean fabIsChecked;
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -154,14 +160,21 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     // Current workmate is choosing a restaurant, update Firestore
     private void chooseRestaurant() {
         if (firebaseUtils.getCurrentUser() != null) {
+            // Update the workmates collection
             WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), place.getName());
+            // Update the restaurants collection
+            restaurantHelper.setIdNameWorkmatesWithMerge(place.getId(), place.getName(),
+                    firebaseUtils.getCurrentUser().getDisplayName());
         }
     }
 
     // Current workmate is deleting a restaurant, update Firestore
     private void deleteRestaurantChoice() {
         if (firebaseUtils.getCurrentUser() != null) {
+            // Update the workmates collection
             WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), null);
+            // Update the restaurants collection
+            restaurantHelper.deleteWorkmate(place.getId(), firebaseUtils.getCurrentUser().getDisplayName());
         }
     }
 
@@ -193,6 +206,11 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         like.setOnClickListener((View v) -> {
             // Save like on Firebase
         });
+    }
+
+    //----------------------------------------------------------------------------------
+
+    private void dislayWorkmates() {
     }
 
 }
