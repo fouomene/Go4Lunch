@@ -38,7 +38,6 @@ import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
-import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import java.util.List;
@@ -59,8 +58,6 @@ public class MainActivity extends AppCompatActivity
 
     // Api Firestore
     private WorkmateHelper workmateHelper = new WorkmateHelper();
-
-    private Workmate workmate = new Workmate();
 
     // Declare user
     private FirebaseUser user;
@@ -111,10 +108,6 @@ public class MainActivity extends AppCompatActivity
         configureBottomView();
 
         createOrUpdateWorkmateInFirestore();
-
-        // Set the restaurant choice from Firestore
-        workmateHelper.getRestaurantChoice(user.getUid());
-        Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
 
         // Request permission when starting MainActivity which contains Google Maps services
         EasyPermissions.requestPermissions(this,

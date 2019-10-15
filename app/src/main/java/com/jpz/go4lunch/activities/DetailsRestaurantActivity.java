@@ -26,19 +26,20 @@ import com.jpz.go4lunch.utils.FirebaseUtils;
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
 
-public class DetailsRestaurantActivity extends AppCompatActivity implements CurrentPlace.PlacePhotoListener {
+public class DetailsRestaurantActivity extends AppCompatActivity
+        implements CurrentPlace.PlacePhotoListener {
 
     // Widgets
     private TextView name, opinions, type, address;
     private ImageView restaurantImage;
     private Button call, like, website;
+    private FloatingActionButton floatingActionButton;
 
     // Places
     private Place place;
 
-    // Models nd Api
-    private Workmate workmate = new Workmate();
-    private WorkmateHelper workmateHelper = new WorkmateHelper();
+    // Models
+    private Workmate currentWorkmate = new Workmate();
 
     // Utils
     private ConvertData convertData = new ConvertData();
@@ -63,63 +64,27 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         call = findViewById(R.id.details_button_call);
         like = findViewById(R.id.details_button_like);
         website = findViewById(R.id.details_button_website);
+        floatingActionButton = findViewById(R.id.details_fab);
 
         // Get the transferred Place data from the source activity
         Intent intent = getIntent();
         place = intent.getParcelableExtra(KEY_PLACE);
 
-        updateUI();
+        updateDetailsRestaurantData();
+        callRestaurant();
+        likeRestaurant();
+        visitWebsiteRestaurant();
 
-        // Display the phone number
-        call.setOnClickListener((View v) -> {
-            String dial = "tel:" + phoneNumber;
-            startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(dial)));
-        });
-
-        like.setOnClickListener((View v) -> {
-            // Save like on Firebase
-        });
-
-        // Display the website
-        website.setOnClickListener((View v) -> {
-            if (uriWebsite == null) {
-                Toast.makeText(this, getString(R.string.no_website), Toast.LENGTH_SHORT).show();
-            } else {
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriWebsite.toString()));
-                startActivity(webIntent);
-            }
-        });
-
-
-        // Set the restaurant choice from Firestore
-        if (firebaseUtils.getCurrentUser() != null) {
-            workmateHelper.getRestaurantChoice(firebaseUtils.getCurrentUser().getUid());
-        }
-
-        FloatingActionButton floatingActionButton = findViewById(R.id.details_fab);
-        // Check the choice of the restaurant and display the button according to the choice
-        verifyRestaurantChoice();
-        Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
-
-        if (fabIsChecked) {
-            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
-        } else floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
-
-        // Listen to the user choice when click on the floatingActionButton
-        floatingActionButton.setOnClickListener((View v) -> {
-            if (!fabIsChecked) {
-                floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_check_circle));
-                chooseRestaurant();
-                fabIsChecked = true;
-            } else {
-                floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_highlight_off));
-                clearRestaurantChoice();
-                fabIsChecked = false;
-            }
-        });
+        // Update fab UI according to the restaurant choice from Firestore
+        getFirestoreRestaurantChoice();
+        // Listen the restaurant choice from the current workmate and update Firestore
+        listenRestaurantChoice();
     }
 
-    private void updateUI() {
+    //----------------------------------------------------------------------------------
+    // For the restaurant data
+
+    private void updateDetailsRestaurantData() {
         // Get Place data
         name.setText(place.getName());
         address.setText(convertData.getAddress(place));
@@ -139,24 +104,95 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     }
 
     //----------------------------------------------------------------------------------
+    // For the restaurant choice
 
-    // Verify if the restaurant chosen is the same that the details restaurant
-    private void verifyRestaurantChoice() {
-        if (place.getName() != null && place.getName().equals(workmate.getSelectedPlace())) {
-            fabIsChecked = true;
+    // Method to retrieve the current workmate with Firestore data and update UI
+    private void getFirestoreRestaurantChoice(){
+        if (firebaseUtils.getCurrentUser() != null) {
+            WorkmateHelper.getCurrentWorkmate(firebaseUtils.getCurrentUser().getUid())
+                    .addOnSuccessListener(documentSnapshot-> {
+                        currentWorkmate = documentSnapshot.toObject(Workmate.class);
+                // Check the restaurant choice
+                compareRestaurants();
+                Log.i(TAG, "restaurant choice = " + currentWorkmate.getSelectedPlace());
+            });
         }
     }
 
+    private void compareRestaurants() {
+        // Verify if the restaurant chosen is the same that the details restaurant displayed
+        if (place.getName() != null && place.getName().equals(currentWorkmate.getSelectedPlace())) {
+            fabIsChecked = true;
+        }
+        // Update fab UI according to this choice
+        if (fabIsChecked) {
+            floatingActionButton.setImageDrawable(ContextCompat
+                    .getDrawable(getApplicationContext(), R.drawable.ic_check_circle));
+        } else {
+            floatingActionButton.setImageDrawable(ContextCompat
+                    .getDrawable(getApplicationContext(), R.drawable.ic_highlight_off));
+        }
+    }
+
+    private void listenRestaurantChoice() {
+        // Listen to the user choice when click on the floatingActionButton
+        floatingActionButton.setOnClickListener((View v) -> {
+            if (!fabIsChecked) {
+                floatingActionButton.setImageDrawable(ContextCompat
+                        .getDrawable(this, R.drawable.ic_check_circle));
+                chooseRestaurant();
+                fabIsChecked = true;
+            } else {
+                floatingActionButton.setImageDrawable(ContextCompat
+                        .getDrawable(this, R.drawable.ic_highlight_off));
+                deleteRestaurantChoice();
+                fabIsChecked = false;
+            }
+        });
+    }
+
+    // Current workmate is choosing a restaurant, update Firestore
     private void chooseRestaurant() {
         if (firebaseUtils.getCurrentUser() != null) {
             WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), place.getName());
         }
     }
 
-    private void clearRestaurantChoice() {
+    // Current workmate is deleting a restaurant, update Firestore
+    private void deleteRestaurantChoice() {
         if (firebaseUtils.getCurrentUser() != null) {
             WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), null);
         }
+    }
+
+    //----------------------------------------------------------------------------------
+    // Comportment of the buttons
+
+    // Display the phone number
+    private void callRestaurant() {
+        call.setOnClickListener((View v) -> {
+            String dial = "tel:" + phoneNumber;
+            startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse(dial)));
+        });
+    }
+
+    // Display the website
+    private void visitWebsiteRestaurant() {
+        website.setOnClickListener((View v) -> {
+            if (uriWebsite == null) {
+                Toast.makeText(this, getString(R.string.no_website), Toast.LENGTH_SHORT).show();
+            } else {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriWebsite.toString()));
+                startActivity(webIntent);
+            }
+        });
+    }
+
+    // Like the restaurant and update Firestore
+    private void likeRestaurant() {
+        like.setOnClickListener((View v) -> {
+            // Save like on Firebase
+        });
     }
 
 }

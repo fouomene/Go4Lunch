@@ -65,6 +65,10 @@ public class WorkmateHelper {
                 .orderBy("uid");
     }
 
+    public static Task<DocumentSnapshot> getCurrentWorkmate(String uid){
+        return WorkmateHelper.getWorkmatesCollection().document(uid).get();
+    }
+
     public void getRestaurantChoice(String uid) {
         DocumentReference docRef = getWorkmatesCollection().document(uid);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
