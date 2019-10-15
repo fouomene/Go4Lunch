@@ -1,5 +1,7 @@
 package com.jpz.go4lunch.views;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,15 +27,29 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder implements View.
     // Declare a Weak Reference to our Callback
     private WeakReference<WorkmatesAdapter.Listener> callbackWeakRef;
 
+    private Context context;
+
     public WorkmateViewHolder(@NonNull View itemView) {
         super(itemView);
         textView = itemView.findViewById(R.id.item_workmate_text);
         workmateImage = itemView.findViewById(R.id.item_workmate_image);
+
+        context = itemView.getContext();
     }
 
     public void updateViewHolder(Workmate workmate, RequestManager glide, WorkmatesAdapter.Listener callback){
         // Update text
-        textView.setText(workmate.getUsername());
+        if (workmate.getSelectedPlace() != null) {
+            textView.setTextColor(context.getResources().getColor(android.R.color.black));
+            textView.setText(context.getString(R.string.workmate_has_a_restaurant_choice,
+                    workmate.getUsername(), workmate.getSelectedPlace()));
+        } else {
+            textView.setTextColor(context.getResources().getColor(R.color.darkGrey));
+            textView.setTypeface(null, Typeface.ITALIC);
+            textView.setText(context.getString(R.string.workmate_has_not_a_restaurant_choice,
+                    workmate.getUsername()));
+        }
+
         // Update image
         if (workmate.getUrlPicture() != null) {
             glide.load(workmate.getUrlPicture())

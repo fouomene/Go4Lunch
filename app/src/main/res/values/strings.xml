@@ -29,7 +29,9 @@
     <string name="distance">%1$dm</string>
 
     <!-- Workmate -->
-    <string name="workmate_choice">Workmate choice</string>
+    <string name="workmate_restaurant_choice">Workmate choice</string>
+    <string name="workmate_has_a_restaurant_choice">%1$s is eating at %2$s</string>
+    <string name="workmate_has_not_a_restaurant_choice">"%1$s hasn't decide yet"</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>

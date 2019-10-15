@@ -62,7 +62,8 @@ public class WorkmateHelper {
 
     public static Query getAllWorkmates(){
         return WorkmateHelper.getWorkmatesCollection()
-                .orderBy("uid");
+                .orderBy("selectedPlace", Query.Direction.DESCENDING)
+                .orderBy("username", Query.Direction.DESCENDING);
     }
 
     public static Task<DocumentSnapshot> getCurrentWorkmate(String uid){

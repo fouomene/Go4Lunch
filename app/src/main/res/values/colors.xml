@@ -9,5 +9,5 @@
     // For closed restaurant
     <color name="crimson">#dc143c</color>
     // For undecided workmates
-    <color name="lightGray">#e8e8e8</color>
+    <color name="darkGrey">#A9A9A9</color>
 </resources>

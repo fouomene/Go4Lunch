@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="6dp">
+    android:background="@android:color/white">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/item_workmate_guideline_twenty_five"
+        android:id="@+id/item_workmate_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -17,11 +17,11 @@
         android:id="@+id/item_workmate_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="4dp"
+        android:layout_margin="8dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/workmate_photo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_workmate_guideline_twenty_five"
+        app:layout_constraintEnd_toStartOf="@+id/item_workmate_guideline"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/item_workmate_separate"/>
 
@@ -29,14 +29,14 @@
         android:id="@+id/item_workmate_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/workmate_choice"
+        android:text="@string/workmate_restaurant_choice"
         android:textAlignment="viewStart"
         android:textSize="16sp"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp"
-        app:layout_constraintStart_toEndOf="@+id/item_workmate_guideline_twenty_five"
+        app:layout_constraintStart_toEndOf="@+id/item_workmate_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -45,8 +45,8 @@
         android:id="@+id/item_workmate_separate"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/lightGray"
-        app:layout_constraintStart_toEndOf="@+id/item_workmate_guideline_twenty_five"
+        android:background="@color/darkGrey"
+        app:layout_constraintStart_toEndOf="@+id/item_workmate_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
