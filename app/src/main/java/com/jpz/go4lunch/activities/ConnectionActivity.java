@@ -23,17 +23,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
 public class ConnectionActivity extends AppCompatActivity {
@@ -107,12 +106,9 @@ public class ConnectionActivity extends AppCompatActivity {
         // For Google Authentication
 
         // Handle sign-in button taps by creating a sign-in intent with the googleSignIn method
-        googleLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleSignIn();
-            }
-        });
+        googleLogin.setOnClickListener( v ->
+            googleSignIn()
+        );
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -182,33 +178,32 @@ public class ConnectionActivity extends AppCompatActivity {
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         auth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.i(FACEBOOK_TAG, "signInWithCredential:success");
-                            startMainActivity();
-                            finish();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(FACEBOOK_TAG, "signInWithCredential:failure", task.getException());
-                            try {
-                                if (task.getException() != null)
-                                    throw task.getException();
-                                } catch(FirebaseAuthUserCollisionException e) {
-                                // If account already exists, logout from Facebook provider
-                                showSnackBar(getString(R.string.account_exists));
-                                LoginManager.getInstance().logOut();
-                            } catch(FirebaseNetworkException e) {
-                                showSnackBar(getString(R.string.connexion_failure));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                showSnackBar(getString(R.string.authentication_failed));
-                            }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Create a workmate document for the current user in Firestore
+                        createWorkmateInFirestore();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.i(FACEBOOK_TAG, "signInWithCredential:success");
+                        startMainActivity();
+                        finish();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(FACEBOOK_TAG, "signInWithCredential:failure", task.getException());
+                        try {
+                            if (task.getException() != null)
+                                throw task.getException();
+                            } catch(FirebaseAuthUserCollisionException e) {
+                            // If account already exists, logout from Facebook provider
+                            showSnackBar(getString(R.string.account_exists));
+                            LoginManager.getInstance().logOut();
+                        } catch(FirebaseNetworkException e) {
+                            showSnackBar(getString(R.string.connexion_failure));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            showSnackBar(getString(R.string.authentication_failed));
                         }
-                        progressBar.setVisibility(View.INVISIBLE);
                     }
+                    progressBar.setVisibility(View.INVISIBLE);
                 });
     }
 
@@ -231,31 +226,30 @@ public class ConnectionActivity extends AppCompatActivity {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         auth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.i(GOOGLE_TAG, "signInWithCredential:success");
-                            startMainActivity();
-                            finish();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(GOOGLE_TAG, "signInWithCredential:failure", task.getException());
-                            try {
-                                if (task.getException() != null)
-                                    throw task.getException();
-                            } catch(FirebaseAuthUserCollisionException e) {
-                                showSnackBar(getString(R.string.account_exists));
-                            } catch(FirebaseNetworkException e) {
-                                showSnackBar(getString(R.string.connexion_failure));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                showSnackBar(getString(R.string.authentication_failed));
-                            }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Create a workmate document for the current user in Firestore
+                        createWorkmateInFirestore();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.i(GOOGLE_TAG, "signInWithCredential:success");
+                        startMainActivity();
+                        finish();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(GOOGLE_TAG, "signInWithCredential:failure", task.getException());
+                        try {
+                            if (task.getException() != null)
+                                throw task.getException();
+                        } catch(FirebaseAuthUserCollisionException e) {
+                            showSnackBar(getString(R.string.account_exists));
+                        } catch(FirebaseNetworkException e) {
+                            showSnackBar(getString(R.string.connexion_failure));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            showSnackBar(getString(R.string.authentication_failed));
                         }
-                        progressBar.setVisibility(View.INVISIBLE);
                     }
+                    progressBar.setVisibility(View.INVISIBLE);
                 });
     }
 
@@ -270,6 +264,20 @@ public class ConnectionActivity extends AppCompatActivity {
     // Show Snack Bar with a message
     private void showSnackBar(String message){
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    //--------------------------------------------------------------------------------------
+
+    // Create the current user in Firestore when he is identified
+    private void createWorkmateInFirestore(){
+        if (firebaseUtils.getCurrentUser() != null){
+            String uid = firebaseUtils.getCurrentUser().getUid();
+            String username = firebaseUtils.getCurrentUser().getDisplayName();
+            String urlPicture = (firebaseUtils.getCurrentUser().getPhotoUrl() != null) ?
+                    firebaseUtils.getCurrentUser().getPhotoUrl().toString() : null;
+            // Set data
+            WorkmateHelper.createWorkmate(uid, username, urlPicture, null);
+        }
     }
 
 }

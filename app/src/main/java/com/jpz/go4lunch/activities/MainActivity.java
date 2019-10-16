@@ -107,8 +107,6 @@ public class MainActivity extends AppCompatActivity
         configureNavigationView();
         configureBottomView();
 
-        createOrUpdateWorkmateInFirestore();
-
         // Request permission when starting MainActivity which contains Google Maps services
         EasyPermissions.requestPermissions(this,
                 getString(R.string.rationale_permission_location_access), RC_LOCATION, PERMS);
@@ -241,19 +239,6 @@ public class MainActivity extends AppCompatActivity
         //Update views with data
         nameProfile.setText(username);
         emailProfile.setText(email);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    // Create or update the current user in Firestore when he is identified
-    private void createOrUpdateWorkmateInFirestore(){
-        if (user != null){
-            String uid = user.getUid();
-            String username = user.getDisplayName();
-            String urlPicture = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : null;
-            // Set data
-            workmateHelper.setUidUsernamePhotoWithMerge(uid, username, urlPicture);
-        }
     }
 
     //----------------------------------------------------------------------------------

@@ -36,7 +36,7 @@ public class WorkmateHelper {
 
     // --- CREATE ---
 
-    private static Task<Void> createWorkmate(String uid, String username, String urlPicture, String selectedPlace) {
+    public static Task<Void> createWorkmate(String uid, String username, String urlPicture, String selectedPlace) {
         Workmate workmateToCreate = new Workmate(uid, username, urlPicture, selectedPlace);
         return WorkmateHelper.getWorkmatesCollection().document(uid).set(workmateToCreate);
     }
@@ -72,21 +72,18 @@ public class WorkmateHelper {
 
     public void getRestaurantChoice(String uid) {
         DocumentReference docRef = getWorkmatesCollection().document(uid);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document != null && document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        workmate.setSelectedPlace(document.getString("selectedPlace"));
-                        Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    workmate.setSelectedPlace(document.getString("selectedPlace"));
+                    Log.i(TAG, "restaurant choice = " + workmate.getSelectedPlace());
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    Log.d(TAG, "No such document");
                 }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
             }
         });
     }
@@ -95,22 +92,18 @@ public class WorkmateHelper {
 
     public void listenToRestaurantChoice(String uid) {
         final DocumentReference docRef = getWorkmatesCollection().document(uid);
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
 
-                if (snapshot != null && snapshot.exists()) {
-                    // Set the restaurant choice with the data from Firestore
-                    workmate.setSelectedPlace(snapshot.getString("selectedPlace"));
-                    Log.d(TAG, "Current data: " + snapshot.getData());
-                } else {
-                    Log.d(TAG, "Current data: null. Create workmate");
-                }
+            if (snapshot != null && snapshot.exists()) {
+                // Set the restaurant choice with the data from Firestore
+                workmate.setSelectedPlace(snapshot.getString("selectedPlace"));
+                Log.d(TAG, "Current data: " + snapshot.getData());
+            } else {
+                Log.d(TAG, "Current data: null. Create workmate");
             }
         });
     }
