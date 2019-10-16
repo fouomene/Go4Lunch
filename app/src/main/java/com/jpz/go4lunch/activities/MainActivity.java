@@ -33,7 +33,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
@@ -56,11 +55,8 @@ public class MainActivity extends AppCompatActivity
     // FirebaseUtils class
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
-    // Api Firestore
-    private WorkmateHelper workmateHelper = new WorkmateHelper();
-
     // Declare user
-    private FirebaseUser user;
+    private FirebaseUser currentUser;
 
     // For design
     private Toolbar toolbar;
@@ -99,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         bottomNav = findViewById(R.id.bottom_navigation);
 
         // Initialize FireBase User
-        user = firebaseUtils.getCurrentUser();
+        currentUser = firebaseUtils.getCurrentUser();
 
         // Display views and layouts
         configureToolbar();
@@ -197,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_drawer_logout:
                 // Check if the user is logged in with Facebook...
-                for (UserInfo user: user.getProviderData()) {
+                for (UserInfo user: currentUser.getProviderData()) {
                     if (user.getProviderId().equals("facebook.com")) {
                         Log.i("Tag", "provider in loop " + user.getProviderId());
                         // ... then, in this case, logout from Facebook
@@ -220,21 +216,21 @@ public class MainActivity extends AppCompatActivity
 
     // Update the user profile in the Nav Drawer Header
     private void updateUserProfile() {
-        if (user != null) {
+        if (currentUser != null) {
             //Get picture URL from Firebase
-            if (user.getPhotoUrl() != null) {
+            if (currentUser.getPhotoUrl() != null) {
                 Glide.with(this)
-                        .load(user.getPhotoUrl())
+                        .load(currentUser.getPhotoUrl())
                         .apply(RequestOptions.circleCropTransform())
                         .into(photoProfile);
             }
             //Get username & email from Firebase
-            username = TextUtils.isEmpty(user.getDisplayName()) ?
-                    getString(R.string.info_no_username_found) : user.getDisplayName();
-            Log.i("MainActivity", "username = " + user.getDisplayName());
-            email = TextUtils.isEmpty(user.getEmail()) ?
-                    getString(R.string.info_no_email_found) : user.getEmail();
-            Log.i("MainActivity", "email = " + user.getEmail());
+            username = TextUtils.isEmpty(currentUser.getDisplayName()) ?
+                    getString(R.string.info_no_username_found) : currentUser.getDisplayName();
+            Log.i("MainActivity", "username = " + currentUser.getDisplayName());
+            email = TextUtils.isEmpty(currentUser.getEmail()) ?
+                    getString(R.string.info_no_email_found) : currentUser.getEmail();
+            Log.i("MainActivity", "email = " + currentUser.getEmail());
         }
         //Update views with data
         nameProfile.setText(username);

@@ -39,10 +39,10 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder implements View.
 
     public void updateViewHolder(Workmate workmate, RequestManager glide, WorkmatesAdapter.Listener callback){
         // Update text
-        if (workmate.getSelectedPlace() != null) {
+        if (workmate.getRestaurantId() != null) {
             textView.setTextColor(context.getResources().getColor(android.R.color.black));
             textView.setText(context.getString(R.string.workmate_has_a_restaurant_choice,
-                    workmate.getUsername(), workmate.getSelectedPlace()));
+                    workmate.getUsername(), workmate.getRestaurantName()));
         } else {
             textView.setTextColor(context.getResources().getColor(R.color.darkGrey));
             textView.setTypeface(null, Typeface.ITALIC);

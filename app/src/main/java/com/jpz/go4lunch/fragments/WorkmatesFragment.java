@@ -24,9 +24,8 @@ import com.jpz.go4lunch.models.Workmate;
  */
 public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.Listener {
 
-    // Declare View, Adapter
+    // Declare View
     private RecyclerView recyclerView;
-    private WorkmatesAdapter workmatesAdapter;
 
     private static final String TAG = WorkmatesFragment.class.getSimpleName();
 
@@ -48,10 +47,10 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     // Configure RecyclerView with a Query
     private void configureRecyclerView(){
         //Configure Adapter & RecyclerView
-        this.workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
+        WorkmatesAdapter workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
                 (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(this.workmatesAdapter);
+        recyclerView.setAdapter(workmatesAdapter);
     }
 
     // Create options for RecyclerView from a Query

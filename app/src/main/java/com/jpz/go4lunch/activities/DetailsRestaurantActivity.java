@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseUser;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.api.RestaurantHelper;
 import com.jpz.go4lunch.api.WorkmateHelper;
@@ -53,6 +54,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     // Utils
     private ConvertData convertData = new ConvertData();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
+    private FirebaseUser currentUser;
 
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
@@ -71,6 +73,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         like = findViewById(R.id.details_button_like);
         website = findViewById(R.id.details_button_website);
         floatingActionButton = findViewById(R.id.details_fab);
+
+        // Initialize FireBase User
+        currentUser = firebaseUtils.getCurrentUser();
 
         // Get the transferred Place data from the source activity
         Intent intent = getIntent();
@@ -114,20 +119,21 @@ public class DetailsRestaurantActivity extends AppCompatActivity
 
     // Method to retrieve the current workmate with Firestore data and update UI
     private void getFirestoreRestaurantChoice(){
-        if (firebaseUtils.getCurrentUser() != null) {
-            WorkmateHelper.getCurrentWorkmate(firebaseUtils.getCurrentUser().getUid())
+        if (currentUser != null) {
+            WorkmateHelper.getCurrentWorkmate(currentUser.getUid())
                     .addOnSuccessListener(documentSnapshot-> {
                         currentWorkmate = documentSnapshot.toObject(Workmate.class);
                 // Check the restaurant choice
                 compareRestaurants();
-                Log.i(TAG, "restaurant choice = " + currentWorkmate.getSelectedPlace());
+                Log.i(TAG, "restaurant choice = " +
+                        currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
             });
         }
     }
 
     private void compareRestaurants() {
         // Verify if the restaurant chosen is the same that the details restaurant displayed
-        if (place.getName() != null && place.getName().equals(currentWorkmate.getSelectedPlace())) {
+        if (place.getId() != null && place.getId().equals(currentWorkmate.getRestaurantId())) {
             fabIsChecked = true;
         }
         // Update fab UI according to this choice
@@ -159,22 +165,22 @@ public class DetailsRestaurantActivity extends AppCompatActivity
 
     // Current workmate is choosing a restaurant, update Firestore
     private void chooseRestaurant() {
-        if (firebaseUtils.getCurrentUser() != null) {
+        if (currentUser != null) {
             // Update the workmates collection
-            WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), place.getName());
+            WorkmateHelper.updateRestaurant(currentUser.getUid(), place.getId(), place.getName());
             // Update the restaurants collection
             restaurantHelper.setIdNameWorkmatesWithMerge(place.getId(), place.getName(),
-                    firebaseUtils.getCurrentUser().getDisplayName());
+                    currentUser.getDisplayName());
         }
     }
 
     // Current workmate is deleting a restaurant, update Firestore
     private void deleteRestaurantChoice() {
-        if (firebaseUtils.getCurrentUser() != null) {
+        if (currentUser != null) {
             // Update the workmates collection
-            WorkmateHelper.updateRestaurant(firebaseUtils.getCurrentUser().getUid(), null);
+            WorkmateHelper.updateRestaurant(currentUser.getUid(), null, null);
             // Update the restaurants collection
-            restaurantHelper.deleteWorkmate(place.getId(), firebaseUtils.getCurrentUser().getDisplayName());
+            restaurantHelper.deleteWorkmate(place.getId(), currentUser.getDisplayName());
         }
     }
 

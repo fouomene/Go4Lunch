@@ -4,10 +4,10 @@ import androidx.annotation.Nullable;
 
 public class Workmate {
 
-    private String uid;
     private String username;
     @Nullable private String urlPicture;
-    @Nullable private String selectedPlace;
+    @Nullable private String restaurantId;
+    @Nullable private String restaurantName;
 
     /*
     Cloud Firestore will internally convert the objects to supported data types.
@@ -19,17 +19,15 @@ public class Workmate {
 
     }
 
-    public Workmate(String uid, String username, @Nullable String urlPicture, @Nullable String selectedPlace) {
-        this.uid = uid;
+    public Workmate(String username, @Nullable String urlPicture,
+                    @Nullable String restaurantId, @Nullable String restaurantName) {
         this.username = username;
         this.urlPicture = urlPicture;
-        this.selectedPlace = selectedPlace;
+        this.restaurantId = restaurantId;
+        this.restaurantName = restaurantName;
     }
 
     // Getters
-    public String getUid() {
-        return uid;
-    }
 
     public String getUsername() {
         return username;
@@ -39,14 +37,18 @@ public class Workmate {
         return urlPicture;
     }
 
-    @Nullable public String getSelectedPlace() {
-        return selectedPlace;
+
+    @Nullable
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    @Nullable
+    public String getRestaurantName() {
+        return restaurantName;
     }
 
     // Setters
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -56,7 +58,11 @@ public class Workmate {
         this.urlPicture = urlPicture;
     }
 
-    public void setSelectedPlace(@Nullable String selectedPlace) {
-        this.selectedPlace = selectedPlace;
+    public void setRestaurantId(@Nullable String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public void setRestaurantName(@Nullable String restaurantName) {
+        this.restaurantName = restaurantName;
     }
 }

@@ -271,12 +271,12 @@ public class ConnectionActivity extends AppCompatActivity {
     // Create the current user in Firestore when he is identified
     private void createWorkmateInFirestore(){
         if (firebaseUtils.getCurrentUser() != null){
-            String uid = firebaseUtils.getCurrentUser().getUid();
+            String id = firebaseUtils.getCurrentUser().getUid();
             String username = firebaseUtils.getCurrentUser().getDisplayName();
             String urlPicture = (firebaseUtils.getCurrentUser().getPhotoUrl() != null) ?
                     firebaseUtils.getCurrentUser().getPhotoUrl().toString() : null;
             // Set data
-            WorkmateHelper.createWorkmate(uid, username, urlPicture, null);
+            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null);
         }
     }
 
