@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 public class Workmate {
 
+    private String id;
     private String username;
     @Nullable private String urlPicture;
     @Nullable private String restaurantId;
@@ -19,8 +20,9 @@ public class Workmate {
 
     }
 
-    public Workmate(String username, @Nullable String urlPicture,
+    public Workmate(String id, String username, @Nullable String urlPicture,
                     @Nullable String restaurantId, @Nullable String restaurantName) {
+        this.id = id;
         this.username = username;
         this.urlPicture = urlPicture;
         this.restaurantId = restaurantId;
@@ -29,6 +31,10 @@ public class Workmate {
 
     // Getters
 
+    public String getId() {
+        return id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -36,7 +42,6 @@ public class Workmate {
     @Nullable public String getUrlPicture() {
         return urlPicture;
     }
-
 
     @Nullable
     public String getRestaurantId() {
@@ -49,6 +54,10 @@ public class Workmate {
     }
 
     // Setters
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public void setUsername(String username) {
         this.username = username;

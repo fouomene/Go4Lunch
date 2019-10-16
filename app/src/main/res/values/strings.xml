@@ -28,10 +28,12 @@
     <string name="open_until_hour">Open until %1$dpm</string>
     <string name="distance">%1$dm</string>
 
-    <!-- Workmate -->
+    <!-- Workmates -->
     <string name="workmate_restaurant_choice">Workmate choice</string>
+    <string name="workmates_joining_restaurant">Workmates are joining the restaurant</string>
     <string name="workmate_has_a_restaurant_choice">%1$s is eating at %2$s</string>
     <string name="workmate_has_not_a_restaurant_choice">"%1$s hasn't decide yet"</string>
+    <string name="workmate_is_joining">"%1$s is joining!"</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>

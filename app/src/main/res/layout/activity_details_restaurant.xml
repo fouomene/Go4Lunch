@@ -182,4 +182,15 @@
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
         app:layout_constraintBottom_toTopOf="@+id/details_guideline_forty"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/details_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_seventy"
+        app:layout_constraintBottom_toBottomOf="parent">
+    </androidx.recyclerview.widget.RecyclerView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

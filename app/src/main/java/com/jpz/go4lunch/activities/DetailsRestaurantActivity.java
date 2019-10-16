@@ -2,6 +2,8 @@ package com.jpz.go4lunch.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,10 +16,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Query;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.adapters.WorkmatesAtRestaurantAdapter;
 import com.jpz.go4lunch.api.RestaurantHelper;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
@@ -29,7 +35,10 @@ import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
 
 public class DetailsRestaurantActivity extends AppCompatActivity
-        implements CurrentPlace.PlacePhotoListener {
+        implements CurrentPlace.PlacePhotoListener, WorkmatesAtRestaurantAdapter.Listener {
+
+    // Declare View
+    private RecyclerView recyclerView;
 
     // Widgets
     private TextView name, opinions, type, address;
@@ -73,6 +82,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         like = findViewById(R.id.details_button_like);
         website = findViewById(R.id.details_button_website);
         floatingActionButton = findViewById(R.id.details_fab);
+        recyclerView = findViewById(R.id.details_recycler_view);
 
         // Initialize FireBase User
         currentUser = firebaseUtils.getCurrentUser();
@@ -90,6 +100,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         getFirestoreRestaurantChoice();
         // Listen the restaurant choice from the current workmate and update Firestore
         listenRestaurantChoice();
+
+        configureRecyclerView();
     }
 
     //----------------------------------------------------------------------------------
@@ -170,7 +182,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
             WorkmateHelper.updateRestaurant(currentUser.getUid(), place.getId(), place.getName());
             // Update the restaurants collection
             restaurantHelper.setIdNameWorkmatesWithMerge(place.getId(), place.getName(),
-                    currentUser.getDisplayName());
+                    currentUser.getUid());
         }
     }
 
@@ -180,7 +192,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
             // Update the workmates collection
             WorkmateHelper.updateRestaurant(currentUser.getUid(), null, null);
             // Update the restaurants collection
-            restaurantHelper.deleteWorkmate(place.getId(), currentUser.getDisplayName());
+            restaurantHelper.deleteWorkmate(place.getId(), currentUser.getUid());
         }
     }
 
@@ -219,4 +231,25 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void dislayWorkmates() {
     }
 
+    // Configure RecyclerView with a Query
+    private void configureRecyclerView(){
+        //Configure Adapter & RecyclerView
+        WorkmatesAtRestaurantAdapter adapter = new WorkmatesAtRestaurantAdapter(generateOptionsForAdapter
+                (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+    }
+
+    // Create options for RecyclerView from a Query
+    private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query){
+        return new FirestoreRecyclerOptions.Builder<Workmate>()
+                .setQuery(query, Workmate.class)
+                .setLifecycleOwner(this)
+                .build();
+    }
+
+    @Override
+    public void onClickItem(int position) {
+
+    }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Restaurant {
 
+    private String id;
     private String name;
     @Nullable private List<String> workmateList;
 
@@ -19,12 +20,17 @@ public class Restaurant {
 
     }
 
-    public Restaurant(String name, @Nullable List<String> workmateList) {
+    public Restaurant(String id, String name, @Nullable List<String> workmateList) {
+        this.id = id;
         this.name = name;
         this.workmateList = workmateList;
     }
 
     // Getters
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -36,6 +42,10 @@ public class Restaurant {
     }
 
     // Setters
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public void setName(String name) {
         this.name = name;

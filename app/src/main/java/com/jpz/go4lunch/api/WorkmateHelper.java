@@ -32,15 +32,19 @@ public class WorkmateHelper {
 
     public static Task<Void> createWorkmate(String id, String username, String urlPicture,
                                             String restaurantId, String restaurantName) {
-        Workmate workmateToCreate = new Workmate(username, urlPicture, restaurantId, restaurantName);
+        Workmate workmateToCreate = new Workmate(id, username, urlPicture, restaurantId, restaurantName);
         return WorkmateHelper.getWorkmatesCollection().document(id).set(workmateToCreate);
     }
 
     // Method used to update or create a workmate without deleting the selectedPlace
     public void setUsernamePhotoWithMerge(String id, String username, String urlPicture) {
-        // Update username and urlPicture fields, creating the document if it does not already exist.
+        // Update id, username and urlPicture fields, creating the document if it does not already exist.
+        Map<String, Object> dataId = new HashMap<>();
         Map<String, Object> dataUsername = new HashMap<>();
         Map<String, Object> dataUrlPicture = new HashMap<>();
+        // Update id
+        dataUsername.put("id", id);
+        getWorkmatesCollection().document(id).set(dataId, SetOptions.merge());
         // Update username
         dataUsername.put("username", username);
         getWorkmatesCollection().document(id).set(dataUsername, SetOptions.merge());
@@ -49,13 +53,15 @@ public class WorkmateHelper {
         getWorkmatesCollection().document(id).set(dataUrlPicture, SetOptions.merge());
     }
 
-    // --- GET ---
+    // --- QUERY ---
 
     public static Query getAllWorkmates(){
         return WorkmateHelper.getWorkmatesCollection()
                 .orderBy("restaurantName", Query.Direction.DESCENDING)
                 .orderBy("username", Query.Direction.DESCENDING);
     }
+
+    // --- GET ---
 
     public static Task<DocumentSnapshot> getCurrentWorkmate(String id){
         return WorkmateHelper.getWorkmatesCollection().document(id).get();

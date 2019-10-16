@@ -32,7 +32,11 @@ public class RestaurantHelper {
     // Method used to update or create a restaurant without deleting the list of workmate
     public void setIdNameWorkmatesWithMerge(String id, String name, String workmate) {
         // Update id, name and workmate fields, creating the document if it does not already exist.
+        Map<String, Object> dataId = new HashMap<>();
         Map<String, Object> dataName = new HashMap<>();
+        // Update id
+        dataName.put("id", id);
+        getRestaurantsCollection().document(id).set(dataId, SetOptions.merge());
         // Update name
         dataName.put("name", name);
         getRestaurantsCollection().document(id).set(dataName, SetOptions.merge());
@@ -41,12 +45,14 @@ public class RestaurantHelper {
         documentReference.update("workmateList", FieldValue.arrayUnion(workmate));
     }
 
-    // --- GET ---
+    // --- QUERY ---
 
     public static Query getAllRestaurants(){
         return RestaurantHelper.getRestaurantsCollection()
                 .orderBy("name");
     }
+
+    // --- GET ---
 
     public static Task<DocumentSnapshot> getCurrentRestaurant(String id){
         return RestaurantHelper.getRestaurantsCollection().document(id).get();
