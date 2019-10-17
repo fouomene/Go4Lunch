@@ -34,6 +34,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.api.RestaurantHelper;
+import com.jpz.go4lunch.models.Restaurant;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
@@ -319,12 +321,31 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     //----------------------------------------------------------------------------------
     // Methods to build and show markers on Map
 
+    // Display markers at current places
     @AfterPermissionGranted(RC_LOCATION)
-    private void findCurrentPlace(List<Place> placeList) {
+    private void showCurrentPlaces(List<Place> placeList) {
         if (getActivity() != null) {
             if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
-                for (Place place : placeList)
-                    addMarkers(place.getLatLng(), place);
+                for (Place place : placeList) {
+                    // Get a restaurant from Firestore and check if workmates join it
+                    RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
+                        Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
+                        if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null) {
+                            // If workmates join a restaurant on the map, mark a green icon
+                            if (!currentRestaurant.getWorkmateList().isEmpty()) {
+                                addMarkers(place.getLatLng(), place,
+                                        R.drawable.ic_map_pin_workmate, R.drawable.ic_restaurant_with_workmate);
+                            } else {
+
+                                // Else no one joins this restaurant, mark a red icon
+                                addMarkers(place.getLatLng(), place,
+                                        R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                            }
+                        }
+                    });
+                    // Otherwise, the restaurant isn't stored, no one joins this restaurant, mark a red icon
+                    addMarkers(place.getLatLng(), place, R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                }
             } else {
                 EasyPermissions.requestPermissions(getActivity(),
                         getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
@@ -332,24 +353,23 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         }
     }
 
-    private void addMarkers(LatLng latLng, Place place) {
+    // Add different color markers depending on whether there are workmates in a restaurant or not
+    private void addMarkers(LatLng latLng, Place place, int icMap, int icRestaurant) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
-                .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.ic_restaurant))
+                .icon(bitmapDescriptorFromVector(getActivity(), icMap, icRestaurant))
                 .position(latLng));
         marker.setTag(place);
     }
 
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int backgroundResId, int vectorResId) {
         // Create background
-        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_map_pin);
+        Drawable background = ContextCompat.getDrawable(context, backgroundResId);
         if (background == null) {
             Log.e(TAG, "Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();
         }
         background.setBounds(0, 0,
                 background.getIntrinsicWidth(), background.getIntrinsicHeight());
-
         // Create vector
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         if (vectorDrawable == null) {
@@ -360,7 +380,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         int top = (background.getIntrinsicHeight() - vectorDrawable.getIntrinsicHeight()) / 3;
         vectorDrawable.setBounds(left, top, left + vectorDrawable.getIntrinsicWidth(),
                 top + vectorDrawable.getIntrinsicHeight());
-
         // Create Bitmap with background and vector then draw them
         Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(),
                 background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -375,7 +394,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onPlacesDetailsFetch(List<Place> places) {
         // Show the restaurants near the user location with the places from the request
-        findCurrentPlace(places);
+        showCurrentPlaces(places);
     }
 
     //----------------------------------------------------------------------------------
