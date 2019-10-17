@@ -55,10 +55,17 @@ public class WorkmateHelper {
 
     // --- QUERY ---
 
+    // Retrieve all workmates and class them especially by a restaurant choice for WorkmatesFragment
     public static Query getAllWorkmates(){
         return WorkmateHelper.getWorkmatesCollection()
                 .orderBy("restaurantName", Query.Direction.DESCENDING)
                 .orderBy("username", Query.Direction.DESCENDING);
+    }
+
+    // Retrieve all workmates with the same restaurant choice for DetailsRestaurantActivity
+    public static Query getWorkmatesAtRestaurant(String id){
+        return WorkmateHelper.getWorkmatesCollection()
+                .whereEqualTo("restaurantId", id);
     }
 
     // --- GET ---

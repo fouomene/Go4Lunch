@@ -14,22 +14,13 @@ import com.jpz.go4lunch.views.WorkmatesAtRestaurantViewHolder;
 
 public class WorkmatesAtRestaurantAdapter extends FirestoreRecyclerAdapter<Workmate, WorkmatesAtRestaurantViewHolder> {
 
-    // Declaring callback
-    private final Listener callback;
-
     // For data
     private final RequestManager glide;
 
     public WorkmatesAtRestaurantAdapter(@NonNull FirestoreRecyclerOptions<Workmate> options,
-                            RequestManager glide, Listener callback) {
+                            RequestManager glide) {
         super(options);
         this.glide = glide;
-        this.callback = callback;
-    }
-
-    // Create interface for callback
-    public interface Listener {
-        void onClickItem(int position);
     }
 
     @NonNull
@@ -42,7 +33,7 @@ public class WorkmatesAtRestaurantAdapter extends FirestoreRecyclerAdapter<Workm
 
     @Override
     protected void onBindViewHolder(@NonNull WorkmatesAtRestaurantViewHolder holder, int position, @NonNull Workmate model) {
-        holder.updateViewHolder(model, this.glide, this.callback);
+        holder.updateViewHolder(model, this.glide);
     }
 
 }

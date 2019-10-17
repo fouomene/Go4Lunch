@@ -33,9 +33,7 @@ import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
-
-public class DetailsRestaurantActivity extends AppCompatActivity
-        implements CurrentPlace.PlacePhotoListener, WorkmatesAtRestaurantAdapter.Listener {
+public class DetailsRestaurantActivity extends AppCompatActivity implements CurrentPlace.PlacePhotoListener {
 
     // Declare View
     private RecyclerView recyclerView;
@@ -64,7 +62,6 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private ConvertData convertData = new ConvertData();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
     private FirebaseUser currentUser;
-
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -101,6 +98,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         // Listen the restaurant choice from the current workmate and update Firestore
         listenRestaurantChoice();
 
+        // Display the workmates joining to the restaurant in a RecyclerView
         configureRecyclerView();
     }
 
@@ -227,15 +225,13 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     }
 
     //----------------------------------------------------------------------------------
-
-    private void dislayWorkmates() {
-    }
+    // For the RecyclerView
 
     // Configure RecyclerView with a Query
     private void configureRecyclerView(){
         //Configure Adapter & RecyclerView
         WorkmatesAtRestaurantAdapter adapter = new WorkmatesAtRestaurantAdapter(generateOptionsForAdapter
-                (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
+                (WorkmateHelper.getWorkmatesAtRestaurant(place.getId())), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
@@ -248,8 +244,4 @@ public class DetailsRestaurantActivity extends AppCompatActivity
                 .build();
     }
 
-    @Override
-    public void onClickItem(int position) {
-
-    }
 }
