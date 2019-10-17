@@ -30,19 +30,32 @@ public class RestaurantHelper {
     // --- CREATE ---
 
     // Method used to update or create a restaurant without deleting the list of workmate
-    public void setIdNameWorkmatesWithMerge(String id, String name, String workmate) {
+    public void setIdNameWorkmates(String id, String name, String workmate) {
         // Update id, name and workmate fields, creating the document if it does not already exist.
         Map<String, Object> dataId = new HashMap<>();
-        Map<String, Object> dataName = new HashMap<>();
         // Update id
-        dataName.put("id", id);
+        dataId.put("id", id);
         getRestaurantsCollection().document(id).set(dataId, SetOptions.merge());
         // Update name
+        Map<String, Object> dataName = new HashMap<>();
         dataName.put("name", name);
         getRestaurantsCollection().document(id).set(dataName, SetOptions.merge());
         // Automatically add a new workmate to the "workmateList" array field.
         DocumentReference documentReference = getRestaurantsCollection().document(id);
         documentReference.update("workmateList", FieldValue.arrayUnion(workmate));
+    }
+
+    // Method used to create or update a restaurant with an id and a name
+    public void setIdName(String id, String name) {
+        // Update id and name fields, creating the document if it doesn't already exist.
+        // Update id
+        Map<String, Object> dataId = new HashMap<>();
+        dataId.put("id", id);
+        getRestaurantsCollection().document(id).set(dataId, SetOptions.merge());
+        // Update name
+        Map<String, Object> dataName = new HashMap<>();
+        dataName.put("name", name);
+        getRestaurantsCollection().document(id).set(dataName, SetOptions.merge());
     }
 
     // --- QUERY ---
@@ -60,16 +73,26 @@ public class RestaurantHelper {
 
     // --- LISTENER ---
 
-
     // --- UPDATE ---
 
+    // Automatically increment the likes of the restaurant by 1
+    public static Task<Void> addLike(String id) {
+        return RestaurantHelper.getRestaurantsCollection().document(id)
+                .update("likes", FieldValue.increment(1));
+    }
+
+    // Automatically decrement the likes of the restaurant by 1
+    public static Task<Void> removeLike(String id) {
+        return RestaurantHelper.getRestaurantsCollection().document(id)
+                .update("likes", FieldValue.increment(-1));
+    }
 
     // --- DELETE ---
 
     public void deleteWorkmate(String id, String workmate) {
-        DocumentReference washingtonRef = getRestaurantsCollection().document(id);
+        DocumentReference documentReference = getRestaurantsCollection().document(id);
         // Automatically remove a workmate from the "workmateList" array field.
-        washingtonRef.update("workmateList", FieldValue.arrayRemove(workmate));
+        documentReference.update("workmateList", FieldValue.arrayRemove(workmate));
     }
 
 }

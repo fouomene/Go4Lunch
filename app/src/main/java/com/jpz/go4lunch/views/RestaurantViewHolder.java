@@ -30,8 +30,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     private ConvertData convertData = new ConvertData();
 
     // Views and Context
-    private TextView name, distance, type, address, workmates, hours, opinions;
-    private ImageView restaurantImage, workmate_ic;
+    private TextView name, distance, type, address, workmates, hours;
+    private ImageView restaurantImage, workmate_ic, firstStar, secondStar, thirdStar;
     private Context context;
 
     // Declare a Weak Reference to our Callback
@@ -45,7 +45,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         address = itemView.findViewById(R.id.item_address);
         workmates = itemView.findViewById(R.id.item_workmates);
         hours = itemView.findViewById(R.id.item_hours);
-        opinions = itemView.findViewById(R.id.item_opinions);
+        firstStar = itemView.findViewById(R.id.item_first_star);
+        secondStar = itemView.findViewById(R.id.item_second_star);
+        thirdStar = itemView.findViewById(R.id.item_third_star);
         restaurantImage = itemView.findViewById(R.id.item_image_restaurant);
         workmate_ic = itemView.findViewById(R.id.item_ic_workmate);
 
@@ -94,7 +96,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
             }
         });
 
-        opinions.setText("opinions");
+        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
+        convertData.updateLikes(place, firstStar, secondStar, thirdStar);
 
         // Create a new weak Reference to our Listener
         this.callbackWeakRef = new WeakReference<>(callback);

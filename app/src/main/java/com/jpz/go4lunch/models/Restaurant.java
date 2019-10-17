@@ -9,6 +9,7 @@ public class Restaurant {
     private String id;
     private String name;
     @Nullable private List<String> workmateList;
+    private int likes;
 
     /*
     Cloud Firestore will internally convert the objects to supported data types.
@@ -20,10 +21,11 @@ public class Restaurant {
 
     }
 
-    public Restaurant(String id, String name, @Nullable List<String> workmateList) {
+    public Restaurant(String id, String name, @Nullable List<String> workmateList, int likes) {
         this.id = id;
         this.name = name;
         this.workmateList = workmateList;
+        this.likes = likes;
     }
 
     // Getters
@@ -41,6 +43,10 @@ public class Restaurant {
         return workmateList;
     }
 
+    public int getLikes() {
+        return likes;
+    }
+
     // Setters
 
     public void setId(String id) {
@@ -53,5 +59,9 @@ public class Restaurant {
 
     public void setWorkmateList(@Nullable List<String> workmateList) {
         this.workmateList = workmateList;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 }

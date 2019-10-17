@@ -1,12 +1,16 @@
 package com.jpz.go4lunch.utils;
 
 import android.content.Context;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.api.RestaurantHelper;
+import com.jpz.go4lunch.models.Restaurant;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ConvertData {
-    // Class to convert data from Place and use it for UI purpose
+    // Class to convert data from Places SDK or Firestore and use its for UI purpose
 
     // Format the address with the components
     public String getAddress(Place place) {
@@ -159,6 +163,33 @@ public class ConvertData {
         double distance = R * c * 1000; // convert to meters
         distance = Math.pow(distance, 2);
         return (int) Math.sqrt(distance);
+    }
+
+    //--------------------------------------------------------------------------------------
+
+    // Update likes for a restaurant from Firestore
+    public void updateLikes(Place place, ImageView firstStar, ImageView secondStar, ImageView thirdStar) {
+        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
+        RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
+            Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
+            if (currentRestaurant != null) {
+                // 1 like = 1 star
+                if (currentRestaurant.getLikes() == 1) {
+                    firstStar.setVisibility(View.VISIBLE);
+                }
+                // 2 or 3 likes = 2 stars
+                if ((currentRestaurant.getLikes() == 2) || (currentRestaurant.getLikes() == 3)) {
+                    firstStar.setVisibility(View.VISIBLE);
+                    secondStar.setVisibility(View.VISIBLE);
+                }
+                // More than 3 likes = 3 stars
+                if (currentRestaurant.getLikes() > 3) {
+                    firstStar.setVisibility(View.VISIBLE);
+                    secondStar.setVisibility(View.VISIBLE);
+                    thirdStar.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
 }

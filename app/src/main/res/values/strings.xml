@@ -27,6 +27,8 @@
     <string name="open_until_hour_minute">Open until %1$d.%2$dpm</string>
     <string name="open_until_hour">Open until %1$dpm</string>
     <string name="distance">%1$dm</string>
+    <string name="add_like">Added your like!</string>
+    <string name="remove_like">Removed your like!</string>
 
     <!-- Workmates -->
     <string name="workmate_restaurant_choice">Workmate choice</string>
@@ -66,5 +68,6 @@
     <string name="primary_color">Primary color</string>
     <string name="workmate_photo">Photo of workmate</string>
     <string name="workmate_icon">Workmate icon</string>
+    <string name="stars">stars</string>
 
 </resources>

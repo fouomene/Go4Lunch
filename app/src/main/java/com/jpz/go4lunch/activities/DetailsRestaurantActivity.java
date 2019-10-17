@@ -30,6 +30,7 @@ import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
+import com.jpz.go4lunch.utils.MySharedPreferences;
 
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
@@ -39,8 +40,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     private RecyclerView recyclerView;
 
     // Widgets
-    private TextView name, opinions, type, address;
-    private ImageView restaurantImage;
+    private TextView name, type, address;
+    private ImageView restaurantImage, firstStar, secondStar, thirdStar;
     private Button call, like, website;
     private FloatingActionButton floatingActionButton;
 
@@ -48,6 +49,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     private String phoneNumber;
     private Uri uriWebsite;
     private boolean fabIsChecked;
+   // private boolean likeIsChecked;
 
     // Places
     private Place place;
@@ -63,6 +65,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
     private FirebaseUser currentUser;
 
+    // To load data from the SharedPreferences
+    private MySharedPreferences prefs;
+
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
     @Override
@@ -73,7 +78,9 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         name = findViewById(R.id.details_name);
         type = findViewById(R.id.details_type);
         address = findViewById(R.id.details_address);
-        opinions = findViewById(R.id.details_opinions);
+        firstStar = findViewById(R.id.details_first_star);
+        secondStar = findViewById(R.id.details_second_star);
+        thirdStar = findViewById(R.id.details_third_star);
         restaurantImage = findViewById(R.id.details_image_restaurant);
         call = findViewById(R.id.details_button_call);
         like = findViewById(R.id.details_button_like);
@@ -88,7 +95,14 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         Intent intent = getIntent();
         place = intent.getParcelableExtra(KEY_PLACE);
 
+        prefs = new MySharedPreferences(this);
+
+        // Update data for the restaurant from Places SDK
         updateDetailsRestaurantData();
+        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
+        convertData.updateLikes(place, firstStar, secondStar, thirdStar);
+
+        // Buttons comportment
         callRestaurant();
         likeRestaurant();
         visitWebsiteRestaurant();
@@ -178,9 +192,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         if (currentUser != null) {
             // Update the workmates collection
             WorkmateHelper.updateRestaurant(currentUser.getUid(), place.getId(), place.getName());
-            // Update the restaurants collection
-            restaurantHelper.setIdNameWorkmatesWithMerge(place.getId(), place.getName(),
-                    currentUser.getUid());
+            // Create or update the restaurants collection with the workmate
+            restaurantHelper.setIdNameWorkmates(place.getId(), place.getName(), currentUser.getUid());
         }
     }
 
@@ -220,7 +233,20 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     // Like the restaurant and update Firestore
     private void likeRestaurant() {
         like.setOnClickListener((View v) -> {
-            // Save like on Firebase
+            // Create or update the restaurants collection
+            restaurantHelper.setIdName(place.getId(), place.getName());
+            boolean likeIsChecked = prefs.getLikeState(place.getId());
+            // Check if the user doesn't already like this restaurant, so add his like
+            if (!likeIsChecked) {
+                RestaurantHelper.addLike(place.getId());
+                prefs.saveLikeState(place.getId(), true);
+                Toast.makeText(this, getString(R.string.add_like), Toast.LENGTH_SHORT).show();
+            } else {
+                // Check if the user already like this restaurant, so remove his like
+                RestaurantHelper.removeLike(place.getId());
+                prefs.saveLikeState(place.getId(), false);
+                Toast.makeText(this, getString(R.string.remove_like), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

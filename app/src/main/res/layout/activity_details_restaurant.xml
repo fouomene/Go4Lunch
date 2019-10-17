@@ -29,11 +29,11 @@
         app:layout_constraintGuide_percent="0.7"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/details_guideline_eighty"
+        android:id="@+id/details_guideline_seventy_five"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8"/>
+        app:layout_constraintGuide_percent="0.75"/>
 
     <ImageView
         android:id="@+id/details_image_restaurant"
@@ -64,31 +64,51 @@
         android:text="@string/restaurant_name"
         android:textColor="@android:color/white"
         android:textSize="20sp"
-        android:gravity="bottom"
+        android:gravity="center_vertical"
         android:textAlignment="gravity"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_marginStart="16dp"
-        app:layout_constraintHorizontal_weight="3"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/details_opinions"
+        app:layout_constraintEnd_toStartOf="@+id/details_first_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
         app:layout_constraintBottom_toTopOf="@+id/details_type"/>
 
-    <TextView
-        android:id="@+id/details_opinions"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="opinions"
-        android:gravity="bottom"
-        android:textAlignment="gravity"
-        android:paddingStart="16dp"
-        android:paddingEnd="0dp"
-        app:layout_constraintHorizontal_weight="1"
+    <ImageView
+        android:id="@+id/details_first_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_star_gold"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/details_name"
-        app:layout_constraintEnd_toEndOf="@+id/details_guideline_eighty"
+        app:layout_constraintEnd_toStartOf="@+id/details_second_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
-        app:layout_constraintBottom_toTopOf="@+id/details_type"/>
+        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        android:contentDescription="@string/stars"/>
+
+    <ImageView
+        android:id="@+id/details_second_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_star_gold"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/details_first_star"
+        app:layout_constraintEnd_toStartOf="@+id/details_third_star"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        android:contentDescription="@string/stars"/>
+
+    <ImageView
+        android:id="@+id/details_third_star"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_star_gold"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/details_second_star"
+        app:layout_constraintEnd_toEndOf="@+id/details_guideline_seventy_five"
+        app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
+        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        android:contentDescription="@string/stars"/>
 
     <TextView
         android:id="@+id/details_type"
