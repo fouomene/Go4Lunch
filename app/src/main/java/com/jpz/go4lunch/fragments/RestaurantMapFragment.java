@@ -327,7 +327,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         if (getActivity() != null) {
             if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                 for (Place place : placeList) {
-                    // Get a restaurant from Firestore and check if workmates join it
+                    // By default, mark a red icon
+                    addMarkers(place.getLatLng(), place, R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                    // If a restaurant is stored in Firestore, check if workmates join it :
                     RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
                         Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
                         if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null) {
@@ -335,16 +337,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                             if (!currentRestaurant.getWorkmateList().isEmpty()) {
                                 addMarkers(place.getLatLng(), place,
                                         R.drawable.ic_map_pin_workmate, R.drawable.ic_restaurant_with_workmate);
-                            } else {
-
-                                // Else no one joins this restaurant, mark a red icon
-                                addMarkers(place.getLatLng(), place,
-                                        R.drawable.ic_map_pin, R.drawable.ic_restaurant);
                             }
                         }
                     });
-                    // Otherwise, the restaurant isn't stored, no one joins this restaurant, mark a red icon
-                    addMarkers(place.getLatLng(), place, R.drawable.ic_map_pin, R.drawable.ic_restaurant);
                 }
             } else {
                 EasyPermissions.requestPermissions(getActivity(),

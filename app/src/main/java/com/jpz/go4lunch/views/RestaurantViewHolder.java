@@ -14,6 +14,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.RestaurantListAdapter;
+import com.jpz.go4lunch.api.RestaurantHelper;
+import com.jpz.go4lunch.models.Restaurant;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 
@@ -29,7 +31,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
     // Views and Context
     private TextView name, distance, type, address, workmates, hours, opinions;
-    private ImageView restaurantImage;
+    private ImageView restaurantImage, workmate_ic;
     private Context context;
 
     // Declare a Weak Reference to our Callback
@@ -45,6 +47,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         hours = itemView.findViewById(R.id.item_hours);
         opinions = itemView.findViewById(R.id.item_opinions);
         restaurantImage = itemView.findViewById(R.id.item_image_restaurant);
+        workmate_ic = itemView.findViewById(R.id.item_ic_workmate);
 
         context = itemView.getContext();
     }
@@ -55,7 +58,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
         hours.setText(convertData.openingHours(place, context));
         if (convertData.openingHours(place, context).contains("Clos")) {
-            hours.setTextColor(context.getApplicationContext().getResources().getColor(R.color.crimson));
+            hours.setTextColor(context.getResources().getColor(R.color.crimson));
             hours.setTypeface(Typeface.DEFAULT_BOLD);
         }
         if (convertData.openingHours(place, context).contains("Open")) {
@@ -76,7 +79,21 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         type.setText("type");
-        workmates.setText("wormates");
+
+        // By default, number of workmates is empty
+        workmates.setText("");
+        // If a restaurant is stored in Firestore, check if workmates join it...
+        RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
+            Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
+            if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null
+                    && !currentRestaurant.getWorkmateList().isEmpty()) {
+                // ... and display the icon with the number of workmates
+                workmate_ic.setVisibility(View.VISIBLE);
+                workmates.setText(context.getString(R.string.number_of_workmates,
+                        currentRestaurant.getWorkmateList().size()));
+            }
+        });
+
         opinions.setText("opinions");
 
         // Create a new weak Reference to our Listener

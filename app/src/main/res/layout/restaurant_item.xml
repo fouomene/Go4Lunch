@@ -9,7 +9,7 @@
     android:id="@+id/cardview"
     android:layout_margin="2dp"
     app:cardCornerRadius="4dp"
-    card_view:cardBackgroundColor="#FFFFFF">
+    card_view:cardBackgroundColor="@android:color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -99,10 +99,11 @@
             app:layout_constraintBottom_toTopOf="@+id/item_hours"/>
 
         <ImageView
-            android:id="@+id/item_image_workmate"
+            android:id="@+id/item_ic_workmate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_person_outline"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="@+id/item_guideline_sixty"
             app:layout_constraintEnd_toEndOf="@+id/item_guideline_eighty"
             app:layout_constraintTop_toBottomOf="@+id/item_distance"
@@ -113,8 +114,10 @@
             android:id="@+id/item_workmates"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="workmates"
-            app:layout_constraintStart_toEndOf="@+id/item_image_workmate"
+            android:text="@string/workmates"
+            android:textColor="@android:color/black"
+            android:gravity="bottom"
+            app:layout_constraintStart_toEndOf="@+id/item_ic_workmate"
             app:layout_constraintEnd_toEndOf="@+id/item_guideline_eighty"
             app:layout_constraintTop_toBottomOf="@+id/item_distance"
             app:layout_constraintBottom_toTopOf="@+id/item_hours"/>

@@ -33,7 +33,8 @@
     <string name="workmates_joining_restaurant">Workmates are joining the restaurant</string>
     <string name="workmate_has_a_restaurant_choice">%1$s is eating at %2$s</string>
     <string name="workmate_has_not_a_restaurant_choice">"%1$s hasn't decide yet"</string>
-    <string name="workmate_is_joining">"%1$s is joining!"</string>
+    <string name="workmate_is_joining">%1$s is joining!</string>
+    <string name="number_of_workmates">(%1$d)</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
