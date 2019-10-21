@@ -2,12 +2,15 @@ package com.jpz.go4lunch.adapters;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.RequestManager;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.views.WorkmateViewHolder;
@@ -29,7 +32,7 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Workmate, Workmat
 
     // Create interface for callback
     public interface Listener {
-        void onClickItem(int position);
+        void onClickItem(String restaurantId, int position);
     }
 
     @NonNull

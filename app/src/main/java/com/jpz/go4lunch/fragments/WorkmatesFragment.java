@@ -7,17 +7,20 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +29,10 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
 
     // Declare View
     private RecyclerView recyclerView;
+
+    private WorkmatesAdapter workmatesAdapter;
+
+    private MyUtilsNavigation utilsNavigation;
 
     private static final String TAG = WorkmatesFragment.class.getSimpleName();
 
@@ -47,7 +54,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     // Configure RecyclerView with a Query
     private void configureRecyclerView(){
         //Configure Adapter & RecyclerView
-        WorkmatesAdapter workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
+        workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
                 (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(workmatesAdapter);
@@ -57,12 +64,13 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query){
         return new FirestoreRecyclerOptions.Builder<Workmate>()
                 .setQuery(query, Workmate.class)
-                .setLifecycleOwner(this)
+                //.setLifecycleOwner(this)
                 .build();
     }
 
     @Override
-    public void onClickItem(int position) {
-
+    public void onClickItem(String restaurantId, int position) {
+        //Place place = restaurantListAdapter.getPosition(position);
+        utilsNavigation.startDetailsRestaurantActivity(getActivity(), null,  restaurantId);
     }
 }

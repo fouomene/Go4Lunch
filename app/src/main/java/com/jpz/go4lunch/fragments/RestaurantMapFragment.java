@@ -146,14 +146,16 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlaces();
+        CurrentPlace.getInstance(getActivity()).findDetailsPlaces(null);
 
         if (googleMap != null) {
             googleMap.setOnMarkerClickListener((Marker marker) -> {
                 // Retrieve the data from the marker.
                 Place place = (Place) marker.getTag();
-                // Start DetailsRestaurantActivity when click the user click on a restaurant
-                utilsNavigation.startDetailsRestaurantActivity(getActivity(), place);
+                if (place != null) {
+                    // Start DetailsRestaurantActivity when click the user click on a restaurant
+                    utilsNavigation.startDetailsRestaurantActivity(getActivity(), place, null);
+                }
                 // Return false to indicate that we have not consumed the event and that we wish
                 // for the default behavior to occur.
                 return false;

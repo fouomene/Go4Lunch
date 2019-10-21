@@ -32,9 +32,14 @@ import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 import com.jpz.go4lunch.utils.MySharedPreferences;
 
+import java.util.Collections;
+import java.util.List;
+
+import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_ID;
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_PLACE;
 
-public class DetailsRestaurantActivity extends AppCompatActivity implements CurrentPlace.PlacePhotoListener {
+public class DetailsRestaurantActivity extends AppCompatActivity
+        implements CurrentPlace.PlacesDetailsListener, CurrentPlace.PlacePhotoListener {
 
     // Declare View
     private RecyclerView recyclerView;
@@ -50,6 +55,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
     private Uri uriWebsite;
     private boolean fabIsChecked;
    // private boolean likeIsChecked;
+
+    private String id;
 
     // Places
     private Place place;
@@ -94,8 +101,18 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
         // Get the transferred Place data from the source activity
         Intent intent = getIntent();
         place = intent.getParcelableExtra(KEY_PLACE);
+        id = intent.getStringExtra(KEY_ID);
+
+        Log.i(TAG, "place = " + place + " / id = " + id);
 
         prefs = new MySharedPreferences(this);
+
+        if (id != null) {
+            // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
+            CurrentPlace.getInstance(this).addDetailsListener(this);
+            // ...to allow fetching places in the method below :
+            CurrentPlace.getInstance(this).findDetailsPlaces(id);
+        }
 
         // Update data for the restaurant from Places SDK
         updateDetailsRestaurantData();
@@ -114,6 +131,14 @@ public class DetailsRestaurantActivity extends AppCompatActivity implements Curr
 
         // Display the workmates joining to the restaurant in a RecyclerView
         configureRecyclerView();
+    }
+
+    @Override
+    public void onPlacesDetailsFetch(List<Place> places) {
+
+        if (id != null) {
+            place = places.get(0);
+        }
     }
 
     //----------------------------------------------------------------------------------

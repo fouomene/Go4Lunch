@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,7 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
         // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlaces();
+        CurrentPlace.getInstance(getActivity()).findDetailsPlaces(null);
 
         return view;
     }
@@ -86,7 +87,8 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     @Override
     public void onClickItem(int position) {
         Place place = restaurantListAdapter.getPosition(position);
-        utilsNavigation.startDetailsRestaurantActivity(getActivity(), place);
+        Log.i("ListFragment", "place.name = " + place.getName());
+        utilsNavigation.startDetailsRestaurantActivity(getActivity(), place,  null);
     }
 
     //----------------------------------------------------------------------------------

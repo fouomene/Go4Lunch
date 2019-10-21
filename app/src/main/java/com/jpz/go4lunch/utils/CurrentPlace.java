@@ -169,9 +169,11 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    public void findDetailsPlaces() {
+    //----------------------------------------------------------------------------------
+
+    public void findDetailsPlaces(String id) {
         // If a list of places details was already created, fetch places details in the listener with it.
-        if (!placeDetailsList.isEmpty()) {
+        if (!placeDetailsList.isEmpty()) { //&& id == null) {
             // For the placeDetailsListener from the map or list fragment, fetch the list of places.
             for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
                 Log.i(TAG, "placeDetailsListener in loop = " + placeDetailsListener);
@@ -180,29 +182,32 @@ public class CurrentPlace {
             return;
         }
 
-        // Call the CurrentPlace request...
-        findCurrentPlace();
-        // ...and use these places to call PlaceDetails requests
-        this.addListener(places -> {
-            // Specify the fields to return.
-            List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
-                    Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
-                    Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+        // Specify the fields to return.
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
+                Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
+                Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
 
-            for (Place place : places) {
-                if (place.getId() != null) {
-                    // Construct a request object, passing the place ID and fields array.
-                    request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
-                }
-                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                    Place placeDetails = response.getPlace();
-                    Log.i(TAG, "Place details found: " + placeDetails.getName());
+        // If there is no id, use the CurrentPlace request to find identifiers from the local restaurants
+        if (id == null) {
+            // Call the CurrentPlace request...
+            findCurrentPlace();
+            // ...and use these places to call PlaceDetails requests
+            this.addListener(places -> {
 
-                    placeDetailsList.add(placeDetails);
-                    // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
-                    for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
-                        placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
+                for (Place place : places) {
+                    if (place.getId() != null) {
+                        // Construct a request object, passing the place ID and fields array.
+                        request = FetchPlaceRequest.newInstance(place.getId(), placeFields);
                     }
+                    placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                        Place placeDetails = response.getPlace();
+                        Log.i(TAG, "Place details found: " + placeDetails.getName());
+
+                        placeDetailsList.add(placeDetails);
+                        // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
+                        for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
+                            placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
+                        }
 
                     }).addOnFailureListener((exception) -> {
                         if (exception instanceof ApiException) {
@@ -212,8 +217,32 @@ public class CurrentPlace {
                             Log.e(TAG, "Place details not found: " + exception.getMessage());
                         }
                     });
-            }
-        });
+                }
+            });
+        // Else use the id to fetch details for the restaurant
+        } else {
+            // Construct a request object, passing the place ID and fields array.
+            request = FetchPlaceRequest.newInstance(id, placeFields);
+
+            placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                Place placeDetails = response.getPlace();
+                Log.i(TAG, "Place details found: " + placeDetails.getName());
+
+                placeDetailsList.add(placeDetails);
+                // For the PlaceDetailsListener from the map or list fragment, fetch the list of places and bitmaps.
+                for (PlacesDetailsListener placeDetailsListener : placeDetailsListeners) {
+                    placeDetailsListener.onPlacesDetailsFetch(placeDetailsList);
+                }
+
+            }).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    ApiException apiException = (ApiException) exception;
+                    int statusCode = apiException.getStatusCode();
+                    // Handle error with given status code.
+                    Log.e(TAG, "Place details not found: " + exception.getMessage());
+                }
+            });
+        }
     }
 
 }

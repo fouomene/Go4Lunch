@@ -11,13 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.models.Workmate;
 
 import java.lang.ref.WeakReference;
 
-public class WorkmateViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     // Represent an item (line) of a workmate in the RecyclerView
 
     // Views
@@ -60,13 +61,16 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder implements View.
         // Create a new weak Reference to our Listener
         this.callbackWeakRef = new WeakReference<>(callback);
         // Implement Listener
-        itemView.setOnClickListener(this);
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // When a click happens, we fire our listener to get the item position in the list
+                WorkmatesAdapter.Listener callback = callbackWeakRef.get();
+                if (callback != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    callback.onClickItem(workmate.getRestaurantId(), getAdapterPosition());
+                }
+            }
+        });
     }
 
-    @Override
-    public void onClick(View v) {
-        // When a click happens, we fire our listener to get the item position in the list
-        WorkmatesAdapter.Listener callback = callbackWeakRef.get();
-        if (callback != null) callback.onClickItem(getAdapterPosition());
-    }
 }
