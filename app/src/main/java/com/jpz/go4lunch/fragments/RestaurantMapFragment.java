@@ -52,7 +52,7 @@ import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback,
-        CurrentPlace.PlacesDetailsListener {
+        CurrentPlace.CurrentPlacesListener {
 
     // Google Mobile Services Objects
     private MapView mMapView;
@@ -143,18 +143,18 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+        // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlaces(null);
+        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
 
         if (googleMap != null) {
             googleMap.setOnMarkerClickListener((Marker marker) -> {
                 // Retrieve the data from the marker.
-                Place place = (Place) marker.getTag();
-                if (place != null) {
-                    // Start DetailsRestaurantActivity when click the user click on a restaurant
-                    utilsNavigation.startDetailsRestaurantActivity(getActivity(), place, null);
+                String restaurantId = (String) marker.getTag();
+                if (restaurantId != null) {
+                    // Start DetailsRestaurantActivity when the user click on a restaurant
+                    utilsNavigation.startDetailsRestaurantActivity(getActivity(), restaurantId);
                 }
                 // Return false to indicate that we have not consumed the event and that we wish
                 // for the default behavior to occur.
@@ -330,14 +330,14 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                 for (Place place : placeList) {
                     // By default, mark a red icon
-                    addMarkers(place.getLatLng(), place, R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                    addMarkers(place.getLatLng(), place.getId(), R.drawable.ic_map_pin, R.drawable.ic_restaurant);
                     // If a restaurant is stored in Firestore, check if workmates join it :
                     RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
                         Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
                         if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null) {
                             // If workmates join a restaurant on the map, mark a green icon
                             if (!currentRestaurant.getWorkmateList().isEmpty()) {
-                                addMarkers(place.getLatLng(), place,
+                                addMarkers(place.getLatLng(), place.getId(),
                                         R.drawable.ic_map_pin_workmate, R.drawable.ic_restaurant_with_workmate);
                             }
                         }
@@ -351,11 +351,11 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     // Add different color markers depending on whether there are workmates in a restaurant or not
-    private void addMarkers(LatLng latLng, Place place, int icMap, int icRestaurant) {
+    private void addMarkers(LatLng latLng, String restaurantId, int icMap, int icRestaurant) {
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .icon(bitmapDescriptorFromVector(getActivity(), icMap, icRestaurant))
                 .position(latLng));
-        marker.setTag(place);
+        marker.setTag(restaurantId);
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int backgroundResId, int vectorResId) {
@@ -389,7 +389,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     //----------------------------------------------------------------------------------
 
     @Override
-    public void onPlacesDetailsFetch(List<Place> places) {
+    public void onPlacesFetch(List<Place> places) {
         // Show the restaurants near the user location with the places from the request
         showCurrentPlaces(places);
     }

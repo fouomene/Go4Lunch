@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.models.Workmate;

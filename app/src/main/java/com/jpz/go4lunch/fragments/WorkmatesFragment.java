@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
@@ -32,7 +31,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
 
     private WorkmatesAdapter workmatesAdapter;
 
-    private MyUtilsNavigation utilsNavigation;
+    private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
 
     private static final String TAG = WorkmatesFragment.class.getSimpleName();
 
@@ -64,13 +63,14 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query){
         return new FirestoreRecyclerOptions.Builder<Workmate>()
                 .setQuery(query, Workmate.class)
-                //.setLifecycleOwner(this)
+                .setLifecycleOwner(this)
                 .build();
     }
 
     @Override
     public void onClickItem(String restaurantId, int position) {
-        //Place place = restaurantListAdapter.getPosition(position);
-        utilsNavigation.startDetailsRestaurantActivity(getActivity(), null,  restaurantId);
+        Workmate workmate = workmatesAdapter.getItem(position);
+        Log.i(TAG, "workmate name from position = " + workmate.getUsername());
+        utilsNavigation.startDetailsRestaurantActivity(getActivity(), restaurantId);
     }
 }

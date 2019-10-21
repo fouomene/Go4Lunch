@@ -19,6 +19,7 @@ import com.jpz.go4lunch.adapters.RestaurantListAdapter;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
@@ -28,12 +29,15 @@ import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantListFragment extends Fragment implements RestaurantListAdapter.Listener,
-        CurrentPlace.PlacesDetailsListener {
+        CurrentPlace.CurrentPlacesListener, CurrentPlace.PlaceDetailsListener {
 
     // Declare View, Adapter & a LatLng
     private RecyclerView recyclerView;
     private RestaurantListAdapter restaurantListAdapter;
     private LatLng deviceLatLng;
+
+    // Places SDK
+    private List<Place> placeList = new ArrayList<>();
 
     // Utils
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
@@ -56,11 +60,13 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
 
         configureRecyclerView();
 
-        // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+        // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addListener(this);
         // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findDetailsPlaces(null);
+        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
 
+        // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         return view;
     }
 
@@ -88,16 +94,28 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     public void onClickItem(int position) {
         Place place = restaurantListAdapter.getPosition(position);
         Log.i("ListFragment", "place.name = " + place.getName());
-        utilsNavigation.startDetailsRestaurantActivity(getActivity(), place,  null);
+        utilsNavigation.startDetailsRestaurantActivity(getActivity(), place.getId());
     }
 
     //----------------------------------------------------------------------------------
 
-    // Use the Interface CurrentPlace to attach the list of places
     @Override
-    public void onPlacesDetailsFetch(List<Place> places) {
+    public void onPlacesFetch(List<Place> places) {
+        // For each place from CurrentPlacesListener
+        for (Place place : places) {
+            // request a detailsPlace
+            CurrentPlace.getInstance(getActivity()).findDetailsPlaces(place.getId());
+        }
+        // Clear the placeList before use it in the onPlaceDetailsFetch
+        placeList.clear();
+    }
+
+    // Use the Interface PlaceDetailsListener to attach the place
+    @Override
+    public void onPlaceDetailsFetch(Place place) {
         // Update UI with the list of restaurant from the request
-        updateUI(places);
+        placeList.add(place);
+        updateUI(placeList);
     }
 
     //----------------------------------------------------------------------------------
