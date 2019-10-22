@@ -17,6 +17,7 @@ import java.util.Map;
 public class WorkmateHelper {
 
     private static final String COLLECTION_NAME = "workmates";
+    public static final String DOCUMENT_RESTAURANT_ID = "restaurantId";
 
     private Workmate workmate = new Workmate();
 
@@ -24,7 +25,7 @@ public class WorkmateHelper {
 
     // --- COLLECTION REFERENCE ---
 
-    private static CollectionReference getWorkmatesCollection(){
+    public static CollectionReference getWorkmatesCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 

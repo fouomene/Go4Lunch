@@ -3,6 +3,7 @@ package com.jpz.go4lunch.views;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,14 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.RestaurantListAdapter;
-import com.jpz.go4lunch.api.RestaurantHelper;
-import com.jpz.go4lunch.models.Restaurant;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
+
+import static com.jpz.go4lunch.api.WorkmateHelper.DOCUMENT_RESTAURANT_ID;
+import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
 
 public class RestaurantViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
@@ -36,6 +42,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
     // Declare a Weak Reference to our Callback
     private WeakReference<RestaurantListAdapter.Listener> callbackWeakRef;
+
+    private static final String TAG = RestaurantViewHolder.class.getSimpleName();
 
     public RestaurantViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -54,7 +62,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback){
+    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback) {
         // Update Place widgets
         name.setText(place.getName());
 
@@ -76,7 +84,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
         // Update others widgets
         if (place.getLatLng() != null) {
-            distance.setText(context.getString(R.string.distance,  convertData.distanceCalculation
+            distance.setText(context.getString(R.string.distance, convertData.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
         }
 
@@ -84,17 +92,55 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
         // By default, number of workmates is empty
         workmates.setText("");
-        // If a restaurant is stored in Firestore, check if workmates join it...
-        RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
-            Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
-            if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null
-                    && !currentRestaurant.getWorkmateList().isEmpty()) {
+
+        // Check if workmates join this restaurant in Firestore :
+        getWorkmatesCollection()
+                .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId())
+                .addSnapshotListener((value, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+                    if (value != null && !value.isEmpty()) {
+                        // ... and display the icon with the number of workmates
+                        workmate_ic.setVisibility(View.VISIBLE);
+                        workmates.setText(context.getString(R.string.number_of_workmates,
+                                value.size()));
+                    }
+
+                    if (value != null && value.isEmpty()) {
+                        // ... or display anything if the list is empty
+                        workmate_ic.setVisibility(View.INVISIBLE);
+                        workmates.setText("");
+                    }
+                });
+
+        /*
+        Query query = getWorkmatesCollection()
+                .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId());
+        ListenerRegistration registration = query.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                Log.w(TAG, "listen:error", e);
+                return;
+            }
+
+            if (snapshots != null && !snapshots.isEmpty()) {
                 // ... and display the icon with the number of workmates
                 workmate_ic.setVisibility(View.VISIBLE);
                 workmates.setText(context.getString(R.string.number_of_workmates,
-                        currentRestaurant.getWorkmateList().size()));
+                        snapshots.size()));
+            }
+
+            if (snapshots != null && snapshots.isEmpty()) {
+                // ... or display anything if the list is empty
+                workmate_ic.setVisibility(View.INVISIBLE);
+                workmates.setText("");
             }
         });
+        // Stop listening to changes
+        registration.remove();
+
+         */
 
         // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
         convertData.updateLikes(place, firstStar, secondStar, thirdStar);

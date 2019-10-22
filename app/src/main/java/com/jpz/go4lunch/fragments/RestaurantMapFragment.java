@@ -33,9 +33,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentChange;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.api.RestaurantHelper;
-import com.jpz.go4lunch.models.Restaurant;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
@@ -46,6 +45,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
+import static com.jpz.go4lunch.api.WorkmateHelper.DOCUMENT_RESTAURANT_ID;
+import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
 
 /**
@@ -296,7 +297,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                             RC_LOCATION, PERMS);
                 }
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -330,32 +331,52 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
                 for (Place place : placeList) {
                     // By default, mark a red icon
-                    addMarkers(place.getLatLng(), place.getId(), R.drawable.ic_map_pin, R.drawable.ic_restaurant);
-                    // If a restaurant is stored in Firestore, check if workmates join it :
-                    RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
-                        Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
-                        if (currentRestaurant != null && currentRestaurant.getWorkmateList() != null) {
-                            // If workmates join a restaurant on the map, mark a green icon
-                            if (!currentRestaurant.getWorkmateList().isEmpty()) {
-                                addMarkers(place.getLatLng(), place.getId(),
-                                        R.drawable.ic_map_pin_workmate, R.drawable.ic_restaurant_with_workmate);
-                            }
-                        }
-                    });
+                    addMarkers(place.getLatLng(), place.getId(),
+                            R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+
+                    // Check if workmates choose a restaurant on the map in Firestore :
+                    getWorkmatesCollection()
+                            .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId())
+                            .addSnapshotListener(getActivity(), (snapshots, e) -> {
+                                if (e != null) {
+                                    Log.w(TAG, "listen:error", e);
+                                    return;
+                                }
+
+                                if (snapshots != null) {
+                                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                        if (dc.getType() == DocumentChange.Type.ADDED ||
+                                                dc.getType() == DocumentChange.Type.MODIFIED) {
+                                            // If a workmate join a restaurant on the map, mark a green icon
+                                            addMarkers(place.getLatLng(), place.getId(),
+                                                    R.drawable.ic_map_pin_workmate,
+                                                    R.drawable.ic_restaurant_with_workmate);
+                                        }
+                                        if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                            // If a workmate delete a restaurant choice on the map, mark a red icon
+                                            addMarkers(place.getLatLng(), place.getId(),
+                                                    R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                                        }
+                                    }
+                                }
+                            });
                 }
             } else {
                 EasyPermissions.requestPermissions(getActivity(),
-                        getString(R.string.rationale_permission_location_access),RC_LOCATION, PERMS);
+                        getString(R.string.rationale_permission_location_access), RC_LOCATION, PERMS);
             }
         }
     }
 
     // Add different color markers depending on whether there are workmates in a restaurant or not
     private void addMarkers(LatLng latLng, String restaurantId, int icMap, int icRestaurant) {
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-                .icon(bitmapDescriptorFromVector(getActivity(), icMap, icRestaurant))
-                .position(latLng));
-        marker.setTag(restaurantId);
+        Marker marker;
+        if (getActivity() != null) {
+            marker = googleMap.addMarker(new MarkerOptions()
+                    .icon(bitmapDescriptorFromVector(getActivity().getApplicationContext(), icMap, icRestaurant))
+                    .position(latLng));
+            marker.setTag(restaurantId);
+        }
     }
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int backgroundResId, int vectorResId) {
@@ -409,12 +430,12 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
     // Create callback to parent activity
-    private void createCallbackToParentActivity(){
+    private void createCallbackToParentActivity() {
         try {
             //Parent activity will automatically subscribe to callback
             deviceLocationListener = (DeviceLocationListener) getActivity();
         } catch (ClassCastException e) {
-            throw new ClassCastException(e.toString()+ " must implement onDeviceLocationFetch");
+            throw new ClassCastException(e.toString() + " must implement onDeviceLocationFetch");
         }
     }
 }
