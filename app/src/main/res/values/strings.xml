@@ -15,6 +15,7 @@
     <!-- Restaurant -->
     <string name="call">CALL</string>
     <string name="like">LIKE</string>
+    <string name="unlike">UNLIKE</string>
     <string name="website">WEBSITE</string>
     <string name="no_website">There is no website for this restaurant.</string>
     <string name="restaurant_name">Name of the restaurant</string>

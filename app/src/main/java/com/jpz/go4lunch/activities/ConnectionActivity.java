@@ -106,8 +106,8 @@ public class ConnectionActivity extends AppCompatActivity {
         // For Google Authentication
 
         // Handle sign-in button taps by creating a sign-in intent with the googleSignIn method
-        googleLogin.setOnClickListener( v ->
-            googleSignIn()
+        googleLogin.setOnClickListener(v ->
+                googleSignIn()
         );
 
         // Configure Google Sign In
@@ -158,7 +158,7 @@ public class ConnectionActivity extends AppCompatActivity {
                 else
                     showSnackBar(getString(R.string.authentication_failed));
             }
-        } else if (requestCode == RC_FACEBOOK_SIGN_IN){
+        } else if (requestCode == RC_FACEBOOK_SIGN_IN) {
             // Pass the activity result back to the Facebook SDK
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
@@ -192,11 +192,11 @@ public class ConnectionActivity extends AppCompatActivity {
                         try {
                             if (task.getException() != null)
                                 throw task.getException();
-                            } catch(FirebaseAuthUserCollisionException e) {
+                        } catch (FirebaseAuthUserCollisionException e) {
                             // If account already exists, logout from Facebook provider
                             showSnackBar(getString(R.string.account_exists));
                             LoginManager.getInstance().logOut();
-                        } catch(FirebaseNetworkException e) {
+                        } catch (FirebaseNetworkException e) {
                             showSnackBar(getString(R.string.connexion_failure));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -240,9 +240,9 @@ public class ConnectionActivity extends AppCompatActivity {
                         try {
                             if (task.getException() != null)
                                 throw task.getException();
-                        } catch(FirebaseAuthUserCollisionException e) {
+                        } catch (FirebaseAuthUserCollisionException e) {
                             showSnackBar(getString(R.string.account_exists));
-                        } catch(FirebaseNetworkException e) {
+                        } catch (FirebaseNetworkException e) {
                             showSnackBar(getString(R.string.connexion_failure));
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -262,21 +262,21 @@ public class ConnectionActivity extends AppCompatActivity {
     }
 
     // Show Snack Bar with a message
-    private void showSnackBar(String message){
+    private void showSnackBar(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
 
     //--------------------------------------------------------------------------------------
 
     // Create the current user in Firestore when he is identified
-    private void createWorkmateInFirestore(){
-        if (firebaseUtils.getCurrentUser() != null){
+    private void createWorkmateInFirestore() {
+        if (firebaseUtils.getCurrentUser() != null) {
             String id = firebaseUtils.getCurrentUser().getUid();
             String username = firebaseUtils.getCurrentUser().getDisplayName();
             String urlPicture = (firebaseUtils.getCurrentUser().getPhotoUrl() != null) ?
                     firebaseUtils.getCurrentUser().getPhotoUrl().toString() : null;
-            // Set data
-            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null);
+            // Set data. By default restaurantId, restaurantName and restaurantsLikedId are null.
+            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null, null);
         }
     }
 

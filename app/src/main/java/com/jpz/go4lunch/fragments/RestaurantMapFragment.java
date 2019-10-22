@@ -45,7 +45,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
-import static com.jpz.go4lunch.api.WorkmateHelper.DOCUMENT_RESTAURANT_ID;
+import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
 
@@ -336,7 +336,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
                     // Check if workmates choose a restaurant on the map in Firestore :
                     getWorkmatesCollection()
-                            .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId())
+                            .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
                             .addSnapshotListener(getActivity(), (snapshots, e) -> {
                                 if (e != null) {
                                     Log.w(TAG, "listen:error", e);

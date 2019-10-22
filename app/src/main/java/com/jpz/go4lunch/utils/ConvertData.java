@@ -9,8 +9,6 @@ import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.api.RestaurantHelper;
-import com.jpz.go4lunch.models.Restaurant;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,9 +54,13 @@ public class ConvertData {
         String weekday = sdf.format(calendar.getTime()).toUpperCase();
 
         // Prevent the user if there is no data
-        if (place.getOpeningHours() == null) openingHours = context.getString(R.string.not_disclosed);
+        if (place.getOpeningHours() == null) {
+            openingHours = context.getString(R.string.not_disclosed);
+        }
         // Else get today's closing time
-        else openingHours = getOpenCloseHours(getPeriods(place, DayOfWeek.valueOf(weekday)), context);
+        else {
+            openingHours = getOpenCloseHours(getPeriods(place, DayOfWeek.valueOf(weekday)), context);
+        }
 
         return openingHours;
     }
@@ -146,6 +148,27 @@ public class ConvertData {
 
     //--------------------------------------------------------------------------------------
 
+    // Update rating and attribute stars
+    public void updateRating(Place place, ImageView firstStar, ImageView secondStar, ImageView thirdStar) {
+        //The place's rating, from 1.0 to 5.0, based on aggregated user reviews.
+        if (place.getRating() != null) {
+            if (place.getRating() >= 2.5 && place.getRating() < 3) {
+                firstStar.setVisibility(View.VISIBLE);
+            }
+            if (place.getRating() >= 3 && place.getRating() < 4) {
+                firstStar.setVisibility(View.VISIBLE);
+                secondStar.setVisibility(View.VISIBLE);
+            }
+            if (place.getRating() >= 4) {
+                firstStar.setVisibility(View.VISIBLE);
+                secondStar.setVisibility(View.VISIBLE);
+                thirdStar.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    //--------------------------------------------------------------------------------------
+
     /*
      * Calculate distance between two points in latitude and longitude.
      * Uses Haversine method as its base.
@@ -163,33 +186,6 @@ public class ConvertData {
         double distance = R * c * 1000; // convert to meters
         distance = Math.pow(distance, 2);
         return (int) Math.sqrt(distance);
-    }
-
-    //--------------------------------------------------------------------------------------
-
-    // Update likes for a restaurant from Firestore
-    public void updateLikes(Place place, ImageView firstStar, ImageView secondStar, ImageView thirdStar) {
-        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
-        RestaurantHelper.getCurrentRestaurant(place.getId()).addOnSuccessListener(documentSnapshot -> {
-            Restaurant currentRestaurant = documentSnapshot.toObject(Restaurant.class);
-            if (currentRestaurant != null) {
-                // 1 like = 1 star
-                if (currentRestaurant.getLikes() == 1) {
-                    firstStar.setVisibility(View.VISIBLE);
-                }
-                // 2 or 3 likes = 2 stars
-                if ((currentRestaurant.getLikes() == 2) || (currentRestaurant.getLikes() == 3)) {
-                    firstStar.setVisibility(View.VISIBLE);
-                    secondStar.setVisibility(View.VISIBLE);
-                }
-                // More than 3 likes = 3 stars
-                if (currentRestaurant.getLikes() > 3) {
-                    firstStar.setVisibility(View.VISIBLE);
-                    secondStar.setVisibility(View.VISIBLE);
-                    thirdStar.setVisibility(View.VISIBLE);
-                }
-            }
-        });
     }
 
 }

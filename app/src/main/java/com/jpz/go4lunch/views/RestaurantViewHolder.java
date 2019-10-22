@@ -24,7 +24,7 @@ import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
 
-import static com.jpz.go4lunch.api.WorkmateHelper.DOCUMENT_RESTAURANT_ID;
+import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
 
@@ -95,7 +95,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
         // Check if workmates join this restaurant in Firestore :
         getWorkmatesCollection()
-                .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId())
+                .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
                 .addSnapshotListener((value, e) -> {
                     if (e != null) {
                         Log.w(TAG, "Listen failed.", e);
@@ -142,8 +142,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
          */
 
-        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
-        convertData.updateLikes(place, firstStar, secondStar, thirdStar);
+        // Update rating and display stars
+        convertData.updateRating(place, firstStar, secondStar, thirdStar);
 
         // Create a new weak Reference to our Listener
         this.callbackWeakRef = new WeakReference<>(callback);

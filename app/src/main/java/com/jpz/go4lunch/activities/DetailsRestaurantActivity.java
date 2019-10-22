@@ -1,6 +1,7 @@
 package com.jpz.go4lunch.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,24 +21,25 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAtRestaurantAdapter;
-import com.jpz.go4lunch.api.RestaurantHelper;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
-import com.jpz.go4lunch.utils.MySharedPreferences;
 
+import static com.jpz.go4lunch.api.WorkmateHelper.getCurrentWorkmate;
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_ID;
 
 public class DetailsRestaurantActivity extends AppCompatActivity
         implements CurrentPlace.PlaceDetailsListener, CurrentPlace.PlacePhotoListener {
 
-    // Declare View
+    // Declare Layout and View
+    private ConstraintLayout constraintLayout;
     private RecyclerView recyclerView;
 
     // Widgets
@@ -47,23 +49,20 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private FloatingActionButton floatingActionButton;
 
     // Private Data
+    private String restaurantId;
     private String phoneNumber;
     private Uri uriWebsite;
     private boolean fabIsChecked;
+    private boolean likeIsChecked;
 
-    // Models
+    // Models and API
     private Workmate currentWorkmate = new Workmate();
-
-    // Api
-    private RestaurantHelper restaurantHelper = new RestaurantHelper();
+    private WorkmateHelper workmateHelper = new WorkmateHelper();
 
     // Utils
     private ConvertData convertData = new ConvertData();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
     private FirebaseUser currentUser;
-
-    // To load data from the SharedPreferences
-    private MySharedPreferences prefs;
 
     private static final String TAG = DetailsRestaurantActivity.class.getSimpleName();
 
@@ -72,6 +71,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_restaurant);
 
+        constraintLayout = findViewById(R.id.details_constraint_layout);
         name = findViewById(R.id.details_name);
         type = findViewById(R.id.details_type);
         address = findViewById(R.id.details_address);
@@ -90,27 +90,21 @@ public class DetailsRestaurantActivity extends AppCompatActivity
 
         // Get the transferred Place data from the source activity
         Intent intent = getIntent();
-        String id = intent.getStringExtra(KEY_ID);
+        restaurantId = intent.getStringExtra(KEY_ID);
 
-        Log.i(TAG, "id = " + id);
-
-        prefs = new MySharedPreferences(this);
-
-        if (id != null) {
-            // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
-            CurrentPlace.getInstance(this).addDetailsListener(this);
-            // ...to allow fetching places in the method below :
-            CurrentPlace.getInstance(this).findDetailsPlaces(id);
-        }
-
-        // If a restaurant is stored in Firestore, retrieve the number of likes and display stars
-        //convertData.updateLikes(place, firstStar, secondStar, thirdStar);
+        // Add the currentDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(this).addDetailsListener(this);
+        // ...to allow fetching places in the method below :
+        CurrentPlace.getInstance(this).findDetailsPlaces(restaurantId);
 
         // Buttons comportment
         callRestaurant();
-        //likeRestaurant();
+        getRestaurantLiked();
+        likeRestaurant();
         visitWebsiteRestaurant();
     }
+
+    //----------------------------------------------------------------------------------
 
     @Override
     public void onPlaceDetailsFetch(Place place) {
@@ -134,11 +128,12 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         address.setText(convertData.getAddress(place));
         phoneNumber = place.getPhoneNumber();
         uriWebsite = place.getWebsiteUri();
-        Log.i(TAG, "Uri " + place.getWebsiteUri());
         // Use findPhotoPlace method to retrieve the photo of the restaurant
         if (place.getPhotoMetadatas() != null) {
             CurrentPlace.getInstance(this).findPhotoPlace(place.getPhotoMetadatas().get(0), this);
         }
+        // Update rating and display stars
+        convertData.updateRating(place, firstStar, secondStar, thirdStar);
     }
 
     @Override
@@ -151,16 +146,16 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     // For the restaurant choice
 
     // Method to retrieve the current workmate with Firestore data and update UI
-    private void getFirestoreRestaurantChoice(Place place){
+    private void getFirestoreRestaurantChoice(Place place) {
         if (currentUser != null) {
-            WorkmateHelper.getCurrentWorkmate(currentUser.getUid())
-                    .addOnSuccessListener(documentSnapshot-> {
+            getCurrentWorkmate(currentUser.getUid())
+                    .addOnSuccessListener(documentSnapshot -> {
                         currentWorkmate = documentSnapshot.toObject(Workmate.class);
-                // Check the restaurant choice
-                compareRestaurants(place);
-                Log.i(TAG, "restaurant choice = " +
-                        currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
-            });
+                        // Check the restaurant choice
+                        compareRestaurants(place);
+                        Log.i(TAG, "restaurant choice = " +
+                                currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
+                    });
         }
     }
 
@@ -190,7 +185,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
             } else {
                 floatingActionButton.setImageDrawable(ContextCompat
                         .getDrawable(this, R.drawable.ic_highlight_off));
-                deleteRestaurantChoice(place);
+                deleteRestaurantChoice();
                 fabIsChecked = false;
             }
         });
@@ -201,18 +196,14 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         if (currentUser != null) {
             // Update the workmates collection
             WorkmateHelper.updateRestaurant(currentUser.getUid(), place.getId(), place.getName());
-            // Create or update the restaurants collection with the workmate
-            restaurantHelper.setIdNameWorkmates(place.getId(), place.getName(), currentUser.getUid());
         }
     }
 
     // Current workmate is deleting a restaurant, update Firestore
-    private void deleteRestaurantChoice(Place place) {
+    private void deleteRestaurantChoice() {
         if (currentUser != null) {
             // Update the workmates collection
             WorkmateHelper.updateRestaurant(currentUser.getUid(), null, null);
-            // Update the restaurants collection
-            restaurantHelper.deleteWorkmate(place.getId(), currentUser.getUid());
         }
     }
 
@@ -239,34 +230,52 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         });
     }
 
-    /*
-    // Like the restaurant and update Firestore
+    // Retrieve like data from Firestore
+    private void getRestaurantLiked() {
+        // Check if the user already like this restaurant and update UI
+        getCurrentWorkmate(currentUser.getUid())
+                .addOnSuccessListener(documentSnapshot -> {
+                    Workmate workmate = documentSnapshot.toObject(Workmate.class);
+                    if (workmate != null && workmate.getRestaurantsLikedId() != null) {
+                        if (workmate.getRestaurantsLikedId().contains(restaurantId)) {
+                            likeIsChecked = true;
+                            like.setText(getString(R.string.unlike));
+                        } else {
+                            likeIsChecked = false;
+                            like.setText(getString(R.string.like));
+                        }
+                    }
+                });
+    }
+
+    // Like or unlike the restaurant and update Firestore when the button nis clicked
     private void likeRestaurant() {
         like.setOnClickListener((View v) -> {
-            // Create or update the restaurants collection
-            restaurantHelper.setIdName(place.getId(), place.getName());
-            boolean likeIsChecked = prefs.getLikeState(place.getId());
             // Check if the user doesn't already like this restaurant, so add his like
             if (!likeIsChecked) {
-                RestaurantHelper.addLike(place.getId());
-                prefs.saveLikeState(place.getId(), true);
-                Toast.makeText(this, getString(R.string.add_like), Toast.LENGTH_SHORT).show();
+                like.setText(getString(R.string.unlike));
+                workmateHelper.addLike(currentUser.getUid(), restaurantId);
+                Snackbar snackbar = Snackbar
+                        .make(constraintLayout, getString(R.string.add_like), Snackbar.LENGTH_SHORT);
+                snackbar.show();
+                likeIsChecked = true;
+                // Else the user already like this restaurant, so remove his like
             } else {
-                // Check if the user already like this restaurant, so remove his like
-                RestaurantHelper.removeLike(place.getId());
-                prefs.saveLikeState(place.getId(), false);
-                Toast.makeText(this, getString(R.string.remove_like), Toast.LENGTH_SHORT).show();
+                like.setText(getString(R.string.like));
+                workmateHelper.removeLike(currentUser.getUid(), restaurantId);
+                Snackbar snackbar = Snackbar
+                        .make(constraintLayout, getString(R.string.remove_like), Snackbar.LENGTH_SHORT);
+                snackbar.show();
+                likeIsChecked = false;
             }
         });
     }
-
-     */
 
     //----------------------------------------------------------------------------------
     // For the RecyclerView
 
     // Configure RecyclerView with a Query
-    private void configureRecyclerView(Place place){
+    private void configureRecyclerView(Place place) {
         //Configure Adapter & RecyclerView
         WorkmatesAtRestaurantAdapter adapter = new WorkmatesAtRestaurantAdapter(generateOptionsForAdapter
                 (WorkmateHelper.getWorkmatesAtRestaurant(place.getId())), Glide.with(this));
@@ -275,7 +284,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     }
 
     // Create options for RecyclerView from a Query
-    private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query){
+    private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query) {
         return new FirestoreRecyclerOptions.Builder<Workmate>()
                 .setQuery(query, Workmate.class)
                 .setLifecycleOwner(this)

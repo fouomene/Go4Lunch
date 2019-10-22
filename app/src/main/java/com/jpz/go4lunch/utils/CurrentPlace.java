@@ -61,7 +61,7 @@ public class CurrentPlace {
 
     // Method to add a PlaceDetailsListener (initialized in list Fragment or the details Activity)
     public void addDetailsListener(PlaceDetailsListener placeDetailsListener) {
-        this.placeDetailsListener  = placeDetailsListener;
+        this.placeDetailsListener = placeDetailsListener;
     }
 
     //----------------------------------------------------------------------------------
@@ -74,10 +74,10 @@ public class CurrentPlace {
     //----------------------------------------------------------------------------------
 
     /**
-     This singleton CurrentPlace class contains the methods :
-     - to find the places near the user location,
-     - to get the details of a place,
-     - to fetch a photo of a place.
+     * This singleton CurrentPlace class contains the methods :
+     * - to find the places near the user location,
+     * - to get the details of a place,
+     * - to fetch a photo of a place.
      */
 
     private static final String TAG = CurrentPlace.class.getSimpleName();
@@ -186,7 +186,7 @@ public class CurrentPlace {
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG,
                 Place.Field.OPENING_HOURS, Place.Field.ADDRESS_COMPONENTS, Place.Field.PHOTO_METADATAS,
-                Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+                Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.RATING);
 
         if (id != null) {
             // Construct a request object, passing the place ID and fields array.
