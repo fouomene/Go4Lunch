@@ -30,11 +30,11 @@
         app:layout_constraintGuide_percent="0.7"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/details_guideline_seventy_five"
+        android:id="@+id/details_guideline_eighty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75"/>
+        app:layout_constraintGuide_percent="0.8"/>
 
     <ImageView
         android:id="@+id/details_image_restaurant"
@@ -60,7 +60,7 @@
 
     <TextView
         android:id="@+id/details_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:text="@string/restaurant_name"
         android:textColor="@android:color/white"
@@ -70,6 +70,9 @@
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_marginStart="16dp"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/details_first_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
@@ -81,6 +84,7 @@
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_star_gold"
         android:visibility="invisible"
+        android:layout_marginStart="16dp"
         app:layout_constraintStart_toEndOf="@+id/details_name"
         app:layout_constraintEnd_toStartOf="@+id/details_second_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
@@ -106,7 +110,7 @@
         app:srcCompat="@drawable/ic_star_gold"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/details_second_star"
-        app:layout_constraintEnd_toEndOf="@+id/details_guideline_seventy_five"
+        app:layout_constraintEnd_toStartOf="@+id/details_guideline_eighty"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
         app:layout_constraintBottom_toTopOf="@+id/details_type"
         android:contentDescription="@string/stars"/>

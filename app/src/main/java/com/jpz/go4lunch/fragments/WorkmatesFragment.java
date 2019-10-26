@@ -78,6 +78,8 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     public void onClickItem(String restaurantId, int position) {
         Workmate workmate = workmatesAdapter.getItem(position);
         Log.i(TAG, "workmate name from position = " + workmate.getUsername());
-        utilsNavigation.startDetailsRestaurantActivity(getActivity(), restaurantId);
+        if (workmate.getRestaurantId() != null) {
+            utilsNavigation.startDetailsRestaurantActivity(getActivity(), restaurantId);
+        }
     }
 }

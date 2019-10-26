@@ -38,6 +38,7 @@
             android:layout_height="0dp"
             app:menu="@menu/menu_bottom_navigation"
             android:background="?android:attr/windowBackground"
+            android:theme="@style/BottomNavigationTheme"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
