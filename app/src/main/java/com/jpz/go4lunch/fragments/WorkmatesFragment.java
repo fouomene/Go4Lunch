@@ -46,12 +46,19 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
         // Get the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         recyclerView = view.findViewById(R.id.workmates_recycler_view);
+
+        // For the toolbar
+        setHasOptionsMenu(true);
+        if (getActivity() != null) {
+            getActivity().setTitle(getString(R.string.available_workmates));
+        }
+
         configureRecyclerView();
         return view;
     }
 
     // Configure RecyclerView with a Query
-    private void configureRecyclerView(){
+    private void configureRecyclerView() {
         //Configure Adapter & RecyclerView
         workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
                 (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
@@ -60,7 +67,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     }
 
     // Create options for RecyclerView from a Query
-    private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query){
+    private FirestoreRecyclerOptions<Workmate> generateOptionsForAdapter(Query query) {
         return new FirestoreRecyclerOptions.Builder<Workmate>()
                 .setQuery(query, Workmate.class)
                 .setLifecycleOwner(this)

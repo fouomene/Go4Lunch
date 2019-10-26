@@ -9,8 +9,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
@@ -55,6 +59,12 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
 
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
+        // For the toolbar
+        setHasOptionsMenu(true);
+        if (getActivity() != null) {
+            getActivity().setTitle(getString(R.string.hungry));
+        }
+
         // Get deviceLatLng value from the map
         if (getArguments() != null) deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
 
@@ -71,9 +81,28 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     }
 
     //----------------------------------------------------------------------------------
+    // Methods for Menu in Toolbar
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        // Inflate the menu and add it to the Toolbar
+        inflater.inflate(R.menu.menu_toolbar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle action on menu items
+        if (item.getItemId() == R.id.menu_toolbar_search) {
+            Toast.makeText(getActivity(), "click on search in the list", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    //----------------------------------------------------------------------------------
     // Configure RecyclerViews, Adapters, LayoutManager & glue it together
 
-    private void configureRecyclerView(){
+    private void configureRecyclerView() {
         // Create the adapter
         this.restaurantListAdapter = new RestaurantListAdapter(deviceLatLng, this);
         // Attach the adapter to the recyclerView to populate items

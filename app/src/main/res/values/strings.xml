@@ -45,6 +45,11 @@
     <!-- Request Permissions -->
     <string name="rationale_permission_location_access">This application needs to access your site to work.</string>
 
+    <!-- Toolbar -->
+    <string name="search_icon">search icon</string>
+    <string name="hungry">"I'm Hungry!"</string>
+    <string name="available_workmates">Available Workmates</string>
+
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
