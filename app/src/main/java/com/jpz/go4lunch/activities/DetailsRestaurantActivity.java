@@ -147,16 +147,14 @@ public class DetailsRestaurantActivity extends AppCompatActivity
 
     // Method to retrieve the current workmate with Firestore data and update UI
     private void getFirestoreRestaurantChoice(Place place) {
-        if (currentUser != null) {
-            getCurrentWorkmate(currentUser.getUid())
-                    .addOnSuccessListener(documentSnapshot -> {
-                        currentWorkmate = documentSnapshot.toObject(Workmate.class);
-                        // Check the restaurant choice
-                        compareRestaurants(place);
-                        Log.i(TAG, "restaurant choice = " +
-                                currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
-                    });
-        }
+        getCurrentWorkmate(currentUser.getUid())
+                .addOnSuccessListener(documentSnapshot -> {
+                    currentWorkmate = documentSnapshot.toObject(Workmate.class);
+                    // Check the restaurant choice
+                    compareRestaurants(place);
+                    Log.i(TAG, "restaurant choice = " +
+                            currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
+                });
     }
 
     private void compareRestaurants(Place place) {

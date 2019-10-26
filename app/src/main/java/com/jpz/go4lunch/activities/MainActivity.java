@@ -33,16 +33,21 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
+import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.utils.FirebaseUtils;
+import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 import java.util.List;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
+
+import static com.jpz.go4lunch.api.WorkmateHelper.getCurrentWorkmate;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -52,11 +57,16 @@ public class MainActivity extends AppCompatActivity
     public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
     public static final int RC_LOCATION = 123;
 
-    // FirebaseUtils class
+    // Utils
+    private MyUtilsNavigation myUtilsNavigation = new MyUtilsNavigation();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
 
     // Declare user
     private FirebaseUser currentUser;
+
+    // Models and API
+    private Workmate currentWorkmate = new Workmate();
+    private WorkmateHelper workmateHelper = new WorkmateHelper();
 
     // For design
     private Toolbar toolbar;
@@ -116,14 +126,14 @@ public class MainActivity extends AppCompatActivity
     //----------------------------------------------------------------------------------
     // Private methods to configure design
 
-    private void configureToolbar(){
+    private void configureToolbar() {
         // Get the toolbar view inside the activity layout
         toolbar = findViewById(R.id.toolbar);
         // Set the Toolbar
         setSupportActionBar(toolbar);
     }
 
-    private void configureDrawerLayout(){
+    private void configureDrawerLayout() {
         drawerLayout = findViewById(R.id.drawer_layout);
         // "Hamburger icon"
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
@@ -132,7 +142,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
     }
 
-    private void configureNavigationView(){
+    private void configureNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_drawer_view);
         // For Menu Item
         navigationView.setNavigationItemSelectedListener(this);
@@ -144,8 +154,8 @@ public class MainActivity extends AppCompatActivity
         updateUserProfile();
     }
 
-    private void configureBottomView(){
-        bottomNav.setOnNavigationItemSelectedListener ((@NonNull MenuItem menuItem) -> {
+    private void configureBottomView() {
+        bottomNav.setOnNavigationItemSelectedListener((@NonNull MenuItem menuItem) -> {
             Fragment selectedFragment = new Fragment();
             // Check the fragment selected
             switch (menuItem.getItemId()) {
@@ -182,18 +192,34 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle Navigation Item Click
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_drawer_lunch:
-                // start DetailRestaurantActivity
-                Toast.makeText(MainActivity.this, "DetailRestaurant", Toast.LENGTH_SHORT).show();
+                // Get the restaurant choice from Firebase
+                getCurrentWorkmate(currentUser.getUid())
+                        .addOnSuccessListener(documentSnapshot -> {
+                            currentWorkmate = documentSnapshot.toObject(Workmate.class);
+                            if (currentWorkmate != null) {
+                                // Start DetailRestaurantActivity with the restaurant identifier
+                                if (currentWorkmate.getRestaurantId() != null) {
+                                    myUtilsNavigation.startDetailsRestaurantActivity(this,
+                                            currentWorkmate.getRestaurantId());
+                                    // If there is no restaurant choice, display a message
+                                } else {
+                                    Toast.makeText(MainActivity.this,
+                                            getString(R.string.you_have_not_chosen), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                 break;
+
             case R.id.nav_drawer_settings:
                 // settings
                 Toast.makeText(MainActivity.this, "settings", Toast.LENGTH_SHORT).show();
                 break;
+
             case R.id.nav_drawer_logout:
                 // Check if the user is logged in with Facebook...
-                for (UserInfo user: currentUser.getProviderData()) {
+                for (UserInfo user : currentUser.getProviderData()) {
                     if (user.getProviderId().equals("facebook.com")) {
                         Log.i("Tag", "provider in loop " + user.getProviderId());
                         // ... then, in this case, logout from Facebook
@@ -205,6 +231,7 @@ public class MainActivity extends AppCompatActivity
                 startConnectionActivity();
                 finish();
                 break;
+
             default:
                 break;
         }
