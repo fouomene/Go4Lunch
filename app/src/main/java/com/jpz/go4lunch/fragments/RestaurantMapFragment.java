@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -19,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -87,6 +89,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
 
+    private EditText editText;
+
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
     public RestaurantMapFragment() {
@@ -98,6 +102,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                              Bundle savedInstanceState) {
         // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
+
+        //editText = view.findViewById(R.id.toolbar_edit_text);
 
         mMapView = view.findViewById(R.id.map_view);
         // *** IMPORTANT ***
@@ -120,7 +126,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
             // For the toolbar
-            setHasOptionsMenu(true);
+            //setHasOptionsMenu(true);
             getActivity().setTitle(getString(R.string.hungry));
         }
 
@@ -134,6 +140,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         return view;
     }
 
+/*
     //----------------------------------------------------------------------------------
     // Methods for Menu in Toolbar
 
@@ -148,10 +155,16 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Handle action on menu items
         if (item.getItemId() == R.id.menu_toolbar_search) {
+
+            // Set the EditText
+            editText.setVisibility(View.VISIBLE);
+            //toolbarEditText.setHint("Search restaurants");
             Toast.makeText(getActivity(), "click on search in the map", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }
+
+ */
 
     //----------------------------------------------------------------------------------
 

@@ -48,7 +48,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
         recyclerView = view.findViewById(R.id.workmates_recycler_view);
 
         // For the toolbar
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
         if (getActivity() != null) {
             getActivity().setTitle(getString(R.string.available_workmates));
         }

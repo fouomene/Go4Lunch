@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -15,10 +16,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,12 +36,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.fragments.RestaurantMapFragment;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
@@ -64,9 +67,8 @@ public class MainActivity extends AppCompatActivity
     // Declare user
     private FirebaseUser currentUser;
 
-    // Models and API
+    // Models and Utils
     private Workmate currentWorkmate = new Workmate();
-    private WorkmateHelper workmateHelper = new WorkmateHelper();
 
     // For design
     private Toolbar toolbar;
@@ -76,12 +78,17 @@ public class MainActivity extends AppCompatActivity
     private TextView emailProfile;
     private ImageView photoProfile;
 
+    // For toolbar
+    private CardView cardView;
+    private EditText editText;
+    private ActionBarDrawerToggle toggle;
+
     // User profile
     private String username;
     private String email;
 
     // DeviceLatLng data for the list of restaurant
-    private Fragment listFragment = new RestaurantListFragment();
+    private Fragment restaurantListFragment = new RestaurantListFragment();
     public static final String LAT_LNG_BUNDLE_KEY = "lat_lng_bundle_key";
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -101,6 +108,10 @@ public class MainActivity extends AppCompatActivity
         // Set a color (requires API 21)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             window.setStatusBarColor(Color.TRANSPARENT);
+
+        // Widgets for the toolbar
+        cardView = findViewById(R.id.toolbar_card_view);
+        editText = findViewById(R.id.toolbar_edit_text);
 
         bottomNav = findViewById(R.id.bottom_navigation);
 
@@ -123,6 +134,37 @@ public class MainActivity extends AppCompatActivity
                     new RestaurantMapFragment()).commit();
     }
 
+//----------------------------------------------------------------------------------
+    // Methods for Menu in Toolbar
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu and add it to the Toolbar
+        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action on menu items
+        if (item.getItemId() == R.id.menu_toolbar_search) {
+            if (getActionBar() != null) {
+                getActionBar().setDisplayShowTitleEnabled(false);
+            }
+            // Set the search icon item
+            item.setVisible(false);
+            // Set toggle and cardView
+            toggle.setDrawerIndicatorEnabled(false);
+            cardView.setVisibility(View.VISIBLE);
+
+            Toast.makeText(this, "click on search in the map", Toast.LENGTH_SHORT).show();
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     //----------------------------------------------------------------------------------
     // Private methods to configure design
 
@@ -131,12 +173,16 @@ public class MainActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         // Set the Toolbar
         setSupportActionBar(toolbar);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayShowTitleEnabled(true);
+        }
+        //setTitle(getString(R.string.hungry));
     }
 
     private void configureDrawerLayout() {
         drawerLayout = findViewById(R.id.drawer_layout);
         // "Hamburger icon"
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
         drawerLayout.addDrawerListener(toggle);
@@ -164,7 +210,7 @@ public class MainActivity extends AppCompatActivity
                     selectedFragment = new RestaurantMapFragment();
                     break;
                 case R.id.nav_list:
-                    selectedFragment = listFragment;
+                    selectedFragment = restaurantListFragment;
                     break;
                 case R.id.nav_workmates:
                     selectedFragment = new WorkmatesFragment();
@@ -313,13 +359,19 @@ public class MainActivity extends AppCompatActivity
 
     //----------------------------------------------------------------------------------
 
-    // Transfer deviceLatLng value in RestaurantListFragment
     @Override
     public void onDeviceLocationFetch(LatLng latLng) {
+        // Transfer deviceLatLng value in RestaurantListFragment
         Bundle bundle = new Bundle();
         bundle.putParcelable(LAT_LNG_BUNDLE_KEY, latLng);
-        listFragment.setArguments(bundle);
-        Log.i("MainActivity", "latlng = " + latLng);
+        restaurantListFragment.setArguments(bundle);
+        Log.i(TAG, "latlng = " + latLng);
+
+        // Transfer deviceLatLng value when use autoComplete method
+        ImageView iconSearch = findViewById(R.id.toolbar_ic_search);
+        iconSearch.setOnClickListener(v ->
+                CurrentPlace.getInstance(this).autoComplete(editText.getText().toString(), latLng)
+        );
     }
 
 }

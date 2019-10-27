@@ -59,11 +59,14 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
 
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
+        /*
         // For the toolbar
         setHasOptionsMenu(true);
         if (getActivity() != null) {
             getActivity().setTitle(getString(R.string.hungry));
         }
+
+         */
 
         // Get deviceLatLng value from the map
         if (getArguments() != null) deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
@@ -80,6 +83,7 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
         return view;
     }
 
+    /*
     //----------------------------------------------------------------------------------
     // Methods for Menu in Toolbar
 
@@ -98,6 +102,8 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
         }
         return super.onOptionsItemSelected(item);
     }
+
+     */
 
     //----------------------------------------------------------------------------------
     // Configure RecyclerViews, Adapters, LayoutManager & glue it together
@@ -122,7 +128,7 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     @Override
     public void onClickItem(int position) {
         Place place = restaurantListAdapter.getPosition(position);
-        Log.i("ListFragment", "place.name = " + place.getName());
+        Log.i("restaurantListFragment", "place.name = " + place.getName());
         utilsNavigation.startDetailsRestaurantActivity(getActivity(), place.getId());
     }
 

@@ -46,9 +46,9 @@
     <string name="rationale_permission_location_access">This application needs to access your site to work.</string>
 
     <!-- Toolbar -->
-    <string name="search_icon">search icon</string>
     <string name="hungry">"I'm Hungry!"</string>
     <string name="available_workmates">Available Workmates</string>
+    <string name="search_restaurants">Search restaurants</string>
 
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -77,5 +77,7 @@
     <string name="workmate_photo">Photo of workmate</string>
     <string name="workmate_icon">Workmate icon</string>
     <string name="stars">stars</string>
+    <string name="search_icon">search icon</string>
+    <string name="mic_icon">mic icon</string>
 
 </resources>
