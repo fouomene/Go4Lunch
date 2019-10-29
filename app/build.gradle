@@ -16,6 +16,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // These values are defined only for the release build, which
+            // is typically used for full builds and continuous builds.
+            buildConfigField('String', "GoogleApiKey", GoogleApiKey)
+            resValue('string', "google_api_key", GoogleApiKey)
         }
     }
     compileOptions {
@@ -37,9 +41,6 @@ dependencies {
 
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
-
-    // Firebase
-    implementation 'com.google.firebase:firebase-core:17.2.0'
 
     // FirebaseUI for Firebase Auth
     implementation 'com.firebaseui:firebase-ui-auth:6.0.2'

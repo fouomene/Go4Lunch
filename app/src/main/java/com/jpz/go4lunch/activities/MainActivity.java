@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity
                 // Check if the user is logged in with Facebook...
                 for (UserInfo user : currentUser.getProviderData()) {
                     if (user.getProviderId().equals("facebook.com")) {
-                        Log.i("Tag", "provider in loop " + user.getProviderId());
+                        Log.i(TAG, "provider in loop " + user.getProviderId());
                         // ... then, in this case, logout from Facebook
                         LoginManager.getInstance().logOut();
                     }
@@ -301,10 +301,10 @@ public class MainActivity extends AppCompatActivity
             //Get username & email from Firebase
             username = TextUtils.isEmpty(currentUser.getDisplayName()) ?
                     getString(R.string.info_no_username_found) : currentUser.getDisplayName();
-            Log.i("MainActivity", "username = " + currentUser.getDisplayName());
+            Log.i(TAG, "username = " + currentUser.getDisplayName());
             email = TextUtils.isEmpty(currentUser.getEmail()) ?
                     getString(R.string.info_no_email_found) : currentUser.getEmail();
-            Log.i("MainActivity", "email = " + currentUser.getEmail());
+            Log.i(TAG, "email = " + currentUser.getEmail());
         }
         //Update views with data
         nameProfile.setText(username);
