@@ -37,7 +37,7 @@
         <!-- The API key for Google Maps-based APIs -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key" />
+            android:value="@string/go4lunch_google_api_key" />
 
         <meta-data
             android:name="com.google.android.gms.version"

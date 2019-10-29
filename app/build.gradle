@@ -18,8 +18,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // These values are defined only for the release build, which
             // is typically used for full builds and continuous builds.
-            buildConfigField('String', "GoogleApiKey", GoogleApiKey)
-            resValue('string', "google_api_key", GoogleApiKey)
+            buildConfigField('String', "Go4LunchGoogleApiKey", Go4LunchGoogleApiKey)
+            resValue('string', "go4lunch_google_api_key", Go4LunchGoogleApiKey)
+        }
+        debug {
+            // Use static values for incremental builds to ensure that
+            // resource files and BuildConfig aren't rebuilt with each run.
+            // If these rebuild dynamically, they can interfere with
+            // Apply Changes as well as Gradle UP-TO-DATE checks.
+            buildConfigField('String', "Go4LunchGoogleApiKey", Go4LunchGoogleApiKey)
+            resValue('string', "go4lunch_google_api_key", Go4LunchGoogleApiKey)
         }
     }
     compileOptions {
