@@ -217,7 +217,6 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-
     public void autoComplete(String query, LatLng latLng) {
 
         // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
@@ -226,15 +225,13 @@ public class CurrentPlace {
 
         // Create a RectangularBounds object.
         RectangularBounds bounds = RectangularBounds.newInstance(
-                //new LatLng(-33.880490, 151.184363),
-                //new LatLng(-33.858754, 151.229596));
-                new LatLng(latLng.latitude - 0.02, latLng.longitude - 0.02),
-                new LatLng(latLng.latitude + 0.02, latLng.longitude + 0.02));
+                new LatLng(latLng.latitude - 0.01, latLng.longitude - 0.01),
+                new LatLng(latLng.latitude + 0.01, latLng.longitude + 0.01));
         // Use the builder to create a FindAutocompletePredictionsRequest.
         FindAutocompletePredictionsRequest predictionsRequest = FindAutocompletePredictionsRequest.builder()
                 // Call either setLocationBias() OR setLocationRestriction().
-                //.setLocationBias(bounds)
-                .setLocationRestriction(bounds)
+                .setLocationBias(bounds)
+                //.setLocationRestriction(bounds)
                 .setCountry("fr") // France
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setSessionToken(token)

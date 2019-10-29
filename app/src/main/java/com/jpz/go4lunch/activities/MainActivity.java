@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -21,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,12 +80,15 @@ public class MainActivity extends AppCompatActivity
 
     // For toolbar
     private CardView cardView;
-    private EditText editText;
+    private SearchView searchView;
     private ActionBarDrawerToggle toggle;
 
     // User profile
     private String username;
     private String email;
+
+    // For Menu Item in ActionBar
+    private MenuItem item;
 
     // DeviceLatLng data for the list of restaurant
     private Fragment restaurantListFragment = new RestaurantListFragment();
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity
 
         // Widgets for the toolbar
         cardView = findViewById(R.id.toolbar_card_view);
-        editText = findViewById(R.id.toolbar_edit_text);
+        searchView = findViewById(R.id.toolbar_search_view);
 
         bottomNav = findViewById(R.id.bottom_navigation);
 
@@ -146,19 +149,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        this.item = item;
         // Handle action on menu items
         if (item.getItemId() == R.id.menu_toolbar_search) {
+            /*
             if (getActionBar() != null) {
                 getActionBar().setDisplayShowTitleEnabled(false);
             }
+
+             */
             // Set the search icon item
             item.setVisible(false);
             // Set toggle and cardView
             toggle.setDrawerIndicatorEnabled(false);
             cardView.setVisibility(View.VISIBLE);
-
-            Toast.makeText(this, "click on search in the map", Toast.LENGTH_SHORT).show();
-
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -231,6 +235,15 @@ public class MainActivity extends AppCompatActivity
         // Handle back click to close menu
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
+        // Handle back click to close the searchView
+        } else if (!searchView.isIconified()) {
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+            // Set the search icon item
+            item.setVisible(true);
+            // Set toggle and cardView
+            toggle.setDrawerIndicatorEnabled(true);
+            cardView.setVisibility(View.INVISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -367,11 +380,26 @@ public class MainActivity extends AppCompatActivity
         restaurantListFragment.setArguments(bundle);
         Log.i(TAG, "latlng = " + latLng);
 
-        // Transfer deviceLatLng value when use autoComplete method
-        ImageView iconSearch = findViewById(R.id.toolbar_ic_search);
-        iconSearch.setOnClickListener(v ->
-                CurrentPlace.getInstance(this).autoComplete(editText.getText().toString(), latLng)
-        );
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Transfer deviceLatLng value when use autoComplete method
+                CurrentPlace.getInstance(MainActivity.this).autoComplete(searchView.getQuery().toString(), latLng);
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+                // Set the search icon item
+                item.setVisible(true);
+                // Set toggle and cardView
+                toggle.setDrawerIndicatorEnabled(true);
+                cardView.setVisibility(View.INVISIBLE);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
 }
