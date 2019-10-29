@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatEditText;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -376,6 +375,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                     // Check if workmates choose a restaurant on the map in Firestore :
                     getWorkmatesCollection()
                             .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
+                            // By passing in the activity,
+                            // Firestore can clean up the listeners automatically when the activity is stopped.
                             .addSnapshotListener(getActivity(), (snapshots, e) -> {
                                 if (e != null) {
                                     Log.w(TAG, "listen:error", e);

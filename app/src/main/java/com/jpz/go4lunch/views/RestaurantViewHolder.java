@@ -13,10 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.RestaurantListAdapter;
 import com.jpz.go4lunch.utils.CurrentPlace;
@@ -39,6 +37,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     private TextView name, distance, type, address, workmates, hours;
     private ImageView restaurantImage, workmate_ic, firstStar, secondStar, thirdStar;
     private Context context;
+
+    // Firestore
+    private ListenerRegistration registration;
 
     // Declare a Weak Reference to our Callback
     private WeakReference<RestaurantListAdapter.Listener> callbackWeakRef;
@@ -94,53 +95,25 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         workmates.setText("");
 
         // Check if workmates join this restaurant in Firestore :
-        getWorkmatesCollection()
-                .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
-                .addSnapshotListener((value, e) -> {
-                    if (e != null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-                    if (value != null && !value.isEmpty()) {
-                        // ... and display the icon with the number of workmates
-                        workmate_ic.setVisibility(View.VISIBLE);
-                        workmates.setText(context.getString(R.string.number_of_workmates,
-                                value.size()));
-                    }
-
-                    if (value != null && value.isEmpty()) {
-                        // ... or display anything if the list is empty
-                        workmate_ic.setVisibility(View.INVISIBLE);
-                        workmates.setText("");
-                    }
-                });
-
-        /*
         Query query = getWorkmatesCollection()
-                .whereEqualTo(DOCUMENT_RESTAURANT_ID, place.getId());
-        ListenerRegistration registration = query.addSnapshotListener((snapshots, e) -> {
+                .whereEqualTo(FIELD_RESTAURANT_ID, place.getId());
+        registration = query.addSnapshotListener((snapshots, e) -> {
             if (e != null) {
                 Log.w(TAG, "listen:error", e);
                 return;
             }
-
+            // Display the icon with the number of workmates
             if (snapshots != null && !snapshots.isEmpty()) {
-                // ... and display the icon with the number of workmates
                 workmate_ic.setVisibility(View.VISIBLE);
                 workmates.setText(context.getString(R.string.number_of_workmates,
                         snapshots.size()));
             }
-
+            // Or display anything if the list is empty
             if (snapshots != null && snapshots.isEmpty()) {
-                // ... or display anything if the list is empty
                 workmate_ic.setVisibility(View.INVISIBLE);
                 workmates.setText("");
             }
         });
-        // Stop listening to changes
-        registration.remove();
-
-         */
 
         // Update rating and display stars
         convertData.updateRating(place, firstStar, secondStar, thirdStar);
@@ -162,5 +135,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     public void onPhotoFetch(Bitmap bitmap) {
         // Get the photo metadata and fetch it in the imageView
         restaurantImage.setImageBitmap(bitmap);
+    }
+
+    public void removeFirestoreListener() {
+        registration.remove();
     }
 }

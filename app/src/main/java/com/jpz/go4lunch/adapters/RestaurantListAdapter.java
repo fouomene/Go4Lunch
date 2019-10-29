@@ -56,14 +56,19 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantViewHo
         return this.placeList.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull RestaurantViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.removeFirestoreListener();
+    }
+
     public void setPlaces(List<Place> places) {
         this.placeList = places;
         notifyDataSetChanged();
     }
 
     // Return the position of an item in the list
-    public Place getPosition(int position){
+    public Place getPosition(int position) {
         return this.placeList.get(position);
     }
-
 }
