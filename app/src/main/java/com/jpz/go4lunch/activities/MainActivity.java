@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
 
     // Fragments
     private Fragment selectedFragment = new Fragment();
-    private Fragment mapFragment = new RestaurantMapFragment();
+    private Fragment restaurantMapFragment = new RestaurantMapFragment();
     private Fragment restaurantListFragment = new RestaurantListFragment();
 
     // DeviceLatLng data for the list of restaurant
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity
             // Check the fragment selected
             switch (menuItem.getItemId()) {
                 case R.id.nav_map:
-                    selectedFragment = mapFragment;
+                    selectedFragment = restaurantMapFragment;
                     break;
                 case R.id.nav_list:
                     selectedFragment = restaurantListFragment;
@@ -416,21 +416,10 @@ public class MainActivity extends AppCompatActivity
         // Transfer placesId in the selectedFragment and update UI
         Bundle bundle = new Bundle();
         bundle.putStringArrayList(PLACES_ID_BUNDLE_KEY, placesId);
-        mapFragment.setArguments(bundle);
+        restaurantMapFragment.setArguments(bundle);
         restaurantListFragment.setArguments(bundle);
         Log.i(TAG, "placesId = " + placesId);
 
-        switch (bottomNav.getSelectedItemId()) {
-            case R.id.nav_map:
-                selectedFragment = mapFragment;
-                break;
-            case R.id.nav_list:
-                selectedFragment = restaurantListFragment;
-                break;
-            case R.id.nav_workmates:
-                selectedFragment = new WorkmatesFragment();
-                break;
-        }
         // Add it to FrameLayout fragment_container
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 selectedFragment).commit();

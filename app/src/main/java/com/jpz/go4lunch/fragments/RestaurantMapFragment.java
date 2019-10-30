@@ -106,7 +106,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
 
-
         mMapView = view.findViewById(R.id.map_view);
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
@@ -129,7 +128,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
             // For the toolbar
             //setHasOptionsMenu(true);
-            //getActivity().setTitle(getString(R.string.hungry));
+            getActivity().setTitle(getString(R.string.hungry));
         }
 
         // Declare FloatingActionButton and its behavior

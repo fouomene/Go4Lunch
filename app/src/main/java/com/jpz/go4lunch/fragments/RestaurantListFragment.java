@@ -60,60 +60,43 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
 
         recyclerView = view.findViewById(R.id.restaurant_list_recycler_view);
 
-        /*
+        // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
+        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+
         // For the toolbar
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
         if (getActivity() != null) {
             getActivity().setTitle(getString(R.string.hungry));
         }
-
-         */
 
         // Get deviceLatLng value from the map
         if (getArguments() != null) {
             deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
         }
 
-        /*
-        if (getArguments() != null && getArguments().getParcelable(PLACES_ID_BUNDLE_KEY) != null) {
-            placeList = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY)
-        }
-
-         */
-
         configureRecyclerView();
 
-        // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addListener(this);
-        // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        // If there is a request from autocomplete, fetch a placeDetails
+        if (getArguments() != null && getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY) != null) {
+            // List of placesId from the autocomplete query
+            ArrayList<String> placesId = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY);
+            Log.i("restaurantListFragment", "placesId = " + placesId);
+            if (placesId != null && !placesId.isEmpty())
+            // For each placeId from autocomplete
+            for (String placeId : placesId) {
+                // request a detailsPlace
+                CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
+            }
+        // Else fetch findCurrentPlace then findDetailsPlace
+        } else {
+            // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
+            CurrentPlace.getInstance(getActivity()).addListener(this);
+            // ...to allow fetching places in the method below :
+            CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        }
 
-        // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
         return view;
     }
-
-    /*
-    //----------------------------------------------------------------------------------
-    // Methods for Menu in Toolbar
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        // Inflate the menu and add it to the Toolbar
-        inflater.inflate(R.menu.menu_toolbar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle action on menu items
-        if (item.getItemId() == R.id.menu_toolbar_search) {
-            Toast.makeText(getActivity(), "click on search in the list", Toast.LENGTH_SHORT).show();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-     */
 
     //----------------------------------------------------------------------------------
     // Configure RecyclerViews, Adapters, LayoutManager & glue it together
@@ -161,6 +144,10 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
         // Update UI with the list of restaurant from the request
         placeList.add(place);
         updateUI(placeList);
+        // Remove the key from the bundle
+        if (getArguments() != null) {
+            getArguments().remove(PLACES_ID_BUNDLE_KEY);
+        }
     }
 
     //----------------------------------------------------------------------------------
