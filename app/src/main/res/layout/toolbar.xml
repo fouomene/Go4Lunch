@@ -9,7 +9,6 @@
     android:background="?attr/colorPrimary"
     android:elevation="8dp"
     app:titleTextColor="@android:color/white"
-    app:title="@string/hungry"
     tools:targetApi="LOLLIPOP">
 
     <androidx.cardview.widget.CardView
@@ -18,7 +17,7 @@
         android:layout_height="match_parent"
         android:layout_margin="8dp"
         android:background="@android:color/white"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:cardCornerRadius="4dp"
         app:cardElevation="2dp">
 

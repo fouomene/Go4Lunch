@@ -9,19 +9,13 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -126,9 +120,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         if (getActivity() != null) {
             // Construct a FusedLocationProviderClient
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-            // For the toolbar
-            //setHasOptionsMenu(true);
-            getActivity().setTitle(getString(R.string.hungry));
         }
 
         // Declare FloatingActionButton and its behavior
@@ -140,32 +131,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         return view;
     }
-
-/*
-    //----------------------------------------------------------------------------------
-    // Methods for Menu in Toolbar
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        // Inflate the menu and add it to the Toolbar
-        inflater.inflate(R.menu.menu_toolbar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // Handle action on menu items
-        if (item.getItemId() == R.id.menu_toolbar_search) {
-
-            // Set the EditText
-            editText.setVisibility(View.VISIBLE);
-            //toolbarEditText.setHint("Search restaurants");
-            Toast.makeText(getActivity(), "click on search in the map", Toast.LENGTH_SHORT).show();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
- */
 
     //----------------------------------------------------------------------------------
 

@@ -137,9 +137,11 @@ public class MainActivity extends AppCompatActivity
                 getString(R.string.rationale_permission_location_access), RC_LOCATION, PERMS);
 
         // Open the view with RestaurantMapFragment if permissions were already allowed
-        if (EasyPermissions.hasPermissions(this, PERMS))
+        if (EasyPermissions.hasPermissions(this, PERMS)) {
+            selectedFragment = restaurantMapFragment;
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new RestaurantMapFragment()).commit();
+                    selectedFragment).commit();
+        }
 
         // Add the AutocompleteListener...
         CurrentPlace.getInstance(MainActivity.this).addAutocompleteListener(MainActivity.this);
@@ -179,14 +181,6 @@ public class MainActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         // Set the Toolbar
         setSupportActionBar(toolbar);
-        /*
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(getString(R.string.hungry));
-        }
-        MainActivity.this.setTitle(getString(R.string.hungry));
-        toolbar.setTitle(getString(R.string.hungry));
-
-         */
     }
 
     private void configureDrawerLayout() {
@@ -217,12 +211,15 @@ public class MainActivity extends AppCompatActivity
             switch (menuItem.getItemId()) {
                 case R.id.nav_map:
                     selectedFragment = restaurantMapFragment;
+                    setTitle(getString(R.string.hungry));
                     break;
                 case R.id.nav_list:
                     selectedFragment = restaurantListFragment;
+                    setTitle(getString(R.string.hungry));
                     break;
                 case R.id.nav_workmates:
                     selectedFragment = new WorkmatesFragment();
+                    setTitle(getString(R.string.available_workmates));
                     break;
             }
             // Add it to FrameLayout fragment_container
@@ -248,7 +245,7 @@ public class MainActivity extends AppCompatActivity
             item.setVisible(true);
             // Set toggle and cardView
             toggle.setDrawerIndicatorEnabled(true);
-            cardView.setVisibility(View.INVISIBLE);
+            cardView.setVisibility(View.GONE);
         } else {
             super.onBackPressed();
         }
@@ -398,7 +395,7 @@ public class MainActivity extends AppCompatActivity
                 item.setVisible(true);
                 // Set toggle and cardView
                 toggle.setDrawerIndicatorEnabled(true);
-                cardView.setVisibility(View.INVISIBLE);
+                cardView.setVisibility(View.GONE);
                 return false;
             }
 
@@ -420,7 +417,22 @@ public class MainActivity extends AppCompatActivity
         restaurantListFragment.setArguments(bundle);
         Log.i(TAG, "placesId = " + placesId);
 
-        // Add it to FrameLayout fragment_container
+        /*
+        if (selectedFragment instanceof RestaurantMapFragment) {
+            restaurantMapFragment.setArguments(bundle);
+            // Refresh the FrameLayout fragment_container
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    restaurantMapFragment).commit();
+        }
+        if (selectedFragment instanceof RestaurantListFragment) {
+            restaurantListFragment.setArguments(bundle);
+            // Refresh the FrameLayout fragment_container
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    restaurantListFragment).commit();
+        }
+         */
+
+        // Refresh the FrameLayout fragment_container
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 selectedFragment).commit();
     }

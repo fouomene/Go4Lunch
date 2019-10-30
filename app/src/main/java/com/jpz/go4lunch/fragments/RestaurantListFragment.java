@@ -9,12 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
@@ -62,12 +58,6 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
 
         // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
-
-        // For the toolbar
-        //setHasOptionsMenu(true);
-        if (getActivity() != null) {
-            getActivity().setTitle(getString(R.string.hungry));
-        }
 
         // Get deviceLatLng value from the map
         if (getArguments() != null) {
