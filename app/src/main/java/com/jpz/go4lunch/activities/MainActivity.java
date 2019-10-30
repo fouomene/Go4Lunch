@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
@@ -26,8 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.login.LoginManager;
@@ -45,6 +44,7 @@ import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
@@ -53,8 +53,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static com.jpz.go4lunch.api.WorkmateHelper.getCurrentWorkmate;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        EasyPermissions.PermissionCallbacks, RestaurantMapFragment.DeviceLocationListener {
+        implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks,
+        RestaurantMapFragment.DeviceLocationListener, CurrentPlace.AutocompleteListener {
 
     // Static data for ACCESS_FINE_LOCATION
     public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -90,9 +90,14 @@ public class MainActivity extends AppCompatActivity
     // For Menu Item in ActionBar
     private MenuItem item;
 
-    // DeviceLatLng data for the list of restaurant
+    // Fragments
+    private Fragment selectedFragment = new Fragment();
+    private Fragment mapFragment = new RestaurantMapFragment();
     private Fragment restaurantListFragment = new RestaurantListFragment();
+
+    // DeviceLatLng data for the list of restaurant
     public static final String LAT_LNG_BUNDLE_KEY = "lat_lng_bundle_key";
+    public static final String PLACES_ID_BUNDLE_KEY = "places_id_bundle_key";
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -135,6 +140,9 @@ public class MainActivity extends AppCompatActivity
         if (EasyPermissions.hasPermissions(this, PERMS))
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new RestaurantMapFragment()).commit();
+
+        // Add the AutocompleteListener...
+        CurrentPlace.getInstance(MainActivity.this).addAutocompleteListener(MainActivity.this);
     }
 
 //----------------------------------------------------------------------------------
@@ -152,12 +160,6 @@ public class MainActivity extends AppCompatActivity
         this.item = item;
         // Handle action on menu items
         if (item.getItemId() == R.id.menu_toolbar_search) {
-            /*
-            if (getActionBar() != null) {
-                getActionBar().setDisplayShowTitleEnabled(false);
-            }
-
-             */
             // Set the search icon item
             item.setVisible(false);
             // Set toggle and cardView
@@ -177,10 +179,14 @@ public class MainActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         // Set the Toolbar
         setSupportActionBar(toolbar);
-        if (getActionBar() != null) {
-            getActionBar().setDisplayShowTitleEnabled(true);
+        /*
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(getString(R.string.hungry));
         }
-        //setTitle(getString(R.string.hungry));
+        MainActivity.this.setTitle(getString(R.string.hungry));
+        toolbar.setTitle(getString(R.string.hungry));
+
+         */
     }
 
     private void configureDrawerLayout() {
@@ -207,11 +213,10 @@ public class MainActivity extends AppCompatActivity
 
     private void configureBottomView() {
         bottomNav.setOnNavigationItemSelectedListener((@NonNull MenuItem menuItem) -> {
-            Fragment selectedFragment = new Fragment();
             // Check the fragment selected
             switch (menuItem.getItemId()) {
                 case R.id.nav_map:
-                    selectedFragment = new RestaurantMapFragment();
+                    selectedFragment = mapFragment;
                     break;
                 case R.id.nav_list:
                     selectedFragment = restaurantListFragment;
@@ -235,7 +240,7 @@ public class MainActivity extends AppCompatActivity
         // Handle back click to close menu
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
-        // Handle back click to close the searchView
+            // Handle back click to close the searchView
         } else if (!searchView.isIconified()) {
             searchView.setQuery("", false);
             searchView.setIconified(true);
@@ -380,11 +385,13 @@ public class MainActivity extends AppCompatActivity
         restaurantListFragment.setArguments(bundle);
         Log.i(TAG, "latlng = " + latLng);
 
+        // When the user click valid a query in the searchView
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Transfer deviceLatLng value when use autoComplete method
-                CurrentPlace.getInstance(MainActivity.this).autoComplete(searchView.getQuery().toString(), latLng);
+                // Transfer deviceLatLng value when use autocomplete method
+                // ...to fetching placesId in the method below :
+                CurrentPlace.getInstance(MainActivity.this).autocomplete(searchView.getQuery().toString(), latLng);
                 searchView.setQuery("", false);
                 searchView.setIconified(true);
                 // Set the search icon item
@@ -402,4 +409,30 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    //----------------------------------------------------------------------------------
+
+    @Override
+    public void onAutocompleteFetch(ArrayList<String> placesId) {
+        // Transfer placesId in the selectedFragment and update UI
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(PLACES_ID_BUNDLE_KEY, placesId);
+        mapFragment.setArguments(bundle);
+        restaurantListFragment.setArguments(bundle);
+        Log.i(TAG, "placesId = " + placesId);
+
+        switch (bottomNav.getSelectedItemId()) {
+            case R.id.nav_map:
+                selectedFragment = mapFragment;
+                break;
+            case R.id.nav_list:
+                selectedFragment = restaurantListFragment;
+                break;
+            case R.id.nav_workmates:
+                selectedFragment = new WorkmatesFragment();
+                break;
+        }
+        // Add it to FrameLayout fragment_container
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                selectedFragment).commit();
+    }
 }

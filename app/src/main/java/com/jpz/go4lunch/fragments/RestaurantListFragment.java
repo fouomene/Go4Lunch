@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
+import static com.jpz.go4lunch.activities.MainActivity.PLACES_ID_BUNDLE_KEY;
 
 
 /**
@@ -69,7 +70,16 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
          */
 
         // Get deviceLatLng value from the map
-        if (getArguments() != null) deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
+        if (getArguments() != null) {
+            deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
+        }
+
+        /*
+        if (getArguments() != null && getArguments().getParcelable(PLACES_ID_BUNDLE_KEY) != null) {
+            placeList = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY)
+        }
+
+         */
 
         configureRecyclerView();
 

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -43,12 +44,14 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
+import static com.jpz.go4lunch.activities.MainActivity.PLACES_ID_BUNDLE_KEY;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
 import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
@@ -58,7 +61,7 @@ import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantMapFragment extends Fragment implements OnMapReadyCallback,
-        CurrentPlace.CurrentPlacesListener {
+        CurrentPlace.CurrentPlacesListener, CurrentPlace.PlaceDetailsListener {
 
     // Google Mobile Services Objects
     private MapView mMapView;
@@ -88,7 +91,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
 
-    private EditText editText;
+    // List of placesId from the autocomplete query
+    private ArrayList<String> placesId = new ArrayList<>();
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -102,7 +106,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Get layout of this fragment
         View view = inflater.inflate(R.layout.fragment_restaurant_map, container, false);
 
-        //editText = view.findViewById(R.id.toolbar_edit_text);
 
         mMapView = view.findViewById(R.id.map_view);
         // *** IMPORTANT ***
@@ -126,7 +129,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
             // For the toolbar
             //setHasOptionsMenu(true);
-            getActivity().setTitle(getString(R.string.hungry));
+            //getActivity().setTitle(getString(R.string.hungry));
         }
 
         // Declare FloatingActionButton and its behavior
@@ -170,7 +173,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
-
         // Prevent to show the My Location button, the MapToolbar and the Compass
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
@@ -178,14 +180,26 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
         // If permissions are granted, turn on My Location and the related control on the map
         updateLocationUI();
-
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
-        CurrentPlace.getInstance(getActivity()).addListener(this);
-        // ...to allow fetching places in the method below :
-        CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        // If there is a request from autocomplete, fetch a placeDetails
+        if (getArguments() != null && getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY) != null) {
+            placesId = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY);
+            // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
+            CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+            // For each placeId from autocomplete
+            for (String placeId : placesId) {
+                // request a detailsPlace
+                CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
+            }
+            // Else fetch findCurrentPlace
+        } else {
+            // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
+            CurrentPlace.getInstance(getActivity()).addListener(this);
+            // ...to allow fetching places in the method below :
+            CurrentPlace.getInstance(getActivity()).findCurrentPlace();
+        }
 
         if (googleMap != null) {
             googleMap.setOnMarkerClickListener((Marker marker) -> {
@@ -364,43 +378,42 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     // Display markers at current places
     @AfterPermissionGranted(RC_LOCATION)
-    private void showCurrentPlaces(List<Place> placeList) {
+    private void showCurrentPlaces(Place place) {
         if (getActivity() != null) {
             if (EasyPermissions.hasPermissions(getActivity(), PERMS)) {
-                for (Place place : placeList) {
-                    // By default, mark a red icon
-                    addMarkers(place.getLatLng(), place.getId(),
-                            R.drawable.ic_map_pin, R.drawable.ic_restaurant);
+                // By default, mark a red icon
+                addMarkers(place.getLatLng(), place.getId(),
+                        R.drawable.ic_map_pin, R.drawable.ic_restaurant);
 
-                    // Check if workmates choose a restaurant on the map in Firestore :
-                    getWorkmatesCollection()
-                            .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
-                            // By passing in the activity,
-                            // Firestore can clean up the listeners automatically when the activity is stopped.
-                            .addSnapshotListener(getActivity(), (snapshots, e) -> {
-                                if (e != null) {
-                                    Log.w(TAG, "listen:error", e);
-                                    return;
-                                }
+                // Check if workmates choose a restaurant on the map in Firestore :
+                getWorkmatesCollection()
+                        .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
+                        // By passing in the activity,
+                        // Firestore can clean up the listeners automatically when the activity is stopped.
+                        .addSnapshotListener(getActivity(), (snapshots, e) -> {
+                            if (e != null) {
+                                Log.w(TAG, "listen:error", e);
+                                return;
+                            }
 
-                                if (snapshots != null) {
-                                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                                        if (dc.getType() == DocumentChange.Type.ADDED ||
-                                                dc.getType() == DocumentChange.Type.MODIFIED) {
-                                            // If a workmate join a restaurant on the map, mark a green icon
-                                            addMarkers(place.getLatLng(), place.getId(),
-                                                    R.drawable.ic_map_pin_workmate,
-                                                    R.drawable.ic_restaurant_with_workmate);
-                                        }
-                                        if (dc.getType() == DocumentChange.Type.REMOVED) {
-                                            // If a workmate delete a restaurant choice on the map, mark a red icon
-                                            addMarkers(place.getLatLng(), place.getId(),
-                                                    R.drawable.ic_map_pin, R.drawable.ic_restaurant);
-                                        }
+                            if (snapshots != null) {
+                                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                                    if (dc.getType() == DocumentChange.Type.ADDED ||
+                                            dc.getType() == DocumentChange.Type.MODIFIED) {
+                                        // If a workmate join a restaurant on the map, mark a green icon
+                                        addMarkers(place.getLatLng(), place.getId(),
+                                                R.drawable.ic_map_pin_workmate,
+                                                R.drawable.ic_restaurant_with_workmate);
+                                    }
+                                    if (dc.getType() == DocumentChange.Type.REMOVED) {
+                                        // If a workmate delete a restaurant choice on the map, mark a red icon
+                                        addMarkers(place.getLatLng(), place.getId(),
+                                                R.drawable.ic_map_pin, R.drawable.ic_restaurant);
                                     }
                                 }
-                            });
-                }
+                            }
+                        });
+
             } else {
                 EasyPermissions.requestPermissions(getActivity(),
                         getString(R.string.rationale_permission_location_access), RC_LOCATION, PERMS);
@@ -452,7 +465,19 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     @Override
     public void onPlacesFetch(List<Place> places) {
         // Show the restaurants near the user location with the places from the request
-        showCurrentPlaces(places);
+        for (Place place : places) {
+            showCurrentPlaces(place);
+        }
+    }
+
+    @Override
+    public void onPlaceDetailsFetch(Place place) {
+        // Show the restaurant from the placeDetails request use after an autocomplete request
+        showCurrentPlaces(place);
+        // Remove the key from the bundle
+        if (getArguments() != null) {
+            getArguments().remove(PLACES_ID_BUNDLE_KEY);
+        }
     }
 
     //----------------------------------------------------------------------------------

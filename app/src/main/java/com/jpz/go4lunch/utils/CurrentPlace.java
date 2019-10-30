@@ -45,7 +45,6 @@ public class CurrentPlace {
 
     // Method to add a CurrentPlacesListener (initialized in the map or list Fragment).
     public void addListener(CurrentPlacesListener currentPlacesListener) {
-        //this.currentPlacesListener = currentPlacesListener;
         currentPlacesListeners.add(currentPlacesListener);
     }
 
@@ -75,6 +74,24 @@ public class CurrentPlace {
     // Interface to retrieve the photo from a list of places when the task is complete.
     public interface PlacePhotoListener {
         void onPhotoFetch(Bitmap bitmap);
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // Interface to retrieve the Autocomplete list of place when the task is complete.
+    public interface AutocompleteListener {
+        void onAutocompleteFetch(ArrayList<String> placesId);
+    }
+
+    // List of place identifiers for the AutocompleteListener
+    private ArrayList<String> autocompletePlaces = new ArrayList<>();
+
+    // Listener from the AutocompleteListener
+    private AutocompleteListener autocompleteListener;
+
+    // Method to add a AutocompleteListener (initialized in the map or restaurant list Fragment)
+    public void addAutocompleteListener(AutocompleteListener autocompleteListener) {
+        this.autocompleteListener = autocompleteListener;
     }
 
     //----------------------------------------------------------------------------------
@@ -217,7 +234,7 @@ public class CurrentPlace {
 
     //----------------------------------------------------------------------------------
 
-    public void autoComplete(String query, LatLng latLng) {
+    public void autocomplete(String query, LatLng latLng) {
 
         // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
         // and once again when the user makes a selection (for example when calling fetchPlace()).
@@ -232,7 +249,7 @@ public class CurrentPlace {
                 // Call either setLocationBias() OR setLocationRestriction().
                 .setLocationBias(bounds)
                 //.setLocationRestriction(bounds)
-                .setCountry("fr") // France
+                .setCountry("FR") // France
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setSessionToken(token)
                 .setQuery(query)
@@ -240,8 +257,12 @@ public class CurrentPlace {
 
         placesClient.findAutocompletePredictions(predictionsRequest).addOnSuccessListener((response) -> {
             for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                Log.i(TAG, prediction.getPlaceId());
-                Log.i(TAG, prediction.getPrimaryText(null).toString());
+                if (prediction.getPlaceTypes().contains(Place.Type.RESTAURANT)) {
+                    autocompletePlaces.add(prediction.getPlaceId());
+                    Log.i(TAG, "prediction = " + prediction.getPlaceId()
+                            + " = " + prediction.getPrimaryText(null).toString());
+                }
+                autocompleteListener.onAutocompleteFetch(autocompletePlaces);
             }
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
