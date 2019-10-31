@@ -84,7 +84,7 @@ public class CurrentPlace {
     }
 
     // List of place identifiers for the AutocompleteListener
-    private ArrayList<String> autocompletePlaces = new ArrayList<>();
+    private ArrayList<String> autocompletePlaces;
 
     // Listener from the AutocompleteListener
     private AutocompleteListener autocompleteListener;
@@ -110,6 +110,9 @@ public class CurrentPlace {
     // Places
     private PlacesClient placesClient;
     private FetchPlaceRequest request;
+    // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
+    // and once again when the user makes a selection (for example when calling fetchPlace()).
+    private AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
     // Private constructor
     private CurrentPlace(Context context) {
@@ -213,7 +216,8 @@ public class CurrentPlace {
 
         if (id != null) {
             // Construct a request object, passing the place ID and fields array.
-            request = FetchPlaceRequest.newInstance(id, placeFields);
+            //request = FetchPlaceRequest.newInstance(id, placeFields);
+            request = FetchPlaceRequest.builder(id, placeFields).setSessionToken(token).build();
         }
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place placeDetails = response.getPlace();
@@ -235,11 +239,8 @@ public class CurrentPlace {
     //----------------------------------------------------------------------------------
 
     public void autocomplete(String query, LatLng latLng) {
-
-        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
-        // and once again when the user makes a selection (for example when calling fetchPlace()).
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
+        // Create a new ArrayList
+        autocompletePlaces = new ArrayList<>();
         // Create a RectangularBounds object.
         RectangularBounds bounds = RectangularBounds.newInstance(
                 new LatLng(latLng.latitude - 0.01, latLng.longitude - 0.01),
