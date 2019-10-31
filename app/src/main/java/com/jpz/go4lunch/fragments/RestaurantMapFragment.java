@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -85,8 +86,8 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
 
-    // List of placesId from the autocomplete query
-    private ArrayList<String> placesId = new ArrayList<>();
+    // List of placesId from the autocomplete request
+    private ArrayList<String> placesId;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -147,17 +148,28 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         // Hide POI of business on the map
         hideBusinessPOI();
 
-        // If there is a request from autocomplete, fetch a placeDetails
-        if (getArguments() != null && getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY) != null) {
+        // Get placesId from autocomplete
+        if (getArguments() != null) {
             placesId = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY);
-            // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
-            CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
-            // For each placeId from autocomplete
-            for (String placeId : placesId) {
-                // request a detailsPlace
-                CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
+        }
+        Log.i(TAG, "placesId = " + placesId);
+
+        // If there is a request from autocomplete, fetch a placeDetails
+        if (placesId != null) {
+            if (placesId.isEmpty()) {
+                Toast.makeText(getActivity(), getString(R.string.no_result), Toast.LENGTH_SHORT).show();
+                // Remove the key from the bundle
+                getArguments().remove(PLACES_ID_BUNDLE_KEY);
+            } else {
+                // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
+                CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
+                // For each placeId from autocomplete
+                for (String placeId : placesId) {
+                    // request a detailsPlace
+                    CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
+                }
             }
-            // Else fetch findCurrentPlace
+            // Else fetch findCurrentPlace then findDetailsPlace
         } else {
             // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
             CurrentPlace.getInstance(getActivity()).addListener(this);

@@ -95,9 +95,14 @@ public class MainActivity extends AppCompatActivity
     private Fragment restaurantMapFragment = new RestaurantMapFragment();
     private Fragment restaurantListFragment = new RestaurantListFragment();
 
-    // DeviceLatLng data for the list of restaurant
+    // Keys for DeviceLatLng data (used for the list of restaurant)
+    // and for placesId from PlaceAutocomplete API
     public static final String LAT_LNG_BUNDLE_KEY = "lat_lng_bundle_key";
     public static final String PLACES_ID_BUNDLE_KEY = "places_id_bundle_key";
+
+    // Bundles for restaurants fragments
+    private Bundle bundleMapRestaurant = new Bundle();
+    private Bundle bundleListRestaurant = new Bundle();
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -377,9 +382,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDeviceLocationFetch(LatLng latLng) {
         // Transfer deviceLatLng value in RestaurantListFragment
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(LAT_LNG_BUNDLE_KEY, latLng);
-        restaurantListFragment.setArguments(bundle);
+        bundleListRestaurant.putParcelable(LAT_LNG_BUNDLE_KEY, latLng);
+        restaurantListFragment.setArguments(bundleListRestaurant);
         Log.i(TAG, "latlng = " + latLng);
 
         // When the user click valid a query in the searchView
@@ -411,29 +415,24 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAutocompleteFetch(ArrayList<String> placesId) {
         // Transfer placesId in the selectedFragment and update UI
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList(PLACES_ID_BUNDLE_KEY, placesId);
-        restaurantMapFragment.setArguments(bundle);
-        restaurantListFragment.setArguments(bundle);
         Log.i(TAG, "placesId = " + placesId);
 
-        /*
-        if (selectedFragment instanceof RestaurantMapFragment) {
-            restaurantMapFragment.setArguments(bundle);
-            // Refresh the FrameLayout fragment_container
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    restaurantMapFragment).commit();
-        }
-        if (selectedFragment instanceof RestaurantListFragment) {
-            restaurantListFragment.setArguments(bundle);
-            // Refresh the FrameLayout fragment_container
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    restaurantListFragment).commit();
-        }
-         */
+        // Refresh the FrameLayout fragment_container with the new fragment parameters
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        // Refresh the FrameLayout fragment_container
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                selectedFragment).commit();
+        if (currentFragment instanceof RestaurantMapFragment) {
+            Log.i(TAG, "currentFragment instanceof RestaurantMapFragment = " + currentFragment);
+            bundleMapRestaurant.putStringArrayList(PLACES_ID_BUNDLE_KEY, placesId);
+            restaurantMapFragment.setArguments(bundleMapRestaurant);
+            getSupportFragmentManager().beginTransaction().detach(currentFragment).commit();
+            getSupportFragmentManager().beginTransaction().attach(restaurantMapFragment).commit();
+        }
+        if (currentFragment instanceof RestaurantListFragment) {
+            Log.i(TAG, "currentFragment instanceof RestaurantListFragment = " + currentFragment);
+            bundleListRestaurant.putStringArrayList(PLACES_ID_BUNDLE_KEY, placesId);
+            restaurantListFragment.setArguments(bundleListRestaurant);
+            getSupportFragmentManager().beginTransaction().detach(currentFragment).commit();
+            getSupportFragmentManager().beginTransaction().attach(restaurantListFragment).commit();
+        }
     }
 }

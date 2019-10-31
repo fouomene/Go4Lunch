@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
@@ -40,8 +41,14 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     // Places SDK
     private List<Place> placeList = new ArrayList<>();
 
+    // List of placesId from the autocomplete request
+    private ArrayList<String> placesId;
+
     // Utils
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
+
+    private static final String TAG = RestaurantListFragment.class.getSimpleName();
+
 
     public RestaurantListFragment() {
         // Required empty public constructor
@@ -59,24 +66,29 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
         // Add the PlaceDetailsListener in the list of listeners from CurrentPlace Singleton...
         CurrentPlace.getInstance(getActivity()).addDetailsListener(this);
 
-        // Get deviceLatLng value from the map
+        // Get deviceLatLng value from the map and placesId from autocomplete
         if (getArguments() != null) {
             deviceLatLng = getArguments().getParcelable(LAT_LNG_BUNDLE_KEY);
+            // List of placesId from the autocomplete query
+            placesId = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY);
+            Log.i(TAG, "placesId = " + placesId);
         }
 
-        configureRecyclerView();
-
         // If there is a request from autocomplete, fetch a placeDetails
-        if (getArguments() != null && getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY) != null) {
-            // List of placesId from the autocomplete query
-            ArrayList<String> placesId = getArguments().getStringArrayList(PLACES_ID_BUNDLE_KEY);
-            Log.i("restaurantListFragment", "placesId = " + placesId);
-            if (placesId != null && !placesId.isEmpty())
-            // For each placeId from autocomplete
-            for (String placeId : placesId) {
-                // request a detailsPlace
-                CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
-            }
+        if (placesId != null) {
+            // Clear the placeList before use it in the onPlaceDetailsFetch
+            placeList.clear();
+             if (placesId.isEmpty()) {
+                 Toast.makeText(getActivity(), getString(R.string.no_result), Toast.LENGTH_SHORT).show();
+                 // Remove the key from the bundle
+                 getArguments().remove(PLACES_ID_BUNDLE_KEY);
+             } else {
+                 // For each placeId from autocomplete
+                 for (String placeId : placesId) {
+                     // request a detailsPlace
+                     CurrentPlace.getInstance(getActivity()).findDetailsPlaces(placeId);
+                 }
+             }
         // Else fetch findCurrentPlace then findDetailsPlace
         } else {
             // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
@@ -84,6 +96,8 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
             // ...to allow fetching places in the method below :
             CurrentPlace.getInstance(getActivity()).findCurrentPlace();
         }
+
+        configureRecyclerView();
 
         return view;
     }
@@ -111,7 +125,7 @@ public class RestaurantListFragment extends Fragment implements RestaurantListAd
     @Override
     public void onClickItem(int position) {
         Place place = restaurantListAdapter.getPosition(position);
-        Log.i("restaurantListFragment", "place.name = " + place.getName());
+        Log.i(TAG, "place.name = " + place.getName());
         utilsNavigation.startDetailsRestaurantActivity(getActivity(), place.getId());
     }
 

@@ -30,6 +30,7 @@
     <string name="distance">%1$dm</string>
     <string name="add_like">Added your like!</string>
     <string name="remove_like">Removed your like!</string>
+    <string name="no_result">There is no result for your query.</string>
 
     <!-- Workmates -->
     <string name="workmate_restaurant_choice">Workmate choice</string>
@@ -53,13 +54,10 @@
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="settings">SETTINGS</string>
     <string name="log_out">LOGOUT</string>
-
     <string name="you_have_not_chosen">"You haven't decide yet"</string>
-
     <string name="info_no_email_found">No email found</string>
     <string name="info_no_username_found">No username found</string>
 

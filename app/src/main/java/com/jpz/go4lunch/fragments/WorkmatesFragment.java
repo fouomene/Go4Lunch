@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,9 +47,14 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
         // Get the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         recyclerView = view.findViewById(R.id.workmates_recycler_view);
-
+        setHasOptionsMenu(true);
         configureRecyclerView();
         return view;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
     }
 
     // Configure RecyclerView with a Query

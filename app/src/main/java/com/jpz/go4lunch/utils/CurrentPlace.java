@@ -114,7 +114,7 @@ public class CurrentPlace {
     // Private constructor
     private CurrentPlace(Context context) {
         // Initialize the SDK
-        Places.initialize(context.getApplicationContext(), context.getString(R.string.google_api_key));
+        Places.initialize(context.getApplicationContext(), context.getString(R.string.go4lunch_google_api_key));
         // Create a new Places client instance
         placesClient = Places.createClient(context.getApplicationContext());
     }
@@ -227,7 +227,7 @@ public class CurrentPlace {
                 ApiException apiException = (ApiException) exception;
                 int statusCode = apiException.getStatusCode();
                 // Handle error with given status code.
-                Log.e(TAG, "Place details not found: " + exception.getMessage());
+                Log.e(TAG, "Place details not found: " + statusCode +  exception.getMessage());
             }
         });
     }
@@ -262,8 +262,8 @@ public class CurrentPlace {
                     Log.i(TAG, "prediction = " + prediction.getPlaceId()
                             + " = " + prediction.getPrimaryText(null).toString());
                 }
-                autocompleteListener.onAutocompleteFetch(autocompletePlaces);
             }
+            autocompleteListener.onAutocompleteFetch(autocompletePlaces);
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 ApiException apiException = (ApiException) exception;

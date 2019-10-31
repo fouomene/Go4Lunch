@@ -84,7 +84,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         // Update others widgets
-        if (place.getLatLng() != null) {
+        if (place.getLatLng() != null && latLng != null) {
             distance.setText(context.getString(R.string.distance, convertData.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
         }
