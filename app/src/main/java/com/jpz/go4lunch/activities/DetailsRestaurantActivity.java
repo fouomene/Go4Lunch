@@ -33,6 +33,8 @@ import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import static com.jpz.go4lunch.api.WorkmateHelper.getCurrentWorkmate;
+import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesAtRestaurant;
+import static com.jpz.go4lunch.api.WorkmateHelper.updateRestaurant;
 import static com.jpz.go4lunch.utils.MyUtilsNavigation.KEY_ID;
 
 public class DetailsRestaurantActivity extends AppCompatActivity
@@ -193,7 +195,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void chooseRestaurant(Place place) {
         if (currentUser != null) {
             // Update the workmates collection
-            WorkmateHelper.updateRestaurant(currentUser.getUid(), place.getId(), place.getName());
+            updateRestaurant(currentUser.getUid(), place.getId(), place.getName(), convertData.getAddress(place));
         }
     }
 
@@ -201,7 +203,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void deleteRestaurantChoice() {
         if (currentUser != null) {
             // Update the workmates collection
-            WorkmateHelper.updateRestaurant(currentUser.getUid(), null, null);
+            updateRestaurant(currentUser.getUid(), null, null, null);
         }
     }
 
@@ -276,7 +278,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void configureRecyclerView(Place place) {
         //Configure Adapter & RecyclerView
         WorkmatesAtRestaurantAdapter adapter = new WorkmatesAtRestaurantAdapter(generateOptionsForAdapter
-                (WorkmateHelper.getWorkmatesAtRestaurant(place.getId())), Glide.with(this));
+                (getWorkmatesAtRestaurant(place.getId())), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }

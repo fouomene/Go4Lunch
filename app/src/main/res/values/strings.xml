@@ -78,4 +78,9 @@
     <string name="search_icon">search icon</string>
     <string name="mic_icon">mic icon</string>
 
+    <!-- Notifications -->
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="time_to_eat">"It's time to eat"</string>
+    <string name="message_from_firebase">Message from Firebase</string>
+
 </resources>

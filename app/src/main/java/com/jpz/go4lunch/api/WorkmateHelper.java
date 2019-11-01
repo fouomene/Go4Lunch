@@ -18,10 +18,11 @@ public class WorkmateHelper {
 
     private static final String COLLECTION_NAME = "workmates";
     private static final String FIELD_ID = "id";
-    private static final String FIELD_USERNAME = "username";
+    public static final String FIELD_USERNAME = "username";
     private static final String FIELD_URLPICTURE = "urlPicture";
     public static final String FIELD_RESTAURANT_ID = "restaurantId";
     private static final String FIELD_RESTAURANT_NAME = "restaurantName";
+    private static final String FIELD_RESTAURANT_ADDRESS = "restaurantAddress";
     private static final String FIELD_RESTAURANTS_LIKED = "restaurantsLikedId";
 
     private static final String TAG = WorkmateHelper.class.getSimpleName();
@@ -34,9 +35,9 @@ public class WorkmateHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createWorkmate(String id, String username, String urlPicture,
-                                            String restaurantId, String restaurantName, List<String> restaurantsLikedId) {
-        Workmate workmateToCreate = new Workmate(id, username, urlPicture, restaurantId, restaurantName, restaurantsLikedId);
+    public static Task<Void> createWorkmate(String id, String username, String urlPicture, String restaurantId,
+                                            String restaurantName, String restaurantAddress, List<String> restaurantsLikedId) {
+        Workmate workmateToCreate = new Workmate(id, username, urlPicture, restaurantId, restaurantName, restaurantAddress, restaurantsLikedId);
         return WorkmateHelper.getWorkmatesCollection().document(id).set(workmateToCreate);
     }
 
@@ -67,21 +68,21 @@ public class WorkmateHelper {
 
     // Retrieve all workmates and class them especially by a restaurant choice for WorkmatesFragment
     public static Query getAllWorkmates() {
-        return WorkmateHelper.getWorkmatesCollection()
+        return getWorkmatesCollection()
                 .orderBy(FIELD_RESTAURANT_NAME, Query.Direction.DESCENDING)
                 .orderBy(FIELD_USERNAME, Query.Direction.DESCENDING);
     }
 
     // Retrieve all workmates with the same restaurant choice for DetailsRestaurantActivity
     public static Query getWorkmatesAtRestaurant(String id) {
-        return WorkmateHelper.getWorkmatesCollection()
+        return getWorkmatesCollection()
                 .whereEqualTo(FIELD_RESTAURANT_ID, id);
     }
 
     // --- GET ---
 
     public static Task<DocumentSnapshot> getCurrentWorkmate(String id) {
-        return WorkmateHelper.getWorkmatesCollection().document(id).get();
+        return getWorkmatesCollection().document(id).get();
     }
 
     // --- LISTENER ---
@@ -89,15 +90,16 @@ public class WorkmateHelper {
     // --- UPDATE ---
 
     // Update the choice of the workmate's restaurant
-    public static Task<Void> updateRestaurant(String id, String placeId, String placeName) {
-        return WorkmateHelper.getWorkmatesCollection().document(id)
-                .update(FIELD_RESTAURANT_ID, placeId, FIELD_RESTAURANT_NAME, placeName);
+    public static Task<Void> updateRestaurant(String id, String placeId, String placeName, String placeAddress) {
+        return getWorkmatesCollection()
+                .document(id)
+                .update(FIELD_RESTAURANT_ID, placeId, FIELD_RESTAURANT_NAME, placeName, FIELD_RESTAURANT_ADDRESS, placeAddress);
     }
 
     // --- DELETE ---
 
     public static Task<Void> deleteWorkmate(String id) {
-        return WorkmateHelper.getWorkmatesCollection().document(id).delete();
+        return getWorkmatesCollection().document(id).delete();
     }
 
     public void removeLike(String id, String restaurantId) {
