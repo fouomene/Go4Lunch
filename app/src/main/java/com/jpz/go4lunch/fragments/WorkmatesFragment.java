@@ -20,6 +20,7 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 /**
@@ -27,11 +28,12 @@ import com.jpz.go4lunch.utils.MyUtilsNavigation;
  */
 public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.Listener {
 
-    // Declare View
+    // Declare View and Adapter
     private RecyclerView recyclerView;
-
     private WorkmatesAdapter workmatesAdapter;
 
+    // Utils
+    private ConvertData convertData = new ConvertData();
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
 
     private static final String TAG = WorkmatesFragment.class.getSimpleName();
@@ -61,7 +63,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     private void configureRecyclerView() {
         //Configure Adapter & RecyclerView
         workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
-                (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
+                (WorkmateHelper.getAllWorkmates(convertData.getTodayDate())), Glide.with(this), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(workmatesAdapter);
     }

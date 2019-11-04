@@ -22,6 +22,7 @@ import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
 
+import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_DATE;
 import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
@@ -94,9 +95,11 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         // By default, number of workmates is empty
         workmates.setText("");
 
-        // Check if workmates join this restaurant in Firestore :
+        // Check if workmates join this restaurant in Firestore (real-time) :
         Query query = getWorkmatesCollection()
-                .whereEqualTo(FIELD_RESTAURANT_ID, place.getId());
+                .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
+                .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate());
+
         registration = query.addSnapshotListener((snapshots, e) -> {
             if (e != null) {
                 Log.w(TAG, "listen:error", e);

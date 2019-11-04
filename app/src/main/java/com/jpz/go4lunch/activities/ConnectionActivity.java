@@ -276,7 +276,7 @@ public class ConnectionActivity extends AppCompatActivity {
             String urlPicture = (firebaseUtils.getCurrentUser().getPhotoUrl() != null) ?
                     firebaseUtils.getCurrentUser().getPhotoUrl().toString() : null;
             // Set data. By default restaurantId, restaurantName, restaurantAddress and restaurantsLikedId are null.
-            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null, null, null);
+            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null, null, null, null);
         }
     }
 

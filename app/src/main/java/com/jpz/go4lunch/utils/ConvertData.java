@@ -188,4 +188,14 @@ public class ConvertData {
         return (int) Math.sqrt(distance);
     }
 
+    //--------------------------------------------------------------------------------------
+
+    // Get the date of the day
+    public String getTodayDate() {
+        Calendar calendar = Calendar.getInstance();
+        // Create a SimpleDateFormat
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        // Get today date
+        return sdf.format(calendar.getTime());
+    }
 }

@@ -14,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.ConvertData;
 
 import java.lang.ref.WeakReference;
 
@@ -24,6 +25,9 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     private TextView textView;
     private ImageView workmateImage;
 
+    // Utils
+    private ConvertData convertData = new ConvertData();
+
     // Declare a Weak Reference to our Callback
     private WeakReference<WorkmatesAdapter.Listener> callbackWeakRef;
 
@@ -33,13 +37,12 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         textView = itemView.findViewById(R.id.item_workmate_text);
         workmateImage = itemView.findViewById(R.id.item_workmate_image);
-
         context = itemView.getContext();
     }
 
     public void updateViewHolder(Workmate workmate, RequestManager glide, WorkmatesAdapter.Listener callback){
         // Update text
-        if (workmate.getRestaurantId() != null) {
+        if (workmate.getRestaurantId() != null && convertData.getTodayDate().equals(workmate.getRestaurantDate())) {
             textView.setTextColor(context.getResources().getColor(android.R.color.black));
             textView.setText(context.getString(R.string.workmate_has_a_restaurant_choice,
                     workmate.getUsername(), workmate.getRestaurantName()));

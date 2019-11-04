@@ -31,11 +31,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
@@ -48,6 +52,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static com.jpz.go4lunch.activities.MainActivity.PERMS;
 import static com.jpz.go4lunch.activities.MainActivity.PLACES_ID_BUNDLE_KEY;
 import static com.jpz.go4lunch.activities.MainActivity.RC_LOCATION;
+import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_DATE;
 import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.getWorkmatesCollection;
 
@@ -82,6 +87,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     // Utils
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
+    private ConvertData convertData = new ConvertData();
 
     // For DeviceLocationListener Interface
     private DeviceLocationListener deviceLocationListener;
@@ -361,9 +367,32 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 addMarkers(place.getLatLng(), place.getId(),
                         R.drawable.ic_map_pin, R.drawable.ic_restaurant);
 
-                // Check if workmates choose a restaurant on the map in Firestore :
+                /*
+                // Check if workmates have already chosen a restaurant on the map in Firestore :
                 getWorkmatesCollection()
                         .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
+                        .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    // If a workmate join a restaurant on the map, mark a green icon
+                                    addMarkers(place.getLatLng(), place.getId(),
+                                            R.drawable.ic_map_pin_workmate,
+                                            R.drawable.ic_restaurant_with_workmate);
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                }
+                            } else {
+                                Log.d(TAG, "Error getting documents: ", task.getException());
+                            }
+                        });
+
+                 */
+
+                // Check if workmates choose a restaurant on the map in Firestore (real-time) :
+                getWorkmatesCollection()
+                        .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
+                        .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
                         // By passing in the activity,
                         // Firestore can clean up the listeners automatically when the activity is stopped.
                         .addSnapshotListener(getActivity(), (snapshots, e) -> {

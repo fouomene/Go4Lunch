@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.ConvertData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ public class WorkmateHelper {
     public static final String FIELD_RESTAURANT_ID = "restaurantId";
     private static final String FIELD_RESTAURANT_NAME = "restaurantName";
     private static final String FIELD_RESTAURANT_ADDRESS = "restaurantAddress";
+    public static final String FIELD_RESTAURANT_DATE = "restaurantDate";
     private static final String FIELD_RESTAURANTS_LIKED = "restaurantsLikedId";
 
     private static final String TAG = WorkmateHelper.class.getSimpleName();
@@ -36,8 +38,10 @@ public class WorkmateHelper {
     // --- CREATE ---
 
     public static Task<Void> createWorkmate(String id, String username, String urlPicture, String restaurantId,
-                                            String restaurantName, String restaurantAddress, List<String> restaurantsLikedId) {
-        Workmate workmateToCreate = new Workmate(id, username, urlPicture, restaurantId, restaurantName, restaurantAddress, restaurantsLikedId);
+                                            String restaurantName, String restaurantAddress,
+                                            String restaurantDate, List<String> restaurantsLikedId) {
+        Workmate workmateToCreate = new Workmate(id, username, urlPicture, restaurantId,
+                restaurantName, restaurantAddress, restaurantDate, restaurantsLikedId);
         return WorkmateHelper.getWorkmatesCollection().document(id).set(workmateToCreate);
     }
 
@@ -67,16 +71,19 @@ public class WorkmateHelper {
     // --- QUERY ---
 
     // Retrieve all workmates and class them especially by a restaurant choice for WorkmatesFragment
-    public static Query getAllWorkmates() {
+    public static Query getAllWorkmates(String restaurantDate) {
         return getWorkmatesCollection()
+                //.whereEqualTo(FIELD_RESTAURANT_DATE, restaurantDate)
                 .orderBy(FIELD_RESTAURANT_NAME, Query.Direction.DESCENDING)
                 .orderBy(FIELD_USERNAME, Query.Direction.DESCENDING);
     }
 
-    // Retrieve all workmates with the same restaurant choice for DetailsRestaurantActivity
-    public static Query getWorkmatesAtRestaurant(String id) {
+    // Retrieve all workmates with the same restaurant choice
+    // on the same day for DetailsRestaurantActivity
+    public static Query getWorkmatesAtRestaurant(String id, String restaurantDate) {
         return getWorkmatesCollection()
-                .whereEqualTo(FIELD_RESTAURANT_ID, id);
+                .whereEqualTo(FIELD_RESTAURANT_ID, id)
+                .whereEqualTo(FIELD_RESTAURANT_DATE, restaurantDate);
     }
 
     // --- GET ---
@@ -90,10 +97,12 @@ public class WorkmateHelper {
     // --- UPDATE ---
 
     // Update the choice of the workmate's restaurant
-    public static Task<Void> updateRestaurant(String id, String placeId, String placeName, String placeAddress) {
+    public static Task<Void> updateRestaurant(String id, String placeId, String placeName,
+                                              String placeAddress, String restaurantDate) {
         return getWorkmatesCollection()
                 .document(id)
-                .update(FIELD_RESTAURANT_ID, placeId, FIELD_RESTAURANT_NAME, placeName, FIELD_RESTAURANT_ADDRESS, placeAddress);
+                .update(FIELD_RESTAURANT_ID, placeId, FIELD_RESTAURANT_NAME, placeName,
+                        FIELD_RESTAURANT_ADDRESS, placeAddress, FIELD_RESTAURANT_DATE, restaurantDate);
     }
 
     // --- DELETE ---

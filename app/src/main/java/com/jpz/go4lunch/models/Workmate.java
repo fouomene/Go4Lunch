@@ -17,6 +17,8 @@ public class Workmate {
     @Nullable
     private String restaurantAddress;
     @Nullable
+    private String restaurantDate;
+    @Nullable
     private List<String> restaurantsLikedId;
 
     /*
@@ -30,13 +32,15 @@ public class Workmate {
     }
 
     public Workmate(String id, String username, @Nullable String urlPicture, @Nullable String restaurantId,
-                    @Nullable String restaurantName, @Nullable String restaurantAddress, @Nullable List<String> restaurantsLikedId) {
+                    @Nullable String restaurantName, @Nullable String restaurantAddress,
+                    @Nullable String restaurantDate, @Nullable List<String> restaurantsLikedId) {
         this.id = id;
         this.username = username;
         this.urlPicture = urlPicture;
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
+        this.restaurantDate = restaurantDate;
         this.restaurantsLikedId = restaurantsLikedId;
     }
 
@@ -71,6 +75,11 @@ public class Workmate {
     }
 
     @Nullable
+    public String getRestaurantDate() {
+        return restaurantDate;
+    }
+
+    @Nullable
     public List<String> getRestaurantsLikedId() {
         return restaurantsLikedId;
     }
@@ -100,6 +109,10 @@ public class Workmate {
 
     public void setRestaurantAddress(@Nullable String restaurantAddress) {
         this.restaurantAddress = restaurantAddress;
+    }
+
+    public void setRestaurantDate(@Nullable String restaurantDate) {
+        this.restaurantDate = restaurantDate;
     }
 
     public void setRestaurantsLikedId(@Nullable List<String> restaurantsLikedId) {

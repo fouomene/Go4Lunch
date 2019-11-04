@@ -155,13 +155,15 @@ public class DetailsRestaurantActivity extends AppCompatActivity
                     // Check the restaurant choice
                     compareRestaurants(place);
                     Log.i(TAG, "restaurant choice = " +
-                            currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName());
+                            currentWorkmate.getRestaurantId() + currentWorkmate.getRestaurantName()
+                    + currentWorkmate.getRestaurantDate());
                 });
     }
 
     private void compareRestaurants(Place place) {
         // Verify if the restaurant chosen is the same that the details restaurant displayed
-        if (place.getId() != null && place.getId().equals(currentWorkmate.getRestaurantId())) {
+        if (place.getId() != null && place.getId().equals(currentWorkmate.getRestaurantId())
+        && convertData.getTodayDate().equals(currentWorkmate.getRestaurantDate())) {
             fabIsChecked = true;
         }
         // Update fab UI according to this choice
@@ -195,7 +197,8 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void chooseRestaurant(Place place) {
         if (currentUser != null) {
             // Update the workmates collection
-            updateRestaurant(currentUser.getUid(), place.getId(), place.getName(), convertData.getAddress(place));
+            updateRestaurant(currentUser.getUid(), place.getId(), place.getName(),
+                    convertData.getAddress(place), convertData.getTodayDate());
         }
     }
 
@@ -203,7 +206,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void deleteRestaurantChoice() {
         if (currentUser != null) {
             // Update the workmates collection
-            updateRestaurant(currentUser.getUid(), null, null, null);
+            updateRestaurant(currentUser.getUid(), null, null, null, null);
         }
     }
 
@@ -278,7 +281,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private void configureRecyclerView(Place place) {
         //Configure Adapter & RecyclerView
         WorkmatesAtRestaurantAdapter adapter = new WorkmatesAtRestaurantAdapter(generateOptionsForAdapter
-                (getWorkmatesAtRestaurant(place.getId())), Glide.with(this));
+                (getWorkmatesAtRestaurant(place.getId(), convertData.getTodayDate())), Glide.with(this));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }

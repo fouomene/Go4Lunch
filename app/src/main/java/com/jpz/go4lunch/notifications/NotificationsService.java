@@ -18,11 +18,13 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.activities.MainActivity;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_DATE;
 import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_RESTAURANT_ID;
 import static com.jpz.go4lunch.api.WorkmateHelper.FIELD_USERNAME;
 import static com.jpz.go4lunch.api.WorkmateHelper.getCurrentWorkmate;
@@ -34,7 +36,8 @@ public class NotificationsService extends FirebaseMessagingService {
     private Workmate currentWorkmate = new Workmate();
 
     // Utils
-    FirebaseUtils firebaseUtils = new FirebaseUtils();
+    private FirebaseUtils firebaseUtils = new FirebaseUtils();
+    private ConvertData convertData = new ConvertData();
 
     private static final String TAG = NotificationsService.class.getSimpleName();
     private final int NOTIFICATION_ID = 123;
@@ -52,8 +55,6 @@ public class NotificationsService extends FirebaseMessagingService {
     // Get the data needed for the notification
     private void getRestaurantData(String messageBody) {
         // Data to show
-        final String[] myLunchRestaurant = {""};
-        final String[] myRestaurantAddress = {""};
         List<String> myLunchWorkmates = new ArrayList<>();
 
         // Initialize FireBase User
@@ -65,11 +66,12 @@ public class NotificationsService extends FirebaseMessagingService {
                         currentWorkmate = documentSnapshot.toObject(Workmate.class);
                         // Get the name of the restaurant chosen from rhe current user
                         if (currentWorkmate != null) {
-                            myLunchRestaurant[0] = currentWorkmate.getRestaurantName();
-                            myRestaurantAddress[0] = currentWorkmate.getRestaurantAddress();
+                            String myLunchRestaurant = currentWorkmate.getRestaurantName();
+                            String myRestaurantAddress = currentWorkmate.getRestaurantAddress();
 
                             // Get the names of the workmates who chose this restaurant
                             getWorkmatesCollection()
+                                    .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
                                     .whereEqualTo(FIELD_RESTAURANT_ID, currentWorkmate.getRestaurantId())
                                     .get()
                                     .addOnCompleteListener(task -> {
@@ -83,8 +85,8 @@ public class NotificationsService extends FirebaseMessagingService {
                                             Log.d(TAG, "Error getting documents: ", task.getException());
                                         }
                                         // Show the notification
-                                        sendVisualNotification(messageBody, myLunchRestaurant[0],
-                                                myRestaurantAddress[0], myLunchWorkmates);
+                                        sendVisualNotification(messageBody, myLunchRestaurant,
+                                                myRestaurantAddress, myLunchWorkmates);
                                     });
                         }
                     });

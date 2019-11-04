@@ -40,6 +40,7 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
 import com.jpz.go4lunch.fragments.WorkmatesFragment;
 import com.jpz.go4lunch.models.Workmate;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.FirebaseUtils;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
@@ -63,11 +64,12 @@ public class MainActivity extends AppCompatActivity
     // Utils
     private MyUtilsNavigation myUtilsNavigation = new MyUtilsNavigation();
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
+    private ConvertData convertData = new ConvertData();
 
     // Declare user
     private FirebaseUser currentUser;
 
-    // Models and Utils
+    // Models
     private Workmate currentWorkmate = new Workmate();
 
     // For design
@@ -267,7 +269,8 @@ public class MainActivity extends AppCompatActivity
                             currentWorkmate = documentSnapshot.toObject(Workmate.class);
                             if (currentWorkmate != null) {
                                 // Start DetailRestaurantActivity with the restaurant identifier
-                                if (currentWorkmate.getRestaurantId() != null) {
+                                if (currentWorkmate.getRestaurantId() != null
+                                        && convertData.getTodayDate().equals(currentWorkmate.getRestaurantDate())) {
                                     myUtilsNavigation.startDetailsRestaurantActivity(this,
                                             currentWorkmate.getRestaurantId());
                                     // If there is no restaurant choice, display a message
