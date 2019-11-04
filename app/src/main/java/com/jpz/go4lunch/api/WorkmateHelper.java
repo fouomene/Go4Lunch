@@ -9,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.jpz.go4lunch.models.Workmate;
-import com.jpz.go4lunch.utils.ConvertData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,9 +70,9 @@ public class WorkmateHelper {
     // --- QUERY ---
 
     // Retrieve all workmates and class them especially by a restaurant choice for WorkmatesFragment
-    public static Query getAllWorkmates(String restaurantDate) {
+    public static Query getAllWorkmates() {
         return getWorkmatesCollection()
-                //.whereEqualTo(FIELD_RESTAURANT_DATE, restaurantDate)
+                .orderBy(FIELD_RESTAURANT_DATE, Query.Direction.DESCENDING)
                 .orderBy(FIELD_RESTAURANT_NAME, Query.Direction.DESCENDING)
                 .orderBy(FIELD_USERNAME, Query.Direction.DESCENDING);
     }

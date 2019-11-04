@@ -63,7 +63,7 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     private void configureRecyclerView() {
         //Configure Adapter & RecyclerView
         workmatesAdapter = new WorkmatesAdapter(generateOptionsForAdapter
-                (WorkmateHelper.getAllWorkmates(convertData.getTodayDate())), Glide.with(this), this);
+                (WorkmateHelper.getAllWorkmates()), Glide.with(this), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(workmatesAdapter);
     }

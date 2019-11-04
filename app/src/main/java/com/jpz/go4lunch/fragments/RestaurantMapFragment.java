@@ -31,13 +31,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.CurrentPlace;
@@ -94,6 +91,9 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     // List of placesId from the autocomplete request
     private ArrayList<String> placesId;
+
+    // This flag is required to avoid first time onResume refreshing
+    private boolean loaded = false;
 
     private static final String TAG = RestaurantMapFragment.class.getSimpleName();
 
@@ -224,6 +224,14 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        if (!loaded) {
+            //First time just set the loaded flag true
+            loaded = true;
+        } else {
+            Log.i(TAG, "Back to MainActivity");
+            //Reload data
+            onMapReady(googleMap);
+        }
     }
 
     @Override
@@ -366,28 +374,6 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
                 // By default, mark a red icon
                 addMarkers(place.getLatLng(), place.getId(),
                         R.drawable.ic_map_pin, R.drawable.ic_restaurant);
-
-                /*
-                // Check if workmates have already chosen a restaurant on the map in Firestore :
-                getWorkmatesCollection()
-                        .whereEqualTo(FIELD_RESTAURANT_ID, place.getId())
-                        .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    // If a workmate join a restaurant on the map, mark a green icon
-                                    addMarkers(place.getLatLng(), place.getId(),
-                                            R.drawable.ic_map_pin_workmate,
-                                            R.drawable.ic_restaurant_with_workmate);
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                }
-                            } else {
-                                Log.d(TAG, "Error getting documents: ", task.getException());
-                            }
-                        });
-
-                 */
 
                 // Check if workmates choose a restaurant on the map in Firestore (real-time) :
                 getWorkmatesCollection()

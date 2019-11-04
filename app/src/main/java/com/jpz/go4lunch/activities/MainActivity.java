@@ -249,7 +249,9 @@ public class MainActivity extends AppCompatActivity
             searchView.setQuery("", false);
             searchView.setIconified(true);
             // Set the search icon item
-            item.setVisible(true);
+            if (item != null) {
+                item.setVisible(true);
+            }
             // Set toggle and cardView
             toggle.setDrawerIndicatorEnabled(true);
             cardView.setVisibility(View.GONE);
