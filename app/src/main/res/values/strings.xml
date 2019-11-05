@@ -82,5 +82,7 @@
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="time_to_eat">"It's time to eat"</string>
     <string name="message_from_firebase">Message from Firebase</string>
+    <string name="notification">You chose to eat at %1$s at %2$s with %3$s.</string>
+    <string name="notification_alone">You chose to eat at %1$s at %2$s, sorry you\'re alone&#8230;</string>
 
 </resources>

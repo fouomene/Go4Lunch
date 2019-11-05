@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -77,9 +78,14 @@ public class NotificationsService extends FirebaseMessagingService {
                                     .addOnCompleteListener(task -> {
                                         if (task.isSuccessful() && task.getResult() != null) {
                                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                                // Add them in a list
-                                                myLunchWorkmates.add(document.getString(FIELD_USERNAME));
-                                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                                // Remove the current user
+                                                if (currentUser.getDisplayName() != null &&
+                                                        !currentUser.getDisplayName()
+                                                                .equals(document.getString(FIELD_USERNAME))) {
+                                                    // Add them in a list
+                                                    myLunchWorkmates.add(document.getString(FIELD_USERNAME));
+                                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                                }
                                             }
                                         } else {
                                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -95,26 +101,26 @@ public class NotificationsService extends FirebaseMessagingService {
 
     private void sendVisualNotification(String messageBody, String myLunchRestaurant,
                                         String myRestaurantAddress, List<String> myLunchWorkmates) {
-        // Initialize FireBase User
-        FirebaseUser currentUser = firebaseUtils.getCurrentUser();
 
         // Create an Intent that will be shown when user will click on the Notification
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        // Create a Style for the Notification
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle(getString(R.string.time_to_eat));
-        inboxStyle.addLine(messageBody);
-        inboxStyle.addLine(myLunchRestaurant);
-        inboxStyle.addLine(myRestaurantAddress);
-        for (String myLunchWorkmate : myLunchWorkmates) {
-            if (currentUser != null) {
-                if (!myLunchWorkmate.equals(currentUser.getDisplayName())) {
-                    inboxStyle.addLine(myLunchWorkmate);
-                }
-            }
+        String notificationText;
+        if (myLunchWorkmates.isEmpty()) {
+            // You are alone to eat...
+            notificationText = getString(R.string.notification_alone,
+                    myLunchRestaurant, myRestaurantAddress);
+        } else {
+            // Format the list of workmates
+            String formatMyLunchWorkmates = TextUtils.join(", ", myLunchWorkmates);
+            // Get notificationText with them
+            notificationText = getString(R.string.notification,
+                    myLunchRestaurant, myRestaurantAddress, formatMyLunchWorkmates);
         }
+
+        // Create a Style for the Notification
+        NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
 
         // Create a Channel (Android 8)
         String channelId = getString(R.string.default_notification_channel_id);
@@ -123,13 +129,12 @@ public class NotificationsService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.hot_food_bowl_white)
-                        //.setContentTitle(getString(R.string.time_to_eat))
+                        .setContentTitle(messageBody)
                         .setColor(getResources().getColor(R.color.colorPrimary))
-                        //.setContentText(messageTitle)
                         .setAutoCancel(true)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentIntent(pendingIntent)
-                        .setStyle(inboxStyle);
+                        .setStyle(bigTextStyle.bigText(notificationText));
 
         // Add the Notification to the NotificationManager and show it.
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -142,7 +147,7 @@ public class NotificationsService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(mChannel);
         }
 
-        // Show the notification
+        // Show the notification (notify builder)
         notificationManager.notify(TAG, NOTIFICATION_ID, notificationBuilder.build());
     }
 }

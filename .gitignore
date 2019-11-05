@@ -11,3 +11,5 @@
 /build
 /captures
 .externalNativeBuild
+# Ajout du fichier :
+gradle.properties
