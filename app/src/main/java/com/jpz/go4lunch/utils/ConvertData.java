@@ -8,6 +8,7 @@ import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.material.snackbar.Snackbar;
 import com.jpz.go4lunch.R;
 
 import java.text.SimpleDateFormat;
@@ -197,5 +198,12 @@ public class ConvertData {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         // Get today date
         return sdf.format(calendar.getTime());
+    }
+
+    //--------------------------------------------------------------------------------------
+
+    public void showSnackbar(View view, String text) {
+        Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 }

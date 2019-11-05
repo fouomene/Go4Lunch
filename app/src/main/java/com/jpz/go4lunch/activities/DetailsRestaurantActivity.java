@@ -21,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
 import com.jpz.go4lunch.R;
@@ -258,17 +257,13 @@ public class DetailsRestaurantActivity extends AppCompatActivity
             if (!likeIsChecked) {
                 like.setText(getString(R.string.unlike));
                 workmateHelper.addLike(currentUser.getUid(), restaurantId);
-                Snackbar snackbar = Snackbar
-                        .make(constraintLayout, getString(R.string.add_like), Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                convertData.showSnackbar(constraintLayout, getString(R.string.add_like));
                 likeIsChecked = true;
-                // Else the user already like this restaurant, so remove his like
+            // Else the user already like this restaurant, so remove his like
             } else {
                 like.setText(getString(R.string.like));
                 workmateHelper.removeLike(currentUser.getUid(), restaurantId);
-                Snackbar snackbar = Snackbar
-                        .make(constraintLayout, getString(R.string.remove_like), Snackbar.LENGTH_SHORT);
-                snackbar.show();
+                convertData.showSnackbar(constraintLayout, getString(R.string.remove_like));
                 likeIsChecked = false;
             }
         });

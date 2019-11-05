@@ -15,15 +15,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activities.DetailsRestaurantActivity"
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:configChanges="orientation"
+            android:label="@string/Settings"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activities.MainActivity">
+        </activity>
+
+        <activity
+            android:name=".activities.DetailsRestaurantActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
-            android:theme="@style/TranslucentStatusBar"/>
+            android:theme="@style/TranslucentStatusBar" />
+
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/hungry"
             android:configChanges="orientation"
+            android:label="@string/hungry"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".activities.ConnectionActivity"
             android:configChanges="orientation"
@@ -39,7 +50,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/go4lunch_google_api_key" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -51,6 +61,7 @@
             android:resource="@drawable/hot_food_bowl_white" />
         <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message. See README(https://goo.gl/6BKBk7) for more. -->
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
@@ -60,7 +71,7 @@
             android:name=".notifications.NotificationsService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 

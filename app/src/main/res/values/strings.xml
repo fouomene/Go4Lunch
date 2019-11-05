@@ -12,6 +12,18 @@
     <string name="account_exists">Account exists with different credential</string>
     <string name="sign_in_cancelled">Sign in cancelled</string>
 
+    <!--Settings Activity -->
+    <string name="Settings">Settings</string>
+    <string name="notification_subscription">Notification subscription</string>
+    <string name="notification_subscribed">Notification subscribed</string>
+    <string name="notification_subscribe_failed">Notification subscribe failed</string>
+    <string name="notification_unsubscribed">Notification unsubscribed</string>
+    <string name="notification_unsubscribe_failed">Notification unsubscribe failed</string>
+    <string name="delete_account">Delete my account!</string>
+    <string name="warning_delete">WARNING!\nThis operation will delete your account!</string>
+    <string name="cancel">@android:string/cancel</string>
+    <string name="ok">@android:string/ok</string>
+
     <!-- Restaurant -->
     <string name="call">CALL</string>
     <string name="like">LIKE</string>

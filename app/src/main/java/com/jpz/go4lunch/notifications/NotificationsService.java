@@ -41,7 +41,7 @@ public class NotificationsService extends FirebaseMessagingService {
     private ConvertData convertData = new ConvertData();
 
     private static final String TAG = NotificationsService.class.getSimpleName();
-    private final int NOTIFICATION_ID = 123;
+    private final int NOTIFICATION_ID = 321;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

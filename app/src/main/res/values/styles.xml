@@ -12,6 +12,7 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <!-- BottomNavigation application theme. -->
     <style name="BottomNavigationTheme" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:textColorSecondary">@android:color/black</item>

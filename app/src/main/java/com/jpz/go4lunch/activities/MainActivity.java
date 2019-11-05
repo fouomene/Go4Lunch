@@ -285,8 +285,8 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.nav_drawer_settings:
-                // settings
-                Toast.makeText(MainActivity.this, "settings", Toast.LENGTH_SHORT).show();
+                // Settings
+                myUtilsNavigation.startSettingsActivity(this);
                 break;
 
             case R.id.nav_drawer_logout:
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 // Log out from Firebase
                 firebaseUtils.userLogout();
-                startConnectionActivity();
+                myUtilsNavigation.startConnectionActivity(this);
                 finish();
                 break;
 
@@ -334,13 +334,6 @@ public class MainActivity extends AppCompatActivity
         //Update views with data
         nameProfile.setText(username);
         emailProfile.setText(email);
-    }
-
-    //----------------------------------------------------------------------------------
-
-    private void startConnectionActivity() {
-        Intent intent = new Intent(this, ConnectionActivity.class);
-        startActivity(intent);
     }
 
     //----------------------------------------------------------------------------------
