@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity
         RestaurantMapFragment.DeviceLocationListener, CurrentPlace.AutocompleteListener {
 
     // Static data for ACCESS_FINE_LOCATION
-    public static final String PERMS = Manifest.permission.ACCESS_FINE_LOCATION;
+    public static final String[] PERMS = {Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET};
     public static final int RC_LOCATION = 123;
 
     // Utils

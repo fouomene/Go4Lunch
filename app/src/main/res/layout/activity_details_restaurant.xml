@@ -76,7 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/details_first_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
-        app:layout_constraintBottom_toTopOf="@+id/details_type"/>
+        app:layout_constraintBottom_toTopOf="@+id/details_address"/>
 
     <ImageView
         android:id="@+id/details_first_star"
@@ -88,7 +88,7 @@
         app:layout_constraintStart_toEndOf="@+id/details_name"
         app:layout_constraintEnd_toStartOf="@+id/details_second_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
-        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        app:layout_constraintBottom_toTopOf="@+id/details_address"
         android:contentDescription="@string/stars"/>
 
     <ImageView
@@ -100,7 +100,7 @@
         app:layout_constraintStart_toEndOf="@+id/details_first_star"
         app:layout_constraintEnd_toStartOf="@+id/details_third_star"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
-        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        app:layout_constraintBottom_toTopOf="@+id/details_address"
         android:contentDescription="@string/stars"/>
 
     <ImageView
@@ -112,23 +112,8 @@
         app:layout_constraintStart_toEndOf="@+id/details_second_star"
         app:layout_constraintEnd_toStartOf="@+id/details_guideline_eighty"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
-        app:layout_constraintBottom_toTopOf="@+id/details_type"
+        app:layout_constraintBottom_toTopOf="@+id/details_address"
         android:contentDescription="@string/stars"/>
-
-    <TextView
-        android:id="@+id/details_type"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:text="type"
-        android:textColor="@android:color/white"
-        android:gravity="top"
-        android:textAlignment="gravity"
-        android:layout_marginStart="16dp"
-        app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/details_address"
-        app:layout_constraintTop_toBottomOf="@+id/details_name"
-        app:layout_constraintBottom_toTopOf="@+id/details_guideline_fifty_five"/>
 
     <TextView
         android:id="@+id/details_address"
@@ -142,8 +127,7 @@
         android:singleLine="true"
         android:paddingStart="16dp"
         android:paddingEnd="0dp"
-        app:layout_constraintHorizontal_weight="5"
-        app:layout_constraintStart_toEndOf="@+id/details_type"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_name"
         app:layout_constraintBottom_toTopOf="@+id/details_guideline_fifty_five"/>

@@ -131,7 +131,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         buttonDelete.setOnClickListener(v -> {
             // Create a dialog window to warn the user
-            AlertDialog.Builder warningDialog = new AlertDialog.Builder(SettingsActivity.this);
+            AlertDialog.Builder warningDialog = new AlertDialog.Builder(SettingsActivity.this, R.style.AlertDialogWarning);
+            warningDialog.setTitle(getString(R.string.warning));
             warningDialog.setMessage(getString(R.string.warning_delete));
 
             // Configure cancel button
@@ -175,11 +176,6 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     }
                 }
-
-                // Log out from Firebase
-                firebaseUtils.userLogout();
-                //myUtilsNavigation.startConnectionActivity(this);
-                finish();
             });
             warningDialog.show();
         });
@@ -193,6 +189,9 @@ public class SettingsActivity extends AppCompatActivity {
                     currentUser.delete().addOnCompleteListener(deleteTask -> {
                         if (deleteTask.isSuccessful()) {
                             Log.d(TAG, "User account deleted.");
+                            // When the user account is deleted, return to ConnectionActivity
+                            myUtilsNavigation.startConnectionActivity(this);
+                            finish();
                         }
                     });
                 });

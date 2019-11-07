@@ -50,7 +50,7 @@ public class ConvertData {
         // Set date format for full weekday
         String dateFormat = "EEEE";
         // Create a SimpleDateFormat with full weekday
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.ENGLISH);
         // Get the weekday in uppercase
         String weekday = sdf.format(calendar.getTime()).toUpperCase();
 

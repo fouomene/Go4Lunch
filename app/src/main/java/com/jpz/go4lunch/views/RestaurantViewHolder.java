@@ -35,7 +35,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     private ConvertData convertData = new ConvertData();
 
     // Views and Context
-    private TextView name, distance, type, address, workmates, hours;
+    private TextView name, distance, address, workmates, hours;
     private ImageView restaurantImage, workmate_ic, firstStar, secondStar, thirdStar;
     private Context context;
 
@@ -51,7 +51,6 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         super(itemView);
         name = itemView.findViewById(R.id.item_name);
         distance = itemView.findViewById(R.id.item_distance);
-        type = itemView.findViewById(R.id.item_type);
         address = itemView.findViewById(R.id.item_address);
         workmates = itemView.findViewById(R.id.item_workmates);
         hours = itemView.findViewById(R.id.item_hours);
@@ -69,11 +68,14 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         name.setText(place.getName());
 
         hours.setText(convertData.openingHours(place, context));
-        if (convertData.openingHours(place, context).contains("Clos")) {
+        // Set style for english or french data
+        if (convertData.openingHours(place, context).contains("Clos")
+                || convertData.openingHours(place, context).contains("Ferm")) {
             hours.setTextColor(context.getResources().getColor(R.color.crimson));
             hours.setTypeface(Typeface.DEFAULT_BOLD);
         }
-        if (convertData.openingHours(place, context).contains("Open")) {
+        if (convertData.openingHours(place, context).contains("Open")
+                || convertData.openingHours(place, context).contains("Ouv")) {
             hours.setTypeface(null, Typeface.ITALIC);
         }
 
@@ -89,8 +91,6 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
             distance.setText(context.getString(R.string.distance, convertData.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
         }
-
-        type.setText("type");
 
         // By default, number of workmates is empty
         workmates.setText("");

@@ -44,7 +44,7 @@ public class DetailsRestaurantActivity extends AppCompatActivity
     private RecyclerView recyclerView;
 
     // Widgets
-    private TextView name, type, address;
+    private TextView name, address;
     private ImageView restaurantImage, firstStar, secondStar, thirdStar;
     private Button call, like, website;
     private FloatingActionButton floatingActionButton;
@@ -74,7 +74,6 @@ public class DetailsRestaurantActivity extends AppCompatActivity
 
         constraintLayout = findViewById(R.id.details_constraint_layout);
         name = findViewById(R.id.details_name);
-        type = findViewById(R.id.details_type);
         address = findViewById(R.id.details_address);
         firstStar = findViewById(R.id.details_first_star);
         secondStar = findViewById(R.id.details_second_star);

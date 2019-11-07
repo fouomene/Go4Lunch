@@ -9,7 +9,7 @@
     <string name="authentication_succeed">Successful authentication</string>
     <string name="authentication_failed">Authentication failed</string>
     <string name="connexion_failure">Connexion failure</string>
-    <string name="account_exists">Account exists with different credential</string>
+    <string name="account_exists">Account already exists with different credential</string>
     <string name="sign_in_cancelled">Sign in cancelled</string>
 
     <!--Settings Activity -->
@@ -20,43 +20,44 @@
     <string name="notification_unsubscribed">Notification unsubscribed</string>
     <string name="notification_unsubscribe_failed">Notification unsubscribe failed</string>
     <string name="delete_account">Delete my account!</string>
-    <string name="warning_delete">WARNING!\nThis operation will delete your account!</string>
+    <string name="warning">WARNING!</string>
+    <string name="warning_delete">This operation will delete your account!</string>
     <string name="cancel">@android:string/cancel</string>
     <string name="ok">@android:string/ok</string>
 
     <!-- Restaurant -->
     <string name="call">CALL</string>
-    <string name="like">LIKE</string>
-    <string name="unlike">UNLIKE</string>
+    <string name="like" translatable="false">LIKE</string>
+    <string name="unlike" translatable="false">UNLIKE</string>
     <string name="website">WEBSITE</string>
     <string name="no_website">There is no website for this restaurant.</string>
-    <string name="restaurant_name">Name of the restaurant</string>
-    <string name="restaurant_address">Address of the restaurant</string>
-    <string name="restaurant_distance">Distance from the restaurant</string>
-    <string name="restaurant_hours">Restaurant hours</string>
+    <string name="restaurant_name" translatable="false">Name of the restaurant</string>
+    <string name="restaurant_address" translatable="false">Address of the restaurant</string>
+    <string name="restaurant_distance" translatable="false">Distance from the restaurant</string>
+    <string name="restaurant_hours" translatable="false">Restaurant hours</string>
     <string name="not_disclosed">Not disclosed</string>
     <string name="closed">Closed</string>
     <string name="closing_soon">Closing soon</string>
     <string name="open_until_hour_minute">Open until %1$d.%2$dpm</string>
     <string name="open_until_hour">Open until %1$dpm</string>
-    <string name="distance">%1$dm</string>
-    <string name="add_like">Added your like!</string>
-    <string name="remove_like">Removed your like!</string>
+    <string name="distance" translatable="false">%1$dm</string>
+    <string name="add_like">Like added!</string>
+    <string name="remove_like">Like removed!</string>
     <string name="no_result">There is no result for your query.</string>
 
     <!-- Workmates -->
-    <string name="workmate_restaurant_choice">Workmate choice</string>
-    <string name="workmates_joining_restaurant">Workmates are joining the restaurant</string>
+    <string name="workmate_restaurant_choice" translatable="false">Workmate choice</string>
+    <string name="workmates_joining_restaurant" translatable="false">Workmates are joining the restaurant</string>
     <string name="workmate_has_a_restaurant_choice">%1$s is eating at %2$s</string>
     <string name="workmate_has_not_a_restaurant_choice">"%1$s hasn't decide yet"</string>
     <string name="workmate_is_joining">%1$s is joining!</string>
-    <string name="number_of_workmates">(%1$d)</string>
+    <string name="number_of_workmates" translatable="false">(%1$d)</string>
 
     <!-- Connection Layout -->
     <string name="home_text">Find a nice restaurant and invite your co-workers for launch!</string>
 
     <!-- Request Permissions -->
-    <string name="rationale_permission_location_access">This application needs to access your site to work.</string>
+    <string name="rationale_permission_location_access">This application needs to access your site and internet to work.</string>
 
     <!-- Toolbar -->
     <string name="hungry">"I'm Hungry!"</string>
@@ -64,8 +65,8 @@
     <string name="search_restaurants">Search restaurants</string>
 
     <!--NavigationDrawer -->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="settings">SETTINGS</string>
     <string name="log_out">LOGOUT</string>
@@ -74,26 +75,26 @@
     <string name="info_no_username_found">No username found</string>
 
     <!-- Bottom Navigation View -->
-    <string name="map_view">Map View</string>
-    <string name="list_view">List View</string>
-    <string name="workmates">Workmates</string>
+    <string name="map_view" translatable="false">Map View</string>
+    <string name="list_view" translatable="false">List View</string>
+    <string name="workmates" translatable="false">Workmates</string>
 
     <!-- ImageViews (contentDescription) -->
-    <string name="business_lunch">Business lunch</string>
-    <string name="hot_food_in_a_bowl">Hot food in a bowl</string>
-    <string name="photo_profile">Photo profile</string>
-    <string name="restaurant_photo">Photo of the restaurant</string>
-    <string name="primary_color">Primary color</string>
-    <string name="workmate_photo">Photo of workmate</string>
-    <string name="workmate_icon">Workmate icon</string>
-    <string name="stars">stars</string>
-    <string name="search_icon">search icon</string>
-    <string name="mic_icon">mic icon</string>
+    <string name="business_lunch" translatable="false">Business lunch</string>
+    <string name="hot_food_in_a_bowl" translatable="false">Hot food in a bowl</string>
+    <string name="photo_profile" translatable="false">Photo profile</string>
+    <string name="restaurant_photo" translatable="false">Photo of the restaurant</string>
+    <string name="primary_color" translatable="false">Primary color</string>
+    <string name="workmate_photo" translatable="false">Photo of workmate</string>
+    <string name="workmate_icon" translatable="false">Workmate icon</string>
+    <string name="stars" translatable="false">stars</string>
+    <string name="search_icon" translatable="false">search icon</string>
+    <string name="mic_icon" translatable="false">mic icon</string>
 
     <!-- Notifications -->
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="time_to_eat">"It's time to eat"</string>
-    <string name="message_from_firebase">Message from Firebase</string>
+    <string name="message_from_firebase" translatable="false">Message from Firebase</string>
     <string name="notification">You chose to eat at %1$s at %2$s with %3$s.</string>
     <string name="notification_alone">You chose to eat at %1$s at %2$s, sorry you\'re alone&#8230;</string>
 
