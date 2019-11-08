@@ -20,19 +20,26 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantViewHo
 
     // Declaring callback
     private final Listener callback;
+    private final DataToSort dataToSort;
 
     // For data
     private List<Place> placeList = new ArrayList<>();
     private LatLng latLng;
 
-    public RestaurantListAdapter(LatLng latLng, Listener callback) {
+    public RestaurantListAdapter(LatLng latLng, Listener callback, DataToSort dataToSort) {
         this.latLng = latLng;
         this.callback = callback;
+        this.dataToSort = dataToSort;
     }
 
     // Create interface for callback
     public interface Listener {
         void onClickItem(int position);
+    }
+
+    // Create interface for data to sort
+    public interface DataToSort {
+        void onSortItem(Place place, Integer proximity, Integer rating, Integer numberWorkmates);
     }
 
     @NonNull
@@ -48,7 +55,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantViewHo
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantViewHolder holder, int position) {
-        holder.updateViewHolder(this.placeList.get(position), this.latLng, this.callback);
+        holder.updateViewHolder(this.placeList.get(position), this.latLng, this.callback, this.dataToSort);
     }
 
     @Override

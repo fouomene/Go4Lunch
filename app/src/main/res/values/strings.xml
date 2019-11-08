@@ -90,6 +90,7 @@
     <string name="stars" translatable="false">stars</string>
     <string name="search_icon" translatable="false">search icon</string>
     <string name="mic_icon" translatable="false">mic icon</string>
+    <string name="sort_icon" translatable="false">sort icon</string>
 
     <!-- Notifications -->
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>

@@ -220,14 +220,17 @@ public class MainActivity extends AppCompatActivity
                 case R.id.nav_map:
                     selectedFragment = restaurantMapFragment;
                     setTitle(getString(R.string.hungry));
+                    resetToolbarUI();
                     break;
                 case R.id.nav_list:
                     selectedFragment = restaurantListFragment;
                     setTitle(getString(R.string.hungry));
+                    resetToolbarUI();
                     break;
                 case R.id.nav_workmates:
                     selectedFragment = new WorkmatesFragment();
                     setTitle(getString(R.string.available_workmates));
+                    resetToolbarUI();
                     break;
             }
             // Add it to FrameLayout fragment_container
@@ -235,6 +238,21 @@ public class MainActivity extends AppCompatActivity
                     selectedFragment).commit();
             return true;
         });
+    }
+
+    private void resetToolbarUI() {
+        // Close the searchView if it's open when change fragment
+        if (!searchView.isIconified()) {
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+            // Set the search icon item
+            if (item != null) {
+                item.setVisible(true);
+            }
+            // Set toggle and cardView
+            toggle.setDrawerIndicatorEnabled(true);
+            cardView.setVisibility(View.GONE);
+        }
     }
 
     //----------------------------------------------------------------------------------
@@ -341,7 +359,8 @@ public class MainActivity extends AppCompatActivity
     // Easy Permissions
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // Forward results to EasyPermissions
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);

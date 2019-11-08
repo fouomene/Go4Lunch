@@ -153,7 +153,7 @@ public class ConvertData {
     public void updateRating(Place place, ImageView firstStar, ImageView secondStar, ImageView thirdStar) {
         //The place's rating, from 1.0 to 5.0, based on aggregated user reviews.
         if (place.getRating() != null) {
-            if (place.getRating() >= 2.5 && place.getRating() < 3) {
+            if (place.getRating() > 2 && place.getRating() < 3) {
                 firstStar.setVisibility(View.VISIBLE);
             }
             if (place.getRating() >= 3 && place.getRating() < 4) {

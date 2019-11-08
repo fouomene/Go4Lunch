@@ -39,6 +39,11 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     private ImageView restaurantImage, workmate_ic, firstStar, secondStar, thirdStar;
     private Context context;
 
+    // To sort data
+    private int proximity;
+    private int rating;
+    private int numberWorkmates;
+
     // Firestore
     private ListenerRegistration registration;
 
@@ -63,7 +68,8 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback) {
+    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback,
+                                 RestaurantListAdapter.DataToSort dataToSort) {
         // Update Place widgets
         name.setText(place.getName());
 
@@ -88,8 +94,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
         // Update others widgets
         if (place.getLatLng() != null && latLng != null) {
-            distance.setText(context.getString(R.string.distance, convertData.distanceCalculation
-                    (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude)));
+            proximity = convertData.distanceCalculation
+                    (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude);
+            distance.setText(context.getString(R.string.distance, proximity));
         }
 
         // By default, number of workmates is empty
@@ -107,9 +114,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
             }
             // Display the icon with the number of workmates
             if (snapshots != null && !snapshots.isEmpty()) {
+                numberWorkmates = snapshots.size();
                 workmate_ic.setVisibility(View.VISIBLE);
-                workmates.setText(context.getString(R.string.number_of_workmates,
-                        snapshots.size()));
+                workmates.setText(context.getString(R.string.number_of_workmates, numberWorkmates));
             }
             // Or display anything if the list is empty
             if (snapshots != null && snapshots.isEmpty()) {
@@ -125,6 +132,14 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         this.callbackWeakRef = new WeakReference<>(callback);
         // Implement Listener
         itemView.setOnClickListener(this);
+
+        // Get rating
+        if (place.getRating() != null) {
+            double d = place.getRating();
+            rating = (int) d;
+        }
+
+        dataToSort.onSortItem(place, proximity, rating, numberWorkmates);
     }
 
     @Override
