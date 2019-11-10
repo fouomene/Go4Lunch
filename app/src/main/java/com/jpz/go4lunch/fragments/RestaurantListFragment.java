@@ -51,7 +51,7 @@ public class RestaurantListFragment extends Fragment
     private ArrayList<String> placesId;
 
     // List of data to sort
-    private ArrayList<RestaurantDataToSort> placesToSort = new ArrayList<>();
+    private ArrayList<RestaurantDataToSort> placesToSort;
 
     // Utils
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
@@ -88,6 +88,8 @@ public class RestaurantListFragment extends Fragment
 
         // If there is a request from autocomplete, fetch a placeDetails
         if (placesId != null) {
+            // Reset the list of data to sort
+            placesToSort = new ArrayList<>();
             // Clear the placeList before use it in the onPlaceDetailsFetch
             placeList.clear();
             if (placesId.isEmpty()) {
@@ -103,6 +105,8 @@ public class RestaurantListFragment extends Fragment
             }
             // Else fetch findCurrentPlace then findDetailsPlace
         } else {
+            // Reset the list of data to sort
+            placesToSort = new ArrayList<>();
             // Add the CurrentPlacesListener in the list of listeners from CurrentPlace Singleton...
             CurrentPlace.getInstance(getActivity()).addListener(this);
             // ...to allow fetching places in the method below :
