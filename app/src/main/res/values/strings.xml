@@ -63,6 +63,9 @@
     <string name="hungry">"I'm Hungry!"</string>
     <string name="available_workmates">Available Workmates</string>
     <string name="search_restaurants">Search restaurants</string>
+    <string name="sort_by_proximity">Sort by proximity</string>
+    <string name="sort_by_rating">Sort by rating</string>
+    <string name="sort_by_number_workmates">Sort by workmates</string>
 
     <!--NavigationDrawer -->
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>

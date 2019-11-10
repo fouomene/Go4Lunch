@@ -84,40 +84,4 @@ public class Workmate {
         return restaurantsLikedId;
     }
 
-    // Setters
-
-    /*
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setUrlPicture(@Nullable String urlPicture) {
-        this.urlPicture = urlPicture;
-    }
-
-    public void setRestaurantId(@Nullable String restaurantId) {
-        this.restaurantId = restaurantId;
-    }
-
-    public void setRestaurantName(@Nullable String restaurantName) {
-        this.restaurantName = restaurantName;
-    }
-
-    public void setRestaurantAddress(@Nullable String restaurantAddress) {
-        this.restaurantAddress = restaurantAddress;
-    }
-
-    public void setRestaurantDate(@Nullable String restaurantDate) {
-        this.restaurantDate = restaurantDate;
-    }
-
-    public void setRestaurantsLikedId(@Nullable List<String> restaurantsLikedId) {
-        this.restaurantsLikedId = restaurantsLikedId;
-    }
-
-     */
 }

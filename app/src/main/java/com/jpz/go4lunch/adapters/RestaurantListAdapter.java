@@ -19,27 +19,27 @@ import java.util.List;
 public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantViewHolder> {
 
     // Declaring callback
-    private final Listener callback;
+    private final ClickListener callback;
     private final DataToSort dataToSort;
 
     // For data
     private List<Place> placeList = new ArrayList<>();
     private LatLng latLng;
 
-    public RestaurantListAdapter(LatLng latLng, Listener callback, DataToSort dataToSort) {
+    public RestaurantListAdapter(LatLng latLng, ClickListener callback, DataToSort dataToSort) {
         this.latLng = latLng;
         this.callback = callback;
         this.dataToSort = dataToSort;
     }
 
-    // Create interface for callback
-    public interface Listener {
+    // Create an interface for callback
+    public interface ClickListener {
         void onClickItem(int position);
     }
 
-    // Create interface for data to sort
+    // Create an interface for data to sort
     public interface DataToSort {
-        void onSortItem(Place place, Integer proximity, Integer rating, Integer numberWorkmates);
+        void onSortItem(Place place, int proximity, double rating, int numberWorkmates);
     }
 
     @NonNull

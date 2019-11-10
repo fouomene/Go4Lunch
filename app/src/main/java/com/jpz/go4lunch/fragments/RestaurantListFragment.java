@@ -20,12 +20,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.RestaurantListAdapter;
+import com.jpz.go4lunch.models.RestaurantDataToSort;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.CurrentPlace;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.jpz.go4lunch.activities.MainActivity.LAT_LNG_BUNDLE_KEY;
@@ -36,7 +36,7 @@ import static com.jpz.go4lunch.activities.MainActivity.PLACES_ID_BUNDLE_KEY;
  * A simple {@link Fragment} subclass.
  */
 public class RestaurantListFragment extends Fragment
-        implements RestaurantListAdapter.Listener, RestaurantListAdapter.DataToSort,
+        implements RestaurantListAdapter.ClickListener, RestaurantListAdapter.DataToSort,
         CurrentPlace.CurrentPlacesListener, CurrentPlace.PlaceDetailsListener {
 
     // Declare View, Adapter & a LatLng
@@ -51,10 +51,11 @@ public class RestaurantListFragment extends Fragment
     private ArrayList<String> placesId;
 
     // List of data to sort
-    private ArrayList<RestaurantData> placesToSort = new ArrayList<>();
+    private ArrayList<RestaurantDataToSort> placesToSort = new ArrayList<>();
 
     // Utils
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
+    private ConvertData convertData = new ConvertData();
 
     private static final String TAG = RestaurantListFragment.class.getSimpleName();
 
@@ -121,28 +122,25 @@ public class RestaurantListFragment extends Fragment
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    // Specific menu in toolbar for this fragment, used to sort restaurants.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //this.item = item;
-        // Handle action on menu items
-        if (item.getItemId() == R.id.menu_toolbar_test) {
-            //Toast.makeText(getActivity(), "TEST", Toast.LENGTH_SHORT).show();
-            List<Place> listSorted = new ArrayList<>();
-
-            if (!placesToSort.isEmpty()) {
-                //restaurantListAdapter.notifyItemRangeRemoved(0, placesToSort.size());
-                Log.w(TAG, "placesToSort size = " + placesToSort.size());
-                sortByProximity(placesToSort);
-
-                // Update UI with the list to sort
-                for (RestaurantData restaurantData : placesToSort) {
-                    listSorted.add(restaurantData.getPlace());
-                }
-                updateUI(listSorted);
-                // Clear the placesToSort in case of reuse it
-                placesToSort.clear();
-            }
-            return true;
+        // Create a sorted list for output
+        List<Place> sortedList;
+        // Sort the list
+        switch (item.getItemId()) {
+            case R.id.sub_item_proximity:
+                sortedList = new ArrayList<>();
+                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_proximity);
+                break;
+            case R.id.sub_item_rating:
+                sortedList = new ArrayList<>();
+                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_rating);
+                break;
+            case R.id.sub_item_number_workmates:
+                sortedList = new ArrayList<>();
+                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_number_workmates);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -209,96 +207,58 @@ public class RestaurantListFragment extends Fragment
 
     //----------------------------------------------------------------------------------
 
-
+    // Use the Interface DataToSort to retrieve data to sort
     @Override
-    public void onSortItem(Place place, Integer proximity, Integer rating, Integer numberWorkmates) {
+    public void onSortItem(Place place, int proximity, double rating, int numberWorkmates) {
+        Log.i(TAG, "placeName = " + place.getName());
 
-        Log.w(TAG, "placeName = " + place.getName());
+        RestaurantDataToSort restaurantData =
+                new RestaurantDataToSort(place, proximity, rating, numberWorkmates);
+        boolean isEqual = false;
 
-        //RestaurantData restaurantData = new RestaurantData(place, proximity, rating, numberWorkmates);
-        RestaurantData restaurantData = new RestaurantData();
-        restaurantData.setPlace(place);
-        restaurantData.setProximity(proximity);
-        restaurantData.setRating(rating);
-        restaurantData.setNumberWorkmates(numberWorkmates);
-
-        boolean isTheSame = false;
-
+        // Check if there is already the same restaurantDataToSort in the list to sort
         if (!placesToSort.isEmpty()) {
-            for (RestaurantData data : placesToSort) {
-                Log.w(TAG, "In LOOP placeName = " + data.getPlace().getName());
-                if (data.getPlace().getId() != null && restaurantData.getPlace().getId() != null) {
-                    if (data.getPlace().getId().equals(restaurantData.getPlace().getId())) {
-                        isTheSame = true;
+            for (RestaurantDataToSort dataToSort : placesToSort) {
+                Log.i(TAG, "In LOOP placeName = " + dataToSort.getPlace().getName());
+                if (dataToSort.getPlace().getId() != null && restaurantData.getPlace().getId() != null) {
+                    if (dataToSort.getPlace().getId().equals(restaurantData.getPlace().getId())) {
+                        isEqual = true;
                     }
                 }
             }
         }
-        if (!isTheSame) {
+        if (!isEqual) {
             placesToSort.add(restaurantData);
         }
     }
 
-    private void sortByProximity(List<RestaurantData> restaurantDataList) {
+    //----------------------------------------------------------------------------------
 
-        Collections.sort(restaurantDataList, (o1, o2) -> {
-            if (o1.getProximity().equals(o2.getProximity())) {
-                return 0;
+    // Final method to sort restaurants and update UI
+    private void sortRestaurantsAndUpdateUI(ArrayList<RestaurantDataToSort> placesToSort,
+                                            List<Place> listSorted, int itemId) {
+        // Assign a sorting method based on the user's choice
+        if (!placesToSort.isEmpty()) {
+            Log.i(TAG, "placesToSort size = " + placesToSort.size());
+            switch (itemId) {
+                case R.id.sub_item_proximity:
+                    convertData.sortByProximity(placesToSort);
+                    break;
+                case R.id.sub_item_rating:
+                    convertData.sortByRating(placesToSort);
+                    break;
+                case R.id.sub_item_number_workmates:
+                    convertData.sortByNumberWorkmates(placesToSort);
+                    break;
             }
-            return o1.getProximity().compareTo(o2.getProximity());
-        });
-    }
-
-    private class RestaurantData {
-        // Data to sort the list of restaurants
-
-        private Place place;
-        private Integer proximity;
-        private Integer rating;
-        private Integer numberWorkmates;
-
-        /*
-        public RestaurantData(Place place, int proximity, double rating, int numberWorkmates) {
-            this.place = place;
-            this.proximity = proximity;
-            this.rating = rating;
-            this.numberWorkmates = numberWorkmates;
+            // Update UI with the list to sort
+            for (RestaurantDataToSort restaurantData : placesToSort) {
+                listSorted.add(restaurantData.getPlace());
+            }
+            updateUI(listSorted);
+            // Clear the placesToSort in case of reuse it
+            placesToSort.clear();
         }
-         */
-
-
-        private Place getPlace() {
-            return place;
-        }
-
-        private Integer getProximity() {
-            return proximity;
-        }
-
-        private Integer getRating() {
-            return rating;
-        }
-
-        private Integer getNumberWorkmates() {
-            return numberWorkmates;
-        }
-
-        private void setPlace(Place place) {
-            this.place = place;
-        }
-
-        private void setProximity(int proximity) {
-            this.proximity = proximity;
-        }
-
-        private void setRating(int rating) {
-            this.rating = rating;
-        }
-
-        private void setNumberWorkmates(int numberWorkmates) {
-            this.numberWorkmates = numberWorkmates;
-        }
-
     }
 
 }

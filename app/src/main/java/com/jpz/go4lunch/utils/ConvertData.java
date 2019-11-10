@@ -10,16 +10,21 @@ import com.google.android.libraries.places.api.model.Period;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.snackbar.Snackbar;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.models.RestaurantDataToSort;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ConvertData {
     // Class to convert data from Places SDK or Firestore and use its for UI purpose
+
+    private static final String TAG = ConvertData.class.getSimpleName();
 
     // Format the address with the components
     public String getAddress(Place place) {
@@ -151,9 +156,13 @@ public class ConvertData {
 
     // Update rating and attribute stars
     public void updateRating(Place place, ImageView firstStar, ImageView secondStar, ImageView thirdStar) {
+        // Reset the stars in the item view before assigning rating
+        firstStar.setVisibility(View.GONE);
+        secondStar.setVisibility(View.GONE);
+        thirdStar.setVisibility(View.GONE);
         //The place's rating, from 1.0 to 5.0, based on aggregated user reviews.
         if (place.getRating() != null) {
-            if (place.getRating() > 2 && place.getRating() < 3) {
+            if (place.getRating() > 2.5 && place.getRating() < 3) {
                 firstStar.setVisibility(View.VISIBLE);
             }
             if (place.getRating() >= 3 && place.getRating() < 4) {
@@ -206,4 +215,41 @@ public class ConvertData {
         Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
+
+    //----------------------------------------------------------------------------------
+    // Methods to sort data of restaurants in function of the user's choice
+
+    public void sortByProximity(List<RestaurantDataToSort> restaurantDataList) {
+        Collections.sort(restaurantDataList, (o1, o2) -> {
+            //if (o1.getProximity().equals(o2.getProximity())) {
+            if (Objects.equals(o1.getProximity(), o2.getProximity())) {
+                return 0;
+            }
+            //return o1.getProximity().compareTo(o2.getProximity());
+            return Objects.compare(o1.getProximity(), o2.getProximity(), Integer::compareTo);
+        });
+    }
+
+    public void sortByRating(List<RestaurantDataToSort> restaurantDataList) {
+        Collections.sort(restaurantDataList, (o1, o2) -> {
+            if (Objects.equals(o1.getRating(), o2.getRating())) {
+                return 0;
+            }
+            // Compare in descending order
+            return Objects.compare(o2.getRating(), o1.getRating(), Double::compareTo);
+        });
+    }
+
+    public void sortByNumberWorkmates(List<RestaurantDataToSort> restaurantDataList) {
+        Collections.sort(restaurantDataList, (o1, o2) -> {
+            if (Objects.equals(o1.getNumberWorkmates(), o2.getNumberWorkmates())) {
+                return 0;
+            }
+            // Compare in descending order
+            return Objects.compare(o2.getNumberWorkmates(), o1.getNumberWorkmates(), Integer::compareTo);
+        });
+    }
+
+    //----------------------------------------------------------------------------------
+
 }

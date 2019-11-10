@@ -41,14 +41,13 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
 
     // To sort data
     private int proximity;
-    private int rating;
-    private int numberWorkmates;
+    private double rating;
 
     // Firestore
     private ListenerRegistration registration;
 
     // Declare a Weak Reference to our Callback
-    private WeakReference<RestaurantListAdapter.Listener> callbackWeakRef;
+    private WeakReference<RestaurantListAdapter.ClickListener> callbackWeakRef;
 
     private static final String TAG = RestaurantViewHolder.class.getSimpleName();
 
@@ -68,12 +67,18 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.Listener callback,
+    public void updateViewHolder(Place place, LatLng latLng, RestaurantListAdapter.ClickListener callback,
                                  RestaurantListAdapter.DataToSort dataToSort) {
         // Update Place widgets
+        // Restaurant Name
         name.setText(place.getName());
 
+        // Restaurant Hours
         hours.setText(convertData.openingHours(place, context));
+
+        // Set style by default
+        hours.setTextColor(context.getResources().getColor(android.R.color.tab_indicator_text));
+        hours.setTypeface(null);
         // Set style for english or french data
         if (convertData.openingHours(place, context).contains("Clos")
                 || convertData.openingHours(place, context).contains("Ferm")) {
@@ -85,6 +90,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
             hours.setTypeface(null, Typeface.ITALIC);
         }
 
+        // Restaurant Address
         address.setText(convertData.getAddress(place));
 
         // Use findPhotoPlace method to retrieve the photo of the restaurant
@@ -93,6 +99,7 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         // Update others widgets
+        // Distance from the Restaurant
         if (place.getLatLng() != null && latLng != null) {
             proximity = convertData.distanceCalculation
                     (latLng.latitude, latLng.longitude, place.getLatLng().latitude, place.getLatLng().longitude);
@@ -108,6 +115,9 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
                 .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate());
 
         registration = query.addSnapshotListener((snapshots, e) -> {
+            // To sort the number of workmates in the query
+            int numberWorkmates = 0;
+
             if (e != null) {
                 Log.w(TAG, "listen:error", e);
                 return;
@@ -123,6 +133,17 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
                 workmate_ic.setVisibility(View.INVISIBLE);
                 workmates.setText("");
             }
+
+            //-----------------
+            // Fetch Data to sort
+            // Get rating
+            if (place.getRating() != null) {
+                rating = place.getRating();
+            }
+            Log.i(TAG, place.getName() + " // numberWorkmates = " + numberWorkmates);
+            dataToSort.onSortItem(place, proximity, rating, numberWorkmates);
+            //-----------------
+
         });
 
         // Update rating and display stars
@@ -132,20 +153,12 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         this.callbackWeakRef = new WeakReference<>(callback);
         // Implement Listener
         itemView.setOnClickListener(this);
-
-        // Get rating
-        if (place.getRating() != null) {
-            double d = place.getRating();
-            rating = (int) d;
-        }
-
-        dataToSort.onSortItem(place, proximity, rating, numberWorkmates);
     }
 
     @Override
     public void onClick(View v) {
         // When a click happens, we fire our listener to get the item position in the list
-        RestaurantListAdapter.Listener callback = callbackWeakRef.get();
+        RestaurantListAdapter.ClickListener callback = callbackWeakRef.get();
         if (callback != null) callback.onClickItem(getAdapterPosition());
     }
 

@@ -7,6 +7,19 @@
         android:icon="@drawable/ic_sort"
         app:showAsAction="ifRoom"
         android:title="@string/sort_icon">
+
+        <menu>
+            <item
+                android:id="@+id/sub_item_proximity"
+                android:title="@string/sort_by_proximity" />
+            <item
+                android:id="@+id/sub_item_rating"
+                android:title="@string/sort_by_rating" />
+            <item
+                android:id="@+id/sub_item_number_workmates"
+                android:title="@string/sort_by_number_workmates" />
+        </menu>
+
     </item>
 
 </menu>

@@ -45,4 +45,7 @@
     <string name="website">SITE WEB</string>
     <string name="search_restaurants">Recherche de restaurants</string>
     <string name="warning">ATTENTION !</string>
+    <string name="sort_by_number_workmates">Trier par collègues</string>
+    <string name="sort_by_proximity">Trier par proximité</string>
+    <string name="sort_by_rating">Trier par étoiles</string>
 </resources>
