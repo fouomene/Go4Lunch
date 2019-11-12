@@ -7,26 +7,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.SetOptions;
 import com.jpz.go4lunch.models.Workmate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WorkmateHelper {
 
     private static final String COLLECTION_NAME = "workmates";
-    private static final String FIELD_ID = "id";
     public static final String FIELD_USERNAME = "username";
-    private static final String FIELD_URLPICTURE = "urlPicture";
     public static final String FIELD_RESTAURANT_ID = "restaurantId";
     private static final String FIELD_RESTAURANT_NAME = "restaurantName";
     private static final String FIELD_RESTAURANT_ADDRESS = "restaurantAddress";
     public static final String FIELD_RESTAURANT_DATE = "restaurantDate";
     private static final String FIELD_RESTAURANTS_LIKED = "restaurantsLikedId";
-
-    private static final String TAG = WorkmateHelper.class.getSimpleName();
 
     // --- COLLECTION REFERENCE ---
 
@@ -36,6 +29,7 @@ public class WorkmateHelper {
 
     // --- CREATE ---
 
+    @SuppressWarnings("UnusedReturnValue")
     public static Task<Void> createWorkmate(String id, String username, String urlPicture, String restaurantId,
                                             String restaurantName, String restaurantAddress,
                                             String restaurantDate, List<String> restaurantsLikedId) {
@@ -50,26 +44,9 @@ public class WorkmateHelper {
         documentReference.update(FIELD_RESTAURANTS_LIKED, FieldValue.arrayUnion(restaurantId));
     }
 
-    // Method used to update or create a workmate without deleting the selectedPlace
-    public void setUsernamePhotoWithMerge(String id, String username, String urlPicture) {
-        // Update id, username and urlPicture fields, creating the document if it does not already exist.
-        Map<String, Object> dataId = new HashMap<>();
-        Map<String, Object> dataUsername = new HashMap<>();
-        Map<String, Object> dataUrlPicture = new HashMap<>();
-        // Update id
-        dataUsername.put(FIELD_ID, id);
-        getWorkmatesCollection().document(id).set(dataId, SetOptions.merge());
-        // Update username
-        dataUsername.put(FIELD_USERNAME, username);
-        getWorkmatesCollection().document(id).set(dataUsername, SetOptions.merge());
-        // Update urlPicture
-        dataUrlPicture.put(FIELD_URLPICTURE, urlPicture);
-        getWorkmatesCollection().document(id).set(dataUrlPicture, SetOptions.merge());
-    }
-
     // --- QUERY ---
 
-    // Retrieve all workmates and class them especially by a restaurant choice for WorkmatesFragment
+    // Retrieve all workmates and order them especially by restaurant date and choice in WorkmatesFragment
     public static Query getAllWorkmates() {
         return getWorkmatesCollection()
                 .orderBy(FIELD_RESTAURANT_DATE, Query.Direction.DESCENDING)
@@ -90,8 +67,6 @@ public class WorkmateHelper {
     public static Task<DocumentSnapshot> getCurrentWorkmate(String id) {
         return getWorkmatesCollection().document(id).get();
     }
-
-    // --- LISTENER ---
 
     // --- UPDATE ---
 

@@ -28,9 +28,6 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
     // Utils
     private ConvertData convertData = new ConvertData();
 
-    // Declare a Weak Reference to our Callback
-    private WeakReference<WorkmatesAdapter.Listener> callbackWeakRef;
-
     private Context context;
 
     public WorkmateViewHolder(@NonNull View itemView) {
@@ -40,10 +37,11 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         context = itemView.getContext();
     }
 
-    public void updateViewHolder(Workmate workmate, RequestManager glide, WorkmatesAdapter.Listener callback){
+    public void updateViewHolder(Workmate workmate, RequestManager glide, WorkmatesAdapter.Listener callback) {
         // Update text
         if (workmate.getRestaurantId() != null && convertData.getTodayDate().equals(workmate.getRestaurantDate())) {
             textView.setTextColor(context.getResources().getColor(android.R.color.black));
+            textView.setTypeface(null);
             textView.setText(context.getString(R.string.workmate_has_a_restaurant_choice,
                     workmate.getUsername(), workmate.getRestaurantName()));
         } else {
@@ -61,15 +59,18 @@ public class WorkmateViewHolder extends RecyclerView.ViewHolder {
         }
 
         // Create a new weak Reference to our Listener
-        this.callbackWeakRef = new WeakReference<>(callback);
+        WeakReference<WorkmatesAdapter.Listener> callbackWeakRef = new WeakReference<>(callback);
+        callback = callbackWeakRef.get();
+
+        // Redefine callback to use it with lambda
+        WorkmatesAdapter.Listener finalCallback = callback;
         // Implement Listener
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // When a click happens, we fire our listener to get the item position in the list
-                WorkmatesAdapter.Listener callback = callbackWeakRef.get();
-                if (callback != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
-                    callback.onClickItem(workmate.getRestaurantId(), getAdapterPosition());
+        itemView.setOnClickListener(v -> {
+            // When a click happens, we fire our listener to get the item position in the list
+            //callback = callbackWeakRef.get();
+            if (finalCallback != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                if (convertData.getTodayDate().equals(workmate.getRestaurantDate())) {
+                    finalCallback.onClickItem(workmate.getRestaurantId(), getAdapterPosition());
                 }
             }
         });

@@ -73,7 +73,7 @@
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="settings">SETTINGS</string>
     <string name="log_out">LOGOUT</string>
-    <string name="you_have_not_chosen">"You haven't decide yet"</string>
+    <string name="you_did_not_choose">You did not choose a restaurant.</string>
     <string name="info_no_email_found">No email found</string>
     <string name="info_no_username_found">No username found</string>
 

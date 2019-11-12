@@ -32,8 +32,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.jpz.go4lunch.R;
-import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.utils.FirebaseUtils;
+
+import static com.jpz.go4lunch.api.WorkmateHelper.createWorkmate;
 
 public class ConnectionActivity extends AppCompatActivity {
 
@@ -56,6 +57,8 @@ public class ConnectionActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     // For Google SignIn
     private GoogleSignInClient googleSignInClient;
+
+    private static final String TAG = ConnectionActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +131,7 @@ public class ConnectionActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null), then if that is the case start MainActivity
-        Log.i("Tag", "user logged = " + firebaseUtils.isCurrentUserLogged());
+        Log.i(TAG, "user logged = " + firebaseUtils.isCurrentUserLogged());
         if (firebaseUtils.isCurrentUserLogged()) {
             startMainActivity();
             finish();
@@ -138,7 +141,7 @@ public class ConnectionActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("Tag", "onActivityResult : " + requestCode + ":" + resultCode + ":" + data);
+        Log.i(TAG, "onActivityResult : " + requestCode + ":" + resultCode + ":" + data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -276,7 +279,7 @@ public class ConnectionActivity extends AppCompatActivity {
             String urlPicture = (firebaseUtils.getCurrentUser().getPhotoUrl() != null) ?
                     firebaseUtils.getCurrentUser().getPhotoUrl().toString() : null;
             // Set data. By default restaurantId, restaurantName, restaurantAddress and restaurantsLikedId are null.
-            WorkmateHelper.createWorkmate(id, username, urlPicture, null, null, null, null, null);
+            createWorkmate(id, username, urlPicture, null, null, null, null, null);
         }
     }
 

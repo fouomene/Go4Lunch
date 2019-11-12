@@ -20,7 +20,6 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.adapters.WorkmatesAdapter;
 import com.jpz.go4lunch.api.WorkmateHelper;
 import com.jpz.go4lunch.models.Workmate;
-import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 /**
@@ -33,7 +32,6 @@ public class WorkmatesFragment extends Fragment implements WorkmatesAdapter.List
     private WorkmatesAdapter workmatesAdapter;
 
     // Utils
-    private ConvertData convertData = new ConvertData();
     private MyUtilsNavigation utilsNavigation = new MyUtilsNavigation();
 
     private static final String TAG = WorkmatesFragment.class.getSimpleName();

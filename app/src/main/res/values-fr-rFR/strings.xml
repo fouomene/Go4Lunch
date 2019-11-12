@@ -36,11 +36,10 @@
     <string name="settings">PARAMETRES</string>
     <string name="sign_in_cancelled">Connexion en cours annulée</string>
     <string name="time_to_eat">C\'est l\'heure de manger</string>
-    <string name="warning_delete">ATTENTION ! Cette opération va supprimer votre compte !</string>
+    <string name="warning_delete">Cette opération va supprimer votre compte !</string>
     <string name="workmate_has_a_restaurant_choice">%1$s va déjeuner à %2$s</string>
     <string name="workmate_has_not_a_restaurant_choice">%1$s n\'a pas encore décidé</string>
     <string name="workmate_is_joining">%1$s est de la partie !</string>
-    <string name="you_have_not_chosen">Vous n\'avez pas encore décidé</string>
     <string name="your_lunch">VOTRE DEJEUNER</string>
     <string name="website">SITE WEB</string>
     <string name="search_restaurants">Recherche de restaurants</string>
@@ -48,4 +47,5 @@
     <string name="sort_by_number_workmates">Trier par collègues</string>
     <string name="sort_by_proximity">Trier par proximité</string>
     <string name="sort_by_rating">Trier par étoiles</string>
+    <string name="you_did_not_choose">Vous n\'avez pas choisi de restaurant.</string>
 </resources>

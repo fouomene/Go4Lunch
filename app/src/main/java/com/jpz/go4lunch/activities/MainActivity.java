@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity
                                     // If there is no restaurant choice, display a message
                                 } else {
                                     Toast.makeText(MainActivity.this,
-                                            getString(R.string.you_have_not_chosen), Toast.LENGTH_SHORT).show();
+                                            getString(R.string.you_did_not_choose), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
