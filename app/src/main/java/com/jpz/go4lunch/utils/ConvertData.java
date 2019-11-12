@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.DayOfWeek;
 import com.google.android.libraries.places.api.model.Period;
@@ -85,7 +87,8 @@ public class ConvertData {
     }
 
     // Calculate the open and close hours and manage UI
-    private String getOpenCloseHours(List<Period> periodList, Context context) {
+    @VisibleForTesting()
+    public String getOpenCloseHours(List<Period> periodList, Context context) {
         String openingHours;
         int closeMinuteUI = 0;
         int closeHourUI = 0;
