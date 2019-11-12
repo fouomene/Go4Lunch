@@ -30,11 +30,11 @@
         app:layout_constraintGuide_percent="0.7"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/details_guideline_eighty"
+        android:id="@+id/details_guideline_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8"/>
+        app:layout_constraintGuide_percent="0.75"/>
 
     <ImageView
         android:id="@+id/details_image_restaurant"
@@ -110,7 +110,7 @@
         app:srcCompat="@drawable/ic_star_gold"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/details_second_star"
-        app:layout_constraintEnd_toStartOf="@+id/details_guideline_eighty"
+        app:layout_constraintEnd_toStartOf="@+id/details_guideline_vertical"
         app:layout_constraintTop_toBottomOf="@+id/details_guideline_forty"
         app:layout_constraintBottom_toTopOf="@+id/details_address"
         android:contentDescription="@string/stars"/>

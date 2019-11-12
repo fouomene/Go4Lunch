@@ -2,9 +2,9 @@ package com.jpz.go4lunch.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -166,11 +166,11 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         }
         // Update fab UI according to this choice
         if (fabIsChecked) {
-            floatingActionButton.setImageDrawable(ContextCompat
-                    .getDrawable(getApplicationContext(), R.drawable.ic_check_circle));
+            floatingActionButton.setImageDrawable(VectorDrawableCompat.create(getResources(),
+                    R.drawable.ic_check_circle, null));
         } else {
-            floatingActionButton.setImageDrawable(ContextCompat
-                    .getDrawable(getApplicationContext(), R.drawable.ic_highlight_off));
+            floatingActionButton.setImageDrawable(VectorDrawableCompat.create(getResources(),
+                    R.drawable.ic_highlight_off, null));
         }
     }
 
@@ -178,13 +178,13 @@ public class DetailsRestaurantActivity extends AppCompatActivity
         // Listen to the user choice when click on the floatingActionButton
         floatingActionButton.setOnClickListener((View v) -> {
             if (!fabIsChecked) {
-                floatingActionButton.setImageDrawable(ContextCompat
-                        .getDrawable(this, R.drawable.ic_check_circle));
+                floatingActionButton.setImageDrawable(VectorDrawableCompat.create(getResources(),
+                        R.drawable.ic_check_circle, null));
                 chooseRestaurant(place);
                 fabIsChecked = true;
             } else {
-                floatingActionButton.setImageDrawable(ContextCompat
-                        .getDrawable(this, R.drawable.ic_highlight_off));
+                floatingActionButton.setImageDrawable(VectorDrawableCompat.create(getResources(),
+                        R.drawable.ic_highlight_off, null));
                 deleteRestaurantChoice();
                 fabIsChecked = false;
             }

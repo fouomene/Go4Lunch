@@ -128,24 +128,32 @@ public class RestaurantListFragment extends Fragment
 
     // Specific menu in toolbar for this fragment, used to sort restaurants.
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Create a sorted list for output
-        List<Place> sortedList;
-        // Sort the list
-        switch (item.getItemId()) {
-            case R.id.sub_item_proximity:
-                sortedList = new ArrayList<>();
-                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_proximity);
-                break;
-            case R.id.sub_item_rating:
-                sortedList = new ArrayList<>();
-                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_rating);
-                break;
-            case R.id.sub_item_number_workmates:
-                sortedList = new ArrayList<>();
-                sortRestaurantsAndUpdateUI(placesToSort, sortedList, R.id.sub_item_number_workmates);
-                break;
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Assign a sorting method based on the user's choice
+        if (!placesToSort.isEmpty()) {
+            Log.i(TAG, "placesToSort size = " + placesToSort.size());
+            // Sort the list
+            switch (item.getItemId()) {
+                case R.id.sub_item_proximity:
+                    convertData.sortByProximity(placesToSort);
+                    break;
+                case R.id.sub_item_rating:
+                    convertData.sortByRating(placesToSort);
+                    break;
+                case R.id.sub_item_number_workmates:
+                    convertData.sortByNumberWorkmates(placesToSort);
+                    break;
+            }
         }
+        // Create a sorted list for output
+        List<Place> listSorted = new ArrayList<>();
+        // Update UI with the list to sort
+        for (RestaurantDataToSort restaurantData : placesToSort) {
+            listSorted.add(restaurantData.getPlace());
+        }
+        updateUI(listSorted);
+        // Clear the placesToSort in case of reuse it
+        placesToSort.clear();
         return super.onOptionsItemSelected(item);
     }
 
@@ -214,8 +222,6 @@ public class RestaurantListFragment extends Fragment
     // Use the Interface DataToSort to retrieve data to sort
     @Override
     public void onSortItem(Place place, int proximity, double rating, int numberWorkmates) {
-        Log.i(TAG, "placeName = " + place.getName());
-
         RestaurantDataToSort restaurantData =
                 new RestaurantDataToSort(place, proximity, rating, numberWorkmates);
         boolean isEqual = false;
@@ -223,7 +229,6 @@ public class RestaurantListFragment extends Fragment
         // Check if there is already the same restaurantDataToSort in the list to sort
         if (!placesToSort.isEmpty()) {
             for (RestaurantDataToSort dataToSort : placesToSort) {
-                Log.i(TAG, "In LOOP placeName = " + dataToSort.getPlace().getName());
                 if (dataToSort.getPlace().getId() != null && restaurantData.getPlace().getId() != null) {
                     if (dataToSort.getPlace().getId().equals(restaurantData.getPlace().getId())) {
                         isEqual = true;
@@ -233,35 +238,6 @@ public class RestaurantListFragment extends Fragment
         }
         if (!isEqual) {
             placesToSort.add(restaurantData);
-        }
-    }
-
-    //----------------------------------------------------------------------------------
-
-    // Final method to sort restaurants and update UI
-    private void sortRestaurantsAndUpdateUI(ArrayList<RestaurantDataToSort> placesToSort,
-                                            List<Place> listSorted, int itemId) {
-        // Assign a sorting method based on the user's choice
-        if (!placesToSort.isEmpty()) {
-            Log.i(TAG, "placesToSort size = " + placesToSort.size());
-            switch (itemId) {
-                case R.id.sub_item_proximity:
-                    convertData.sortByProximity(placesToSort);
-                    break;
-                case R.id.sub_item_rating:
-                    convertData.sortByRating(placesToSort);
-                    break;
-                case R.id.sub_item_number_workmates:
-                    convertData.sortByNumberWorkmates(placesToSort);
-                    break;
-            }
-            // Update UI with the list to sort
-            for (RestaurantDataToSort restaurantData : placesToSort) {
-                listSorted.add(restaurantData.getPlace());
-            }
-            updateUI(listSorted);
-            // Clear the placesToSort in case of reuse it
-            placesToSort.clear();
         }
     }
 

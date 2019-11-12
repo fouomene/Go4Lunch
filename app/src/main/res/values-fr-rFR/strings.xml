@@ -31,7 +31,7 @@
     <string name="ok">OK</string>
     <string name="open_until_hour">Ouvert jusqu\'à %1$dpm</string>
     <string name="open_until_hour_minute">Ouvert jusqu\'à %1$d.%2$dpm</string>
-    <string name="rationale_permission_location_access">Cette application doit accéder à votre site et inernet pour fonctionner.</string>
+    <string name="rationale_permission_location_access">Cette application doit accéder à votre site et internet pour fonctionner.</string>
     <string name="remove_like">Like retiré !</string>
     <string name="settings">PARAMETRES</string>
     <string name="sign_in_cancelled">Connexion en cours annulée</string>

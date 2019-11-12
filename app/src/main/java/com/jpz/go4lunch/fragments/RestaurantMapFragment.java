@@ -9,8 +9,8 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -425,7 +425,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int backgroundResId, int vectorResId) {
         // Create background
-        Drawable background = ContextCompat.getDrawable(context, backgroundResId);
+        Drawable background = VectorDrawableCompat.create(getResources(), backgroundResId, null);
         if (background == null) {
             Log.e(TAG, "Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();
@@ -433,7 +433,7 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         background.setBounds(0, 0,
                 background.getIntrinsicWidth(), background.getIntrinsicHeight());
         // Create vector
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        Drawable vectorDrawable = VectorDrawableCompat.create(getResources(), vectorResId, null);
         if (vectorDrawable == null) {
             Log.e(TAG, "Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();
