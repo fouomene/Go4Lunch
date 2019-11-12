@@ -5,7 +5,9 @@ import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.google.android.libraries.places.api.model.Period;
+import com.google.android.libraries.places.api.model.Place;
 import com.jpz.go4lunch.fragments.RestaurantListFragment;
+import com.jpz.go4lunch.models.RestaurantDataToSort;
 import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.MySharedPreferences;
 
@@ -16,6 +18,7 @@ import org.robolectric.RuntimeEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
@@ -30,6 +33,22 @@ public class UtilsTest {
     private Double lng2;
     private boolean isChecked;
 
+    private Place place;
+    int proximity;
+    private double rating;
+    private int numberWorkmates;
+
+    private RestaurantDataToSort restaurantDataToSort;
+
+
+    private Place place2;
+    int proximity2;
+    private double rating2;
+    private int numberWorkmates2;
+    private RestaurantDataToSort restaurantDataToSort2;
+
+    private List<RestaurantDataToSort> restaurantDataList = new ArrayList<>();
+
     @Before
     public void setStringsForTests() {
         // GPS coordinates
@@ -42,6 +61,19 @@ public class UtilsTest {
 
         // Boolean for the value of the CheckBox in SettingsActivity
         isChecked = true;
+
+        proximity = 10;
+        rating = 3.5;
+        numberWorkmates = 2;
+        restaurantDataToSort = new RestaurantDataToSort(place, proximity, rating, numberWorkmates);
+
+        proximity2 = 5;
+        rating2 = 4.5;
+        numberWorkmates2 = 4;
+        restaurantDataToSort2 = new RestaurantDataToSort(place2, proximity2, rating2, numberWorkmates2);
+
+        restaurantDataList.add(restaurantDataToSort);
+        restaurantDataList.add(restaurantDataToSort2);
     }
 
     @Test
@@ -60,7 +92,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void displayOpeningHour() {
+    public void displayOpeningHourTest() {
         List<Period> periods = new ArrayList<>();
         Context context = RuntimeEnvironment.systemContext;
         //Context context = ApplicationProvider.getApplicationContext();
@@ -71,4 +103,11 @@ public class UtilsTest {
         when(convertData.getOpenCloseHours(periods, context)).thenReturn("Closed");
         assertEquals("Closed", convertData.getOpenCloseHours(periods, context));
     }
+
+    @Test
+    public void sortByProximityTest() {
+        convertData.sortByProximity(restaurantDataList);
+        assertThat(restaurantDataList, containsInAnyOrder(10));
+    }
+
 }
