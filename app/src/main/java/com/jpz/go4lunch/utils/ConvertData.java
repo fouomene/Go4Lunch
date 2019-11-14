@@ -26,8 +26,6 @@ import java.util.Objects;
 public class ConvertData {
     // Class to convert data from Places SDK or Firestore and use its for UI purpose
 
-    private static final String TAG = ConvertData.class.getSimpleName();
-
     // Format the address with the components
     public String getAddress(Place place) {
         String streetNumber = null;

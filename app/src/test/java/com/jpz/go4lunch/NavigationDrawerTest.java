@@ -3,10 +3,8 @@ package com.jpz.go4lunch;
 import android.content.Context;
 import android.content.Intent;
 
-
-import androidx.test.core.app.ApplicationProvider;
-
 import com.google.firebase.FirebaseApp;
+import com.jpz.go4lunch.activities.ConnectionActivity;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
 import com.jpz.go4lunch.activities.MainActivity;
 import com.jpz.go4lunch.activities.SettingsActivity;
@@ -14,6 +12,8 @@ import com.jpz.go4lunch.activities.SettingsActivity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
@@ -27,23 +27,36 @@ import static org.robolectric.Shadows.shadowOf;
 public class NavigationDrawerTest {
 
     private MainActivity mainActivity;
-    private Context context = ApplicationProvider.getApplicationContext();
-    //private Context context = RuntimeEnvironment.systemContext;
+    private ConnectionActivity connectionActivity;
+    //private Context context = ApplicationProvider.getApplicationContext();
+    private Context context = RuntimeEnvironment.systemContext;
+
+    private FirebaseApp firebaseApp;
 
     @Before
-    public void setUp()
-    {
-        FirebaseApp.initializeApp(context);
+    public void setUp() {
 
+        firebaseApp = Mockito.mock(FirebaseApp.class);
+
+        FirebaseApp.initializeApp(context);
+/*
+        connectionActivity = Robolectric.buildActivity(ConnectionActivity.class)
+                .create()
+                .start()
+                .resume()
+                .visible()
+                .get();
+*/
         mainActivity = Robolectric.buildActivity(MainActivity.class)
                 .create()
                 .start()
                 .resume()
+                //.visible()
                 .get();
     }
 
     @Test
-    public void checkMainActivityNotNull(){
+    public void checkMainActivityNotNull() {
         assertNotNull(mainActivity);
     }
 
