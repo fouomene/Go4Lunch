@@ -78,9 +78,9 @@
     <string name="info_no_username_found">No username found</string>
 
     <!-- Bottom Navigation View -->
-    <string name="map_view" translatable="false">Map View</string>
-    <string name="list_view" translatable="false">List View</string>
-    <string name="workmates" translatable="false">Workmates</string>
+    <string name="map_view">Map View</string>
+    <string name="list_view">List View</string>
+    <string name="workmates">Workmates</string>
 
     <!-- ImageViews (contentDescription) -->
     <string name="business_lunch" translatable="false">Business lunch</string>

@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Add the AutocompleteListener...
-        CurrentPlace.getInstance(MainActivity.this).addAutocompleteListener(MainActivity.this);
+        CurrentPlace.getInstance(this).addAutocompleteListener(this);
     }
 
 //----------------------------------------------------------------------------------

@@ -417,13 +417,13 @@ public class RestaurantMapFragment extends Fragment implements OnMapReadyCallbac
         Marker marker;
         if (getActivity() != null) {
             marker = googleMap.addMarker(new MarkerOptions()
-                    .icon(bitmapDescriptorFromVector(getActivity().getApplicationContext(), icMap, icRestaurant))
+                    .icon(bitmapDescriptorFromVector(icMap, icRestaurant))
                     .position(latLng));
             marker.setTag(restaurantId);
         }
     }
 
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int backgroundResId, int vectorResId) {
+    private BitmapDescriptor bitmapDescriptorFromVector(int backgroundResId, int vectorResId) {
         // Create background
         Drawable background = VectorDrawableCompat.create(getResources(), backgroundResId, null);
         if (background == null) {

@@ -20,7 +20,7 @@
     <string name="log_out">SE DECONNECTER</string>
     <string name="no_result">Il n\'y a pas de résultat pour votre requête.</string>
     <string name="no_website">Il n\'y a pas de website pour ce restaurant.</string>
-    <string name="not_disclosed">Non comuniqué</string>
+    <string name="not_disclosed">Non communiqué</string>
     <string name="notification">Vous avez choisi de manger à %1$s au %2$s avec %3$s.</string>
     <string name="notification_alone">Vous avez choisi de manger à %1$s au %2$s, désolé tu es seul&#8230;</string>
     <string name="notification_subscribe_failed">Souscription à la notification échouée</string>
@@ -48,4 +48,7 @@
     <string name="sort_by_proximity">Trier par proximité</string>
     <string name="sort_by_rating">Trier par étoiles</string>
     <string name="you_did_not_choose">Vous n\'avez pas choisi de restaurant.</string>
+    <string name="list_view">Vue de la liste</string>
+    <string name="map_view">Vue de la carte</string>
+    <string name="workmates">Collègues</string>
 </resources>

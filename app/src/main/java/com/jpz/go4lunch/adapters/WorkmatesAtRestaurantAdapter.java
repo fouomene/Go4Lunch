@@ -12,7 +12,8 @@ import com.jpz.go4lunch.R;
 import com.jpz.go4lunch.models.Workmate;
 import com.jpz.go4lunch.views.WorkmatesAtRestaurantViewHolder;
 
-public class WorkmatesAtRestaurantAdapter extends FirestoreRecyclerAdapter<Workmate, WorkmatesAtRestaurantViewHolder> {
+public class WorkmatesAtRestaurantAdapter extends FirestoreRecyclerAdapter<Workmate,
+        WorkmatesAtRestaurantViewHolder> {
 
     // For data
     private final RequestManager glide;
@@ -32,7 +33,8 @@ public class WorkmatesAtRestaurantAdapter extends FirestoreRecyclerAdapter<Workm
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull WorkmatesAtRestaurantViewHolder holder, int position, @NonNull Workmate model) {
+    protected void onBindViewHolder(@NonNull WorkmatesAtRestaurantViewHolder holder, int position,
+                                    @NonNull Workmate model) {
         holder.updateViewHolder(model, this.glide);
     }
 

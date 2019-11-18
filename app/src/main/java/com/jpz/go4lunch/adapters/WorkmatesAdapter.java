@@ -41,7 +41,8 @@ public class WorkmatesAdapter extends FirestoreRecyclerAdapter<Workmate, Workmat
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull WorkmateViewHolder holder, int position, @NonNull Workmate model) {
+    protected void onBindViewHolder(@NonNull WorkmateViewHolder holder, int position,
+                                    @NonNull Workmate model) {
         holder.updateViewHolder(model, this.glide, this.callback);
     }
 
