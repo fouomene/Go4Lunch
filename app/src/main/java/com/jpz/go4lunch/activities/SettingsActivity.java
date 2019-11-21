@@ -110,7 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
             } else {
                 // Save the state of the checkbox and reuse it when SettingsActivity is open
                 prefs.saveNotificationState(false);
-                // If is unchecked, subscribe to notification
+                // If is unchecked, unsubscribe to notification
                 FirebaseMessaging.getInstance().unsubscribeFromTopic("notification")
                         .addOnCompleteListener(task -> {
                             String msg = getString(R.string.notification_unsubscribed);
@@ -144,6 +144,18 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // Delete account on Firestore
                 deleteWorkmate(currentUser.getUid());
+
+                // Unsubscribe to notification and save the state of the checkbox at false
+                prefs.saveNotificationState(false);
+                // Unsubscribe to notification
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("notification")
+                        .addOnCompleteListener(task -> {
+                            String msg = getString(R.string.notification_unsubscribed);
+                            if (!task.isSuccessful()) {
+                                msg = getString(R.string.notification_unsubscribe_failed);
+                            }
+                            Log.d(TAG, msg);
+                        });
 
                 // Delete Authentication
                 // Some security-sensitive actions require that the user has recently signed in.

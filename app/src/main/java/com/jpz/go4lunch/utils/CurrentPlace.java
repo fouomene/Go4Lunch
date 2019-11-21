@@ -101,6 +101,7 @@ public class CurrentPlace {
      * - to find the places near the user location,
      * - to get the details of a place,
      * - to fetch a photo of a place.
+     * - to return place predictions in response to user search queries.
      */
 
     private static final String TAG = CurrentPlace.class.getSimpleName();

@@ -65,35 +65,39 @@ public class NotificationsService extends FirebaseMessagingService {
             getCurrentWorkmate(currentUser.getUid())
                     .addOnSuccessListener(documentSnapshot -> {
                         currentWorkmate = documentSnapshot.toObject(Workmate.class);
-                        // Get the name of the restaurant chosen from rhe current user
                         if (currentWorkmate != null) {
-                            String myLunchRestaurant = currentWorkmate.getRestaurantName();
-                            String myRestaurantAddress = currentWorkmate.getRestaurantAddress();
+                            // If the user has chosen a restaurant this day, get data to notify
+                            if (convertData.getTodayDate().equals(currentWorkmate.getRestaurantDate())) {
 
-                            // Get the names of the workmates who chose this restaurant
-                            getWorkmatesCollection()
-                                    .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
-                                    .whereEqualTo(FIELD_RESTAURANT_ID, currentWorkmate.getRestaurantId())
-                                    .get()
-                                    .addOnCompleteListener(task -> {
-                                        if (task.isSuccessful() && task.getResult() != null) {
-                                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                                // Remove the current user
-                                                if (currentUser.getDisplayName() != null &&
-                                                        !currentUser.getDisplayName()
-                                                                .equals(document.getString(FIELD_USERNAME))) {
-                                                    // Add them in a list
-                                                    myLunchWorkmates.add(document.getString(FIELD_USERNAME));
-                                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                // Get the name of the restaurant chosen from rhe current user
+                                String myLunchRestaurant = currentWorkmate.getRestaurantName();
+                                String myRestaurantAddress = currentWorkmate.getRestaurantAddress();
+
+                                // Get the names of the workmates who chose this restaurant
+                                getWorkmatesCollection()
+                                        .whereEqualTo(FIELD_RESTAURANT_DATE, convertData.getTodayDate())
+                                        .whereEqualTo(FIELD_RESTAURANT_ID, currentWorkmate.getRestaurantId())
+                                        .get()
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful() && task.getResult() != null) {
+                                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                                    // Remove the current user
+                                                    if (currentUser.getDisplayName() != null &&
+                                                            !currentUser.getDisplayName()
+                                                                    .equals(document.getString(FIELD_USERNAME))) {
+                                                        // Add them in a list
+                                                        myLunchWorkmates.add(document.getString(FIELD_USERNAME));
+                                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                                    }
                                                 }
+                                            } else {
+                                                Log.d(TAG, "Error getting documents: ", task.getException());
                                             }
-                                        } else {
-                                            Log.d(TAG, "Error getting documents: ", task.getException());
-                                        }
-                                        // Show the notification
-                                        sendVisualNotification(messageBody, myLunchRestaurant,
-                                                myRestaurantAddress, myLunchWorkmates);
-                                    });
+                                            // Show the notification
+                                            sendVisualNotification(messageBody, myLunchRestaurant,
+                                                    myRestaurantAddress, myLunchWorkmates);
+                                        });
+                            }
                         }
                     });
         }
