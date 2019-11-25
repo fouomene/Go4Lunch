@@ -8,7 +8,7 @@
     <!--Connexion Activity -->
     <string name="authentication_succeed">Successful authentication</string>
     <string name="authentication_failed">Authentication failed</string>
-    <string name="connexion_failure">Connexion failure</string>
+    <string name="connection_failure">Connection failure</string>
     <string name="account_exists">Account already exists with different credential</string>
     <string name="sign_in_cancelled">Sign in cancelled</string>
 

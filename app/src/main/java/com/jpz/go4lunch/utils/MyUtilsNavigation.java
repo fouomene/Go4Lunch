@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.jpz.go4lunch.activities.ConnectionActivity;
 import com.jpz.go4lunch.activities.DetailsRestaurantActivity;
+import com.jpz.go4lunch.activities.MainActivity;
 import com.jpz.go4lunch.activities.SettingsActivity;
 
 public class MyUtilsNavigation {
@@ -28,6 +29,11 @@ public class MyUtilsNavigation {
 
     public void startSettingsActivity(Context context) {
         Intent intent = new Intent(context, SettingsActivity.class);
+        context.startActivity(intent);
+    }
+
+    public void startMainActivity(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
 }

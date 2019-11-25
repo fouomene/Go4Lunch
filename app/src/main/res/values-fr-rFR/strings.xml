@@ -11,7 +11,6 @@
     <string name="cancel">ANNULER</string>
     <string name="closed">Fermé</string>
     <string name="closing_soon">Ferme bientôt</string>
-    <string name="connexion_failure">Echec de la connection</string>
     <string name="delete_account">Supprimer mon compte !</string>
     <string name="home_text">Trouve un bon restaurant et invite des collègues à déjeuner !</string>
     <string name="hungry">Je suis affamé !</string>
@@ -51,4 +50,5 @@
     <string name="list_view">Vue de la liste</string>
     <string name="map_view">Vue de la carte</string>
     <string name="workmates">Collègues</string>
+    <string name="connection_failure">Echec de la connexion</string>
 </resources>

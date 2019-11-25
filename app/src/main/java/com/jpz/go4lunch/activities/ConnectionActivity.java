@@ -24,7 +24,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
@@ -32,12 +31,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.jpz.go4lunch.R;
+import com.jpz.go4lunch.utils.ConvertData;
 import com.jpz.go4lunch.utils.FirebaseUtils;
+import com.jpz.go4lunch.utils.MyUtilsNavigation;
 
 import static com.jpz.go4lunch.api.WorkmateHelper.createWorkmate;
 
 public class ConnectionActivity extends AppCompatActivity {
 
+    private View contentView;
     private ProgressBar progressBar;
 
     // Identifier for Google and Facebook Sign-In
@@ -47,8 +49,10 @@ public class ConnectionActivity extends AppCompatActivity {
     private static final String FACEBOOK_TAG = "FacebookLogin";
     private static final String GOOGLE_TAG = "GoogleActivity";
 
-    // FirebaseUtils class
+    // Utils
     private FirebaseUtils firebaseUtils = new FirebaseUtils();
+    private ConvertData convertData = new ConvertData();
+    private MyUtilsNavigation myUtilsNavigation = new MyUtilsNavigation();
 
     // Declare Firebase authentication
     private FirebaseAuth auth;
@@ -65,6 +69,7 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
 
+        contentView = findViewById(android.R.id.content);
         progressBar = findViewById(R.id.progress_bar);
 
         LoginButton facebookLogin = findViewById(R.id.connection_activity_facebook_login);
@@ -89,16 +94,17 @@ public class ConnectionActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
                 Log.i(FACEBOOK_TAG, "facebook:onCancel");
-                showSnackBar(getString(R.string.sign_in_cancelled));
+                convertData.showSnackbar(contentView, getString(R.string.sign_in_cancelled));
             }
 
             @Override
             public void onError(FacebookException error) {
                 Log.w(FACEBOOK_TAG, "facebook:onError", error);
-                if (error.toString().equals("CONNECTION_FAILURE: CONNECTION_FAILURE"))
-                    showSnackBar(getString(R.string.connexion_failure));
-                else
-                    showSnackBar(getString(R.string.authentication_failed));
+                if (error.toString().equals("CONNECTION_FAILURE: CONNECTION_FAILURE")) {
+                    convertData.showSnackbar(contentView, getString(R.string.connection_failure));
+                } else {
+                    convertData.showSnackbar(contentView, getString(R.string.authentication_failed));
+                }
             }
         });
 
@@ -133,7 +139,7 @@ public class ConnectionActivity extends AppCompatActivity {
         // Check if user is signed in (non-null), then if that is the case start MainActivity
         Log.i(TAG, "user logged = " + firebaseUtils.isCurrentUserLogged());
         if (firebaseUtils.isCurrentUserLogged()) {
-            startMainActivity();
+            myUtilsNavigation.startMainActivity(this);
             finish();
         }
     }
@@ -154,12 +160,13 @@ public class ConnectionActivity extends AppCompatActivity {
                 // Google Sign In failed, update UI appropriately
                 Log.w(GOOGLE_TAG, "Google sign in failed", e);
                 Log.i(GOOGLE_TAG, "signInResult:failed code=" + e.getStatusCode());
-                if (e.getStatusCode() == 12501)
-                    showSnackBar(getString(R.string.sign_in_cancelled));
-                else if (e.getStatusCode() == 7)
-                    showSnackBar(getString(R.string.connexion_failure));
-                else
-                    showSnackBar(getString(R.string.authentication_failed));
+                if (e.getStatusCode() == 12501) {
+                    convertData.showSnackbar(contentView, getString(R.string.sign_in_cancelled));
+                } else if (e.getStatusCode() == 7) {
+                    convertData.showSnackbar(contentView, getString(R.string.connection_failure));
+                } else {
+                    convertData.showSnackbar(contentView, getString(R.string.authentication_failed));
+                }
             }
         } else if (requestCode == RC_FACEBOOK_SIGN_IN) {
             // Pass the activity result back to the Facebook SDK
@@ -187,7 +194,7 @@ public class ConnectionActivity extends AppCompatActivity {
                         createWorkmateInFirestore();
                         // Sign in success, update UI with the signed-in user's information
                         Log.i(FACEBOOK_TAG, "signInWithCredential:success");
-                        startMainActivity();
+                        myUtilsNavigation.startMainActivity(this);
                         finish();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -197,13 +204,13 @@ public class ConnectionActivity extends AppCompatActivity {
                                 throw task.getException();
                         } catch (FirebaseAuthUserCollisionException e) {
                             // If account already exists, logout from Facebook provider
-                            showSnackBar(getString(R.string.account_exists));
+                            convertData.showSnackbar(contentView, getString(R.string.account_exists));
                             LoginManager.getInstance().logOut();
                         } catch (FirebaseNetworkException e) {
-                            showSnackBar(getString(R.string.connexion_failure));
+                            convertData.showSnackbar(contentView, getString(R.string.connection_failure));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            showSnackBar(getString(R.string.authentication_failed));
+                            convertData.showSnackbar(contentView, getString(R.string.authentication_failed));
                         }
                     }
                     progressBar.setVisibility(View.INVISIBLE);
@@ -235,7 +242,7 @@ public class ConnectionActivity extends AppCompatActivity {
                         createWorkmateInFirestore();
                         // Sign in success, update UI with the signed-in user's information
                         Log.i(GOOGLE_TAG, "signInWithCredential:success");
-                        startMainActivity();
+                        myUtilsNavigation.startMainActivity(this);
                         finish();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -244,29 +251,16 @@ public class ConnectionActivity extends AppCompatActivity {
                             if (task.getException() != null)
                                 throw task.getException();
                         } catch (FirebaseAuthUserCollisionException e) {
-                            showSnackBar(getString(R.string.account_exists));
+                            convertData.showSnackbar(contentView, getString(R.string.account_exists));
                         } catch (FirebaseNetworkException e) {
-                            showSnackBar(getString(R.string.connexion_failure));
+                            convertData.showSnackbar(contentView, getString(R.string.connection_failure));
                         } catch (Exception e) {
                             e.printStackTrace();
-                            showSnackBar(getString(R.string.authentication_failed));
+                            convertData.showSnackbar(contentView, getString(R.string.authentication_failed));
                         }
                     }
                     progressBar.setVisibility(View.INVISIBLE);
                 });
-    }
-
-    //--------------------------------------------------------------------------------------
-    // Privates methods for UI and Utils
-
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    // Show Snack Bar with a message
-    private void showSnackBar(String message) {
-        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
 
     //--------------------------------------------------------------------------------------
